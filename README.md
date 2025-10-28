@@ -190,4 +190,4 @@ To begin implementation, open `.kiro/specs/integrated-credit-system/tasks.md` an
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is proprietary and confidential. All rights reserved. Unauthorized copying, distribution, or use of this software is strictly prohibited.

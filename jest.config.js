@@ -1,7 +1,7 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  roots: ['<rootDir>/src'],
+  roots: ['<rootDir>/src', '<rootDir>/test'],
   testMatch: ['**/__tests__/**/*.test.ts', '**/?(*.)+(spec|test).ts'],
   transform: {
     '^.+\\.ts$': ['ts-jest', {
@@ -19,6 +19,5 @@ module.exports = {
     '^@features/(.*)$': '<rootDir>/src/features/$1',
     '^@shared/(.*)$': '<rootDir>/src/shared/$1',
     '^@api/(.*)$': '<rootDir>/src/api/$1'
-  },
-  setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts']
+  }
 };

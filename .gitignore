@@ -1,0 +1,95 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+lib/
+dist/
+build/
+*.tsbuildinfo
+
+# Environment variables and secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.local
+
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+database-debug.log
+pubsub-debug.log
+ui-debug.log
+
+# Firebase Functions
+functions/lib/
+functions/node_modules/
+
+# Testing
+coverage/
+.nyc_output/
+test-results/
+junit.xml
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+
+# AI Assistant specific
+# Model cache files
+models/cache/
+*.model
+*.weights
+
+# LangChain cache
+.langchain/
+langchain_cache/
+
+# Image generation cache
+images/cache/
+generated_images/temp/
+
+# Credit system sensitive data
+credit_keys/
+payment_keys/
+blockchain_keys/
+
+# Backup files
+*.backup
+*.bak
+
+# Development tools
+.eslintcache
+.stylelintcache

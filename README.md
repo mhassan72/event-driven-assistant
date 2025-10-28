@@ -32,12 +32,12 @@ A production-ready, event-driven AI assistant application built on Firebase Func
 ### System Components
 ```
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   Client Apps   │    │  Firebase Auth   │    │  Express API    │
-│  (Web/Mobile)   │───▶│  Authentication  │───▶│   Gateway       │
+│   Client Apps   │    │  Authentication  │    │   REST API      │
+│  (Web/Mobile)   │───▶│     Service      │───▶│   Gateway       │
 └─────────────────┘    └──────────────────┘    └─────────────────┘
                                                          │
 ┌─────────────────────────────────────────────────────────────────┐
-│                Firebase Realtime Database                       │
+│                   Real-time Database                            │
 │                 (Central Orchestrator)                          │
 │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐│
 │  │ Conversation│ │   Credit    │ │  Payment    │ │   User      ││
@@ -50,31 +50,31 @@ A production-ready, event-driven AI assistant application built on Firebase Func
 ┌─────────────┐        ┌─────────────┐        ┌─────────────┐
 │   AI Agent  │        │   Credit    │        │  Payment    │
 │  Functions  │        │ Management  │        │ Processing  │
-│ (LangChain) │        │   Service   │        │   Service   │
+│ (Workflows) │        │   Service   │        │   Service   │
 └─────────────┘        └─────────────┘        └─────────────┘
         │                       │                       │
 ┌─────────────┐        ┌─────────────┐        ┌─────────────┐
-│ AI Models   │        │  Firestore  │        │  External   │
-│ (OpenAI     │        │ (Blockchain │        │  Payment    │
-│ Compatible) │        │   Ledger)   │        │  Providers  │
+│ AI Models   │        │  Document   │        │  External   │
+│ (Multi-     │        │  Database   │        │  Payment    │
+│ Provider)   │        │ (Ledger)    │        │  Providers  │
 └─────────────┘        └─────────────┘        └─────────────┘
 ```
 
-### Supported AI Models (via Nebius AI Platform)
-- **Text Generation**: `openai/gpt-oss-120b`, `meta-llama/Meta-Llama-3.1-8B-Instruct`, `google/gemma-2-2b-it`
-- **Vision Models**: `google/gemma-3-27b-it`, `Qwen/Qwen2.5-VL-72B-Instruct`, `nvidia/Nemotron-Nano-V2-12b`
-- **Image Generation**: `black-forest-labs/flux-schnell`, `black-forest-labs/flux-dev`
-- **Embeddings**: `BAAI/bge-en-icl`
+### Supported AI Models
+- **Text Generation**: GPT-compatible models, Meta Llama, Google Gemma
+- **Vision Models**: Multi-modal vision-language models for image understanding
+- **Image Generation**: FLUX models (schnell and dev variants)
+- **Embeddings**: High-performance embedding models for semantic search
 
 ## 🛠️ Technology Stack
 
-- **Backend**: Firebase Functions Gen 2, Express.js, TypeScript
-- **Authentication**: Firebase Auth
-- **Database**: Firebase Realtime Database (orchestration), Firestore (persistence)
-- **AI Framework**: LangChain, LangGraph
-- **Payments**: Stripe, PayPal, Web3 wallets
-- **Security**: Blockchain-style cryptographic ledger
-- **Testing**: Jest, Firebase Emulator Suite
+- **Backend**: Serverless functions, REST API, TypeScript
+- **Authentication**: Multi-provider authentication system
+- **Database**: Real-time database (orchestration), Document database (persistence)
+- **AI Framework**: Advanced AI orchestration and workflow management
+- **Payments**: Traditional payment processors and Web3 wallets
+- **Security**: Cryptographic ledger with immutable transaction records
+- **Testing**: Comprehensive test suite with emulation support
 
 ## 📁 Project Structure
 
@@ -108,24 +108,23 @@ functions/
 │   │   ├── container/                # Dependency injection
 │   │   └── utils/                    # Utilities
 │   └── functions.ts                  # Firebase Functions definitions
-├── test/                             # Tests mirroring src structure
-└── .kiro/specs/integrated-credit-system/  # Implementation spec
+└── test/                             # Tests mirroring src structure
 ```
 
 ## 🚦 Getting Started
 
 ### Prerequisites
 - Node.js 18+
-- Firebase CLI
-- Firebase project with Functions, Auth, Realtime Database, and Firestore enabled
+- Cloud platform CLI tools
+- Cloud project with serverless functions, authentication, and database services enabled
 
 ### Installation
 ```bash
 # Install dependencies
 npm install
 
-# Set up Firebase emulators
-firebase init emulators
+# Set up local development environment
+npm run setup
 
 # Configure environment variables
 cp .env.example .env
@@ -134,30 +133,30 @@ cp .env.example .env
 
 ### Development
 ```bash
-# Start Firebase emulators
-npm run emulators
+# Start local development environment
+npm run dev
 
 # Run tests
 npm test
 
-# Deploy to Firebase
+# Deploy to cloud
 npm run deploy
 ```
 
 ## 📋 Implementation Plan
 
-The system is built following a comprehensive spec located in `.kiro/specs/integrated-credit-system/`. The implementation is organized into 16 major phases:
+The system is built following a comprehensive implementation specification. The development is organized into 16 major phases:
 
-1. **Firebase Infrastructure Setup** - Core Firebase configuration
+1. **Cloud Infrastructure Setup** - Core cloud platform configuration
 2. **Data Models & Types** - TypeScript interfaces and models
 3. **✅ Realtime Database Orchestration** - Central coordination system *(COMPLETED)*
-4. **Firebase Auth Integration** - Authentication and authorization
+4. **Authentication Integration** - User authentication and authorization
 5. **Dynamic Model Management** - AI model configuration and selection
 6. **AI Assistant Core** - LangChain/LangGraph integration
 7. **Agentic Cloud Functions** - Long-running AI task execution
 8. **Credit Management** - Blockchain-secured credit system
 9. **Payment Processing** - Traditional and Web3 payments
-10. **Express.js API Layer** - RESTful API with versioning
+10. **REST API Layer** - RESTful API with versioning
 11. **Notifications & Alerts** - User and system notifications
 12. **Admin & Monitoring** - Administrative tools and analytics
 13. **User Interface** - Real-time UI components
@@ -168,14 +167,14 @@ The system is built following a comprehensive spec located in `.kiro/specs/integ
 ### Current Implementation Status
 
 **✅ Phase 3 - Realtime Database Orchestration System (COMPLETED)**
-- Firebase Realtime Database orchestrator service with workflow coordination
+- Real-time database orchestrator service with workflow coordination
 - Event bus with guaranteed delivery, retry mechanisms, and dead letter queues
 - Saga manager for distributed transactions with compensation patterns
 - Operation queue management with priority-based processing and failure recovery
 - Comprehensive unit tests covering all orchestration components
 
-### Starting Implementation
-To continue implementation, open `.kiro/specs/integrated-credit-system/tasks.md` and proceed with task 4. Each task includes:
+### Next Steps
+The implementation follows a structured development plan with each phase building upon the previous ones. Each task includes:
 - Clear implementation objectives
 - Specific requirement references
 - Detailed acceptance criteria
@@ -183,10 +182,10 @@ To continue implementation, open `.kiro/specs/integrated-credit-system/tasks.md`
 
 ## 🎯 Orchestration System
 
-The application features a sophisticated orchestration system built on Firebase Realtime Database that coordinates all workflows and operations:
+The application features a sophisticated orchestration system built on real-time database technology that coordinates all workflows and operations:
 
 ### Key Components
-- **RTDB Orchestrator**: Central coordination hub for AI tasks and credit operations
+- **Central Orchestrator**: Coordination hub for AI tasks and credit operations
 - **Event Bus**: Guaranteed message delivery with retry mechanisms and dead letter queues
 - **Saga Manager**: Distributed transaction management with automatic compensation
 - **Operation Queue**: Priority-based processing with exponential backoff retry
@@ -202,7 +201,7 @@ The application features a sophisticated orchestration system built on Firebase 
 
 ## 🔐 Security Features
 
-- **Firebase Auth Integration**: Secure user authentication with multiple providers
+- **Multi-Provider Authentication**: Secure user authentication with multiple identity providers
 - **Blockchain-style Ledger**: Immutable transaction records with cryptographic verification
 - **API Security**: Rate limiting, request validation, and comprehensive middleware
 - **Payment Security**: PCI-compliant payment processing with fraud detection
@@ -219,7 +218,7 @@ The application features a sophisticated orchestration system built on Firebase 
 
 ## 🤝 Contributing
 
-1. Follow the implementation spec in `.kiro/specs/integrated-credit-system/`
+1. Follow the structured implementation specification
 2. Maintain the feature-based architecture
 3. Write comprehensive tests for all functionality
 4. Follow clean code principles (OOP, DRY, dynamic configuration)

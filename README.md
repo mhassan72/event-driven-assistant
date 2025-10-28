@@ -25,6 +25,7 @@ A production-ready, event-driven AI assistant application built on Firebase Func
 - **Realtime Database**: Central orchestration hub for workflows and real-time sync
 - **Firestore**: Long-term data storage for users, models, and transactions
 - **Event-Driven Design**: Saga patterns with comprehensive error handling
+- **Orchestration System**: Advanced workflow coordination with retry mechanisms and failure recovery
 
 ## 🏗️ Architecture
 
@@ -59,8 +60,8 @@ A production-ready, event-driven AI assistant application built on Firebase Func
 └─────────────┘        └─────────────┘        └─────────────┘
 ```
 
-### Supported AI Models
-- **Text Generation**: `meta-llama/Meta-Llama-3.1-8B-Instruct`, `google/gemma-2-2b-it`
+### Supported AI Models (via Nebius AI Platform)
+- **Text Generation**: `openai/gpt-oss-120b`, `meta-llama/Meta-Llama-3.1-8B-Instruct`, `google/gemma-2-2b-it`
 - **Vision Models**: `google/gemma-3-27b-it`, `Qwen/Qwen2.5-VL-72B-Instruct`, `nvidia/Nemotron-Nano-V2-12b`
 - **Image Generation**: `black-forest-labs/flux-schnell`, `black-forest-labs/flux-dev`
 - **Embeddings**: `BAAI/bge-en-icl`
@@ -95,7 +96,14 @@ functions/
 │   │   ├── user-management/          # User operations
 │   │   └── authentication/           # Auth services
 │   ├── shared/                       # Shared infrastructure
-│   │   ├── orchestration/            # Event orchestration
+│   │   ├── orchestration/            # Event orchestration system
+│   │   │   ├── base-orchestrator.ts  # Abstract orchestrator foundation
+│   │   │   ├── rtdb-orchestrator.ts  # Firebase RTDB orchestrator
+│   │   │   ├── event-bus.ts          # Event bus with guaranteed delivery
+│   │   │   ├── saga-manager.ts       # Distributed transaction management
+│   │   │   └── operation-queue.ts    # Priority-based operation queue
+│   │   ├── types/                    # TypeScript type definitions
+│   │   │   └── orchestration.ts      # Orchestration system types
 │   │   ├── config/                   # Configuration
 │   │   ├── container/                # Dependency injection
 │   │   └── utils/                    # Utilities
@@ -142,7 +150,7 @@ The system is built following a comprehensive spec located in `.kiro/specs/integ
 
 1. **Firebase Infrastructure Setup** - Core Firebase configuration
 2. **Data Models & Types** - TypeScript interfaces and models
-3. **Realtime Database Orchestration** - Central coordination system
+3. **✅ Realtime Database Orchestration** - Central coordination system *(COMPLETED)*
 4. **Firebase Auth Integration** - Authentication and authorization
 5. **Dynamic Model Management** - AI model configuration and selection
 6. **AI Assistant Core** - LangChain/LangGraph integration
@@ -157,12 +165,40 @@ The system is built following a comprehensive spec located in `.kiro/specs/integ
 15. **Integration Testing** - Comprehensive test suite
 16. **Production Deployment** - Production configuration and monitoring
 
+### Current Implementation Status
+
+**✅ Phase 3 - Realtime Database Orchestration System (COMPLETED)**
+- Firebase Realtime Database orchestrator service with workflow coordination
+- Event bus with guaranteed delivery, retry mechanisms, and dead letter queues
+- Saga manager for distributed transactions with compensation patterns
+- Operation queue management with priority-based processing and failure recovery
+- Comprehensive unit tests covering all orchestration components
+
 ### Starting Implementation
-To begin implementation, open `.kiro/specs/integrated-credit-system/tasks.md` and start with task 1. Each task includes:
+To continue implementation, open `.kiro/specs/integrated-credit-system/tasks.md` and proceed with task 4. Each task includes:
 - Clear implementation objectives
 - Specific requirement references
 - Detailed acceptance criteria
 - Testing requirements
+
+## 🎯 Orchestration System
+
+The application features a sophisticated orchestration system built on Firebase Realtime Database that coordinates all workflows and operations:
+
+### Key Components
+- **RTDB Orchestrator**: Central coordination hub for AI tasks and credit operations
+- **Event Bus**: Guaranteed message delivery with retry mechanisms and dead letter queues
+- **Saga Manager**: Distributed transaction management with automatic compensation
+- **Operation Queue**: Priority-based processing with exponential backoff retry
+- **Real-time Sync**: Instant state synchronization across all connected clients
+
+### Features
+- **Workflow Coordination**: Orchestrates complex AI assistant and credit workflows
+- **Security-based Routing**: Automatically routes operations to cloud functions or API endpoints
+- **Failure Recovery**: Comprehensive error handling with saga compensation patterns
+- **Event-Driven Architecture**: All components communicate through events with guaranteed delivery
+- **Priority Processing**: Operations processed by priority with intelligent queuing
+- **Monitoring & Metrics**: Extensive observability with health checks and performance tracking
 
 ## 🔐 Security Features
 
@@ -171,6 +207,7 @@ To begin implementation, open `.kiro/specs/integrated-credit-system/tasks.md` an
 - **API Security**: Rate limiting, request validation, and comprehensive middleware
 - **Payment Security**: PCI-compliant payment processing with fraud detection
 - **Data Protection**: Encrypted sensitive data with proper access controls
+- **Orchestration Security**: Security-level based routing with audit trails
 
 ## 📊 Monitoring & Analytics
 

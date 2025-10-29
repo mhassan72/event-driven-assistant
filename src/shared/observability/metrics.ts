@@ -3,7 +3,18 @@
  * Performance and usage metrics tracking
  */
 
-interface HttpRequestMetric {
+export interface IMetricsCollector {
+  increment(name: string, value?: number, labels?: Record<string, string>): void;
+  histogram(name: string, value: number, labels?: Record<string, string>): void;
+  gauge(name: string, value: number, labels?: Record<string, string>): void;
+  recordHttpRequest(metric: HttpRequestMetric): void;
+  recordCreditOperation(metric: CreditOperationMetric): void;
+  recordPayment(metric: PaymentMetric): void;
+  getMetrics(type?: string): any[];
+  clearMetrics(type?: string): void;
+}
+
+export interface HttpRequestMetric {
   method: string;
   route: string;
   statusCode: number;
@@ -11,7 +22,7 @@ interface HttpRequestMetric {
   userId?: string;
 }
 
-interface CreditOperationMetric {
+export interface CreditOperationMetric {
   operation: 'deduction' | 'addition' | 'balance_check';
   amount?: number;
   userId: string;
@@ -19,7 +30,7 @@ interface CreditOperationMetric {
   duration: number;
 }
 
-interface PaymentMetric {
+export interface PaymentMetric {
   method: 'stripe' | 'crypto' | 'paypal';
   amount: number;
   currency: string;
@@ -27,8 +38,41 @@ interface PaymentMetric {
   userId: string;
 }
 
-class MetricsCollector {
+class MetricsCollector implements IMetricsCollector {
   private metrics: Map<string, any[]> = new Map();
+
+  increment(name: string, value: number = 1, labels?: Record<string, string>): void {
+    console.log(JSON.stringify({
+      type: 'metric',
+      name: 'counter',
+      metric_name: name,
+      value,
+      labels: labels || {},
+      timestamp: new Date().toISOString()
+    }));
+  }
+
+  histogram(name: string, value: number, labels?: Record<string, string>): void {
+    console.log(JSON.stringify({
+      type: 'metric',
+      name: 'histogram',
+      metric_name: name,
+      value,
+      labels: labels || {},
+      timestamp: new Date().toISOString()
+    }));
+  }
+
+  gauge(name: string, value: number, labels?: Record<string, string>): void {
+    console.log(JSON.stringify({
+      type: 'metric',
+      name: 'gauge',
+      metric_name: name,
+      value,
+      labels: labels || {},
+      timestamp: new Date().toISOString()
+    }));
+  }
 
   recordHttpRequest(metric: HttpRequestMetric): void {
     const key = 'http_requests';

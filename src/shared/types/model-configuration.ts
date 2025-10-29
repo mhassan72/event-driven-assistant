@@ -3,6 +3,8 @@
  * Advanced interfaces for model management, analytics, and user feedback
  */
 
+import { TaskType, ModelSelectionCriteria } from './ai-assistant';
+
 // ============================================================================
 // Model Analytics and Performance Tracking
 // ============================================================================
@@ -392,7 +394,7 @@ export interface RecommendationCostBenefit {
   benefits: BenefitItem[];
   
   // Comparison
-  vsCurrentModel?: ComparisonMetrics;
+  vsCurrentModel?: ComparisonMetric;
   vsAlternatives?: AlternativeComparison[];
 }
 

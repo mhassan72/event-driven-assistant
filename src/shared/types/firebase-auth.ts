@@ -122,7 +122,7 @@ export interface UserMetadata {
 export interface IFirebaseAuthMiddleware {
   // Token validation
   validateIdToken(req: Request, res: Response, next: NextFunction): Promise<void>;
-  extractUserContext(idToken: string): Promise<UserContext>;
+  extractUserContext(idToken: string): Promise<TokenValidationResult>;
   
   // Optional authentication (for public endpoints)
   optionalAuth(req: Request, res: Response, next: NextFunction): Promise<void>;

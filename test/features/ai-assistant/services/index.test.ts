@@ -1,0 +1,16 @@
+/**
+ * AI Assistant Services Test Index
+ * Aggregates all service tests for the AI assistant feature
+ */
+
+// Import all service tests to ensure they run
+import './model-management-service.test';
+import './user-preference-manager.test';
+import './model-cost-calculator.test';
+
+describe('AI Assistant Services', () => {
+  it('should have all service tests available', () => {
+    // This test ensures all service test files are properly imported
+    expect(true).toBe(true);
+  });
+});

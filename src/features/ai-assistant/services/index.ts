@@ -12,6 +12,7 @@ export * from './conversation-manager';
 export * from './nebius-ai-service';
 export * from './langchain-manager';
 export * from './langgraph-workflow';
+export * from './agent-workflow-manager';
 
 // User Preference Manager - export with aliases to avoid conflicts
 export {

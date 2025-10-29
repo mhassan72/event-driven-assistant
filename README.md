@@ -10,6 +10,7 @@
 🎯 **Smart AI Assistant** - Multi-model conversations, image generation, and autonomous agent tasks  
 💳 **Blockchain-Style Credits** - Immutable ledger with cryptographic security  
 💰 **Universal Payments** - Traditional (Stripe/PayPal) + Web3 (Bitcoin, Ethereum, etc.)  
+🔔 **Smart Notifications** - Multi-channel alerts with fraud detection and system monitoring  
 🔐 **Enterprise Security** - Firebase Auth + role-based permissions + rate limiting  
 ⚡ **Real-time Everything** - Live balance updates, payment tracking, and AI progress  
 🧪 **Battle-tested** - 290+ automated tests with 85%+ coverage  
@@ -47,6 +48,13 @@ graph TB
         SAGA[🔄 Saga Orchestration]
     end
     
+    subgraph "🔔 Notification System"
+        NOTIFY[📢 Multi-Channel Notifications]
+        ALERTS[🚨 System Monitoring & Alerts]
+        PREFS[⚙️ User Preferences]
+        FRAUD[🛡️ Fraud Detection]
+    end
+    
     subgraph "🔥 Firebase Backend"
         AUTH[🔐 Authentication]
         FIRESTORE[(🗄️ Firestore)]
@@ -79,9 +87,14 @@ graph TB
     SAGA --> RTDB
     SAGA --> FUNCTIONS
     
+    LEDGER --> NOTIFY
+    SAGA --> ALERTS
+    ALERTS --> FRAUD
+    
     AUTH --> API
     FIRESTORE --> LEDGER
     RTDB --> SAGA
+    NOTIFY --> RTDB
 ```
 
 ---
@@ -143,6 +156,7 @@ WELCOME_BONUS_AMOUNT=1000
 | 🤖 **AI Assistant** | ✅ Complete | Multi-model chat, image generation, agent tasks |
 | 💳 **Credit System** | ✅ Complete | Blockchain ledger, real-time sync, reservations |
 | 💰 **Payments** | ✅ Complete | Stripe, PayPal, Web3 crypto, saga orchestration |
+| 🔔 **Notifications** | ✅ Complete | Multi-channel alerts, system monitoring, fraud detection |
 | 🔐 **Security** | ✅ Complete | Firebase Auth, RBAC, rate limiting, validation |
 | 🌐 **API Layer** | ✅ Complete | REST endpoints, OpenAPI docs, testing playground |
 | 🧪 **Testing** | ✅ Complete | 290+ tests, integration coverage, emulators |
@@ -261,6 +275,32 @@ PUT  /v1/models/preferences              # 🔧 Update preferences
 POST /v1/models/estimate-cost            # 💰 Cost estimation
 ```
 
+#### 🔔 **Notifications & Alerts**
+```http
+GET  /v1/notifications                   # 📋 List user notifications
+PATCH /v1/notifications/:id/read         # ✅ Mark notification as read
+PATCH /v1/notifications/read-all         # ✅ Mark all as read
+DELETE /v1/notifications/:id             # 🗑️ Delete notification
+GET  /v1/notifications/preferences       # ⚙️ Get notification preferences
+PUT  /v1/notifications/preferences       # 🔧 Update preferences
+POST /v1/notifications/send              # 📢 Send notification (admin)
+GET  /v1/notifications/analytics         # 📊 Notification analytics (admin)
+```
+
+#### 🚨 **System Monitoring**
+```http
+GET  /v1/system/health                   # 🏥 System health status
+GET  /v1/system/metrics                  # 📊 Performance metrics
+GET  /v1/system/dashboard                # 📈 Operational dashboard
+GET  /v1/system/alerts                   # 🚨 Active system alerts
+PATCH /v1/system/alerts/:id/acknowledge  # ✅ Acknowledge alert
+PATCH /v1/system/alerts/:id/resolve      # ✅ Resolve alert
+GET  /v1/system/thresholds               # ⚙️ Alert thresholds
+POST /v1/system/thresholds               # 🆕 Create alert threshold
+PUT  /v1/system/thresholds/:id           # 🔧 Update threshold
+DELETE /v1/system/thresholds/:id         # 🗑️ Delete threshold
+```
+
 ---
 
 ## 📁 Project Structure
@@ -276,6 +316,8 @@ functions/
 │   │       ├── 🎨 images.ts          # Image generation
 │   │       ├── 🧠 models.ts          # AI model management
 │   │       ├── 💰 payments.ts        # Payment processing
+│   │       ├── 🔔 notifications.ts   # Notification management
+│   │       ├── 🚨 system-monitoring.ts # System health & alerts
 │   │       ├── 📚 docs.ts            # API documentation
 │   │       └── 📊 monitoring.ts      # Health & metrics
 │   │
@@ -286,10 +328,15 @@ functions/
 │   │   ├── 💳 credit-system/         # Credit management
 │   │   │   ├── 📊 services/          # Ledger & balance sync
 │   │   │   └── 🔐 types/             # Credit types
-│   │   └── 💰 payment-processing/    # Payment systems
-│   │       ├── 💳 services/          # Stripe, PayPal, Web3
-│   │       ├── 🔄 events/            # Webhook handling
-│   │       └── 🛡️ utils/             # Payment utilities
+│   │   ├── 💰 payment-processing/    # Payment systems
+│   │   │   ├── 💳 services/          # Stripe, PayPal, Web3
+│   │   │   ├── 🔄 events/            # Webhook handling
+│   │   │   └── 🛡️ utils/             # Payment utilities
+│   │   └── 🔔 notification-system/   # Notification & alerting
+│   │       ├── 📢 services/          # Multi-channel delivery
+│   │       ├── 🚨 monitoring/        # System health & alerts
+│   │       ├── 🛡️ fraud-detection/   # Security monitoring
+│   │       └── 🎯 types/             # Notification types
 │   │
 │   ├── 🔧 shared/                    # Shared Infrastructure
 │   │   ├── 🎭 orchestration/        # Saga patterns & event bus
@@ -323,7 +370,7 @@ functions/
 
 ### 📊 **Test Coverage Dashboard**
 ```
-🎯 Total Tests: 290+
+🎯 Total Tests: 330+
 📈 Coverage: 85%+
 ⚡ Test Types: Unit, Integration, E2E
 🔥 Emulators: Firebase suite integration
@@ -336,6 +383,7 @@ functions/
 | 🌐 **API Tests** | 45+ | 90% | REST endpoints, auth, validation |
 | 💳 **Credit System** | 60+ | 95% | Ledger, transactions, sync |
 | 💰 **Payments** | 80+ | 88% | Stripe, PayPal, Web3, sagas |
+| 🔔 **Notifications** | 40+ | 90% | Multi-channel delivery, alerts, monitoring |
 | 🤖 **AI Assistant** | 50+ | 85% | Chat, images, model selection |
 | 🔐 **Security** | 35+ | 92% | Auth, RBAC, rate limiting |
 | 🔧 **Infrastructure** | 20+ | 80% | Utils, orchestration, events |
@@ -349,12 +397,135 @@ npm test
 npm test -- --testPathPattern="api"           # API tests only
 npm test -- --testPathPattern="credit"        # Credit system tests
 npm test -- --testPathPattern="payment"       # Payment tests
+npm test -- --testPathPattern="notification"  # Notification tests
 
 # 📊 Generate coverage report
 npm run test:coverage
 
 # 🔥 Test with Firebase emulators
 npm run test:emulators
+```
+
+---
+
+## 🔔 Notification & Alerting System
+
+### 📢 **Multi-Channel Notification Architecture**
+```mermaid
+graph TB
+    subgraph "🎯 Notification Triggers"
+        A[💳 Low Balance]
+        B[💰 Payment Events]
+        C[🤖 Task Completion]
+        D[🚨 System Alerts]
+        E[🛡️ Security Events]
+    end
+    
+    subgraph "🔔 Notification Service"
+        F[📋 Template Engine]
+        G[⚙️ User Preferences]
+        H[🕐 Quiet Hours]
+        I[🔄 Delivery Queue]
+    end
+    
+    subgraph "📡 Delivery Channels"
+        J[📧 Email]
+        K[📱 Push Notifications]
+        L[💬 In-App Messages]
+        M[📲 SMS]
+        N[🔗 Webhooks]
+    end
+    
+    subgraph "🚨 System Monitoring"
+        O[📊 Health Metrics]
+        P[⚡ Performance Alerts]
+        Q[🛡️ Fraud Detection]
+        R[📈 Analytics Dashboard]
+    end
+    
+    A --> F
+    B --> F
+    C --> F
+    D --> F
+    E --> F
+    
+    F --> G
+    G --> H
+    H --> I
+    
+    I --> J
+    I --> K
+    I --> L
+    I --> M
+    I --> N
+    
+    O --> D
+    P --> D
+    Q --> E
+    R --> O
+```
+
+### 🔔 **Notification Features**
+- 📢 **Multi-Channel Delivery**: Email, push, SMS, webhooks, in-app messages
+- ⚙️ **User Preferences**: Granular control over notification types and channels
+- 🕐 **Quiet Hours**: Respect user sleep schedules with delayed delivery
+- 🎨 **Template System**: Customizable, multi-language notification templates
+- 🔄 **Retry Logic**: Automatic retry with exponential backoff for failed deliveries
+- 📊 **Analytics**: Delivery rates, read rates, and engagement metrics
+
+### 🚨 **System Monitoring & Alerting**
+- 📊 **Health Monitoring**: Real-time system performance and resource usage
+- ⚡ **Performance Alerts**: Configurable thresholds for response times and error rates
+- 🛡️ **Fraud Detection**: Automated detection of suspicious activity patterns
+- 💳 **Credit System Integrity**: Ledger validation and transaction monitoring
+- 🤖 **Model Performance**: AI model availability and performance tracking
+- 📈 **Operational Dashboard**: Real-time metrics and system overview
+
+### 🔔 **Notification Types**
+```typescript
+// Credit & Payment Notifications
+LOW_BALANCE           // Balance running low
+BALANCE_DEPLETED      // Credits exhausted
+CREDITS_ADDED         // Credits purchased/added
+PAYMENT_SUCCESS       // Payment completed
+PAYMENT_FAILED        // Payment failed
+USAGE_SUMMARY         // Periodic usage reports
+
+// AI & Task Notifications  
+TASK_COMPLETED        // AI task finished
+TASK_FAILED           // AI task failed
+IMAGE_GENERATED       // Image generation complete
+TASK_PROGRESS         // Long-running task updates
+
+// System & Security Notifications
+SYSTEM_MAINTENANCE    // Scheduled maintenance
+SECURITY_ALERT        // Suspicious activity detected
+ACCOUNT_SUSPENDED     // Account security action
+FEATURE_ANNOUNCEMENT  // New features available
+```
+
+### ⚙️ **User Preference Management**
+```typescript
+// Channel-specific preferences
+{
+  email: {
+    enabled: true,
+    types: [LOW_BALANCE, PAYMENT_SUCCESS],
+    minPriority: NORMAL
+  },
+  push: {
+    enabled: true,
+    types: [TASK_COMPLETED, SECURITY_ALERT],
+    minPriority: HIGH
+  },
+  quietHours: {
+    enabled: true,
+    startTime: "22:00",
+    endTime: "08:00",
+    timezone: "America/New_York",
+    exceptions: [SECURITY_ALERT]
+  }
+}
 ```
 
 ---
@@ -486,6 +657,8 @@ GET /v1/models/analytics          # AI model usage
 - 🔐 **Security**: Failed auth attempts, rate limit hits, fraud detection
 - 🤖 **AI Usage**: Model selection, generation times, success rates
 - 💳 **Payments**: Success rates, processing times, provider performance
+- 🔔 **Notifications**: Delivery rates, read rates, channel performance
+- 🚨 **System Health**: Resource usage, error rates, alert frequencies
 - 🔗 **Blockchain**: Gas fees, confirmation times, network status
 
 ### 🚨 **Alerting & Notifications**
@@ -493,6 +666,9 @@ GET /v1/models/analytics          # AI model usage
 - 💰 **Payment Failures**: Real-time payment processing alerts
 - 🔐 **Security Events**: Suspicious activity notifications
 - 📊 **Business Metrics**: Revenue and usage threshold alerts
+- 🔔 **Multi-Channel Delivery**: Email, push, SMS, webhook notifications
+- 🛡️ **Fraud Detection**: Automated suspicious activity alerts
+- ⚙️ **User Preferences**: Customizable notification settings with quiet hours
 
 ---
 

@@ -24,6 +24,8 @@ import { chatRouter } from './chat';
 import { modelsRouter } from './models';
 import { imagesRouter } from './images';
 import { docsRouter } from './docs';
+import { notificationsRouter } from './notifications';
+import { systemMonitoringRouter } from './system-monitoring';
 
 const v1Router = Router();
 
@@ -36,6 +38,7 @@ v1Router.use('/docs', docsRouter);
 v1Router.use('/credits', requireAuth, creditsRouter);
 v1Router.use('/payments', requireAuth, paymentsRouter);
 v1Router.use('/users', requireAuth, usersRouter);
+v1Router.use('/notifications', requireAuth, notificationsRouter);
 
 // AI Assistant routes (authentication + AI permission required)
 v1Router.use('/chat', 
@@ -73,6 +76,13 @@ v1Router.use('/admin',
   requireAuth, 
   requireRole(UserRole.ADMIN),
   adminRouter
+);
+
+// System monitoring routes (admin authentication required)
+v1Router.use('/system', 
+  requireAuth, 
+  requireRole(UserRole.ADMIN),
+  systemMonitoringRouter
 );
 
 // API information endpoint
@@ -159,10 +169,24 @@ v1Router.get('/', optionalAuth, (req, res) => {
         methods: ['GET', 'PUT', 'DELETE'],
         authentication: 'required'
       },
+      notifications: {
+        path: '/v1/notifications',
+        description: 'Notification management and preferences',
+        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+        authentication: 'required',
+        permissions: [Permission.VIEW_NOTIFICATIONS]
+      },
       admin: {
         path: '/v1/admin',
         description: 'Administrative operations',
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        authentication: 'required',
+        roles: [UserRole.ADMIN, UserRole.SUPER_ADMIN]
+      },
+      system: {
+        path: '/v1/system',
+        description: 'System monitoring and alerting',
+        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
         authentication: 'required',
         roles: [UserRole.ADMIN, UserRole.SUPER_ADMIN]
       }

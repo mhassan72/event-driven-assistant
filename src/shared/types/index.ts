@@ -154,6 +154,9 @@ export {
     AuditContext
 } from './firebase-auth';
 
+// Notification System Types
+export * from './notification-types';
+
 // Express Types
 export {
     AuthenticatedRequest,

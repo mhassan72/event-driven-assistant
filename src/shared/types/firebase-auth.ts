@@ -85,6 +85,11 @@ export enum Permission {
   MANAGE_MODELS = 'manage_models',
   SYSTEM_ADMIN = 'system_admin',
   
+  // Notification operations
+  VIEW_NOTIFICATIONS = 'view_notifications',
+  MANAGE_NOTIFICATIONS = 'manage_notifications',
+  SEND_NOTIFICATIONS = 'send_notifications',
+  
   // API access
   API_ACCESS = 'api_access',
   WEBHOOK_ACCESS = 'webhook_access',

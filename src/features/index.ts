@@ -6,3 +6,4 @@
 export * from './ai-assistant';
 export * from './credit-system';
 export * from './payment-processing';
+export * from './notification-system';

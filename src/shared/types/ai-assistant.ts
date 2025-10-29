@@ -519,3 +519,108 @@ export interface ModelRequirements {
   requiredFeatures?: string[];
   qualityThreshold?: number;
 }
+
+// ============================================================================
+// Nebius AI Integration Types
+// ============================================================================
+
+export interface NebiusChatRequest {
+  model: string;
+  messages: NebiusMessage[];
+  temperature?: number;
+  maxTokens?: number;
+  stream?: boolean;
+  userId?: string;
+  conversationId?: string;
+}
+
+export interface NebiusMessage {
+  role: 'system' | 'user' | 'assistant';
+  content: string | NebiusMessageContent[];
+}
+
+export interface NebiusMessageContent {
+  type: 'text' | 'image_url';
+  text?: string;
+  image_url?: {
+    url: string;
+    detail?: 'low' | 'high' | 'auto';
+  };
+}
+
+export interface NebiusChatResponse {
+  id: string;
+  object: string;
+  created: number;
+  model: string;
+  choices: NebiusChoice[];
+  usage: NebiusUsage;
+}
+
+export interface NebiusChoice {
+  index: number;
+  message: NebiusMessage;
+  finish_reason: string;
+}
+
+export interface NebiusUsage {
+  prompt_tokens: number;
+  completion_tokens: number;
+  total_tokens: number;
+}
+
+export interface NebiusConfig {
+  apiKey: string;
+  baseURL: string;
+  timeout?: number;
+  retries?: number;
+}
+
+export interface NebiusModel {
+  id: string;
+  object: string;
+  created: number;
+  owned_by: string;
+  capabilities: {
+    chat: boolean;
+    completion: boolean;
+    embedding: boolean;
+    vision: boolean;
+    function_calling: boolean;
+    streaming: boolean;
+  };
+  pricing: {
+    input_cost_per_1k_tokens: number;
+    output_cost_per_1k_tokens: number;
+    currency: string;
+  };
+  limits: {
+    max_tokens: number;
+    context_window: number;
+    rate_limit_rpm: number;
+    rate_limit_tpm: number;
+  };
+}
+
+export interface ConnectionResult {
+  success: boolean;
+  latency: number;
+  timestamp: Date;
+  version?: string;
+  features?: string[];
+  error?: string;
+}
+
+export enum ServiceStatus {
+  HEALTHY = 'healthy',
+  DEGRADED = 'degraded',
+  UNHEALTHY = 'unhealthy',
+  MAINTENANCE = 'maintenance'
+}
+
+export enum ModelStatus {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  MAINTENANCE = 'maintenance',
+  DEPRECATED = 'deprecated'
+}

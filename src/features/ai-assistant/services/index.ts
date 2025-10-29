@@ -4,6 +4,14 @@
  */
 
 export * from './model-management-service';
+export * from './task-classifier';
+export * from './task-router';
+export * from './ai-assistant-service';
+export * from './quick-response-handler';
+export * from './conversation-manager';
+export * from './nebius-ai-service';
+export * from './langchain-manager';
+export * from './langgraph-workflow';
 
 // User Preference Manager - export with aliases to avoid conflicts
 export {

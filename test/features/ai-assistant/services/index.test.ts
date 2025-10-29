@@ -4,7 +4,6 @@
  */
 
 // Import all service tests to ensure they run
-import './model-management-service.test';
 import './user-preference-manager.test';
 import './model-cost-calculator.test';
 

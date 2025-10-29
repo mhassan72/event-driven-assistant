@@ -7,7 +7,7 @@ import {
   ConversationContext,
   ConversationMessage,
   MessageRole,
-  ConversationRequest,
+
   MemoryConfig,
   MemoryType
 } from '@/shared/types';

@@ -5,14 +5,13 @@
 
 import {
   ConversationRequest,
-  ConversationResponse,
   ConversationContext,
   ConversationMessage,
   MessageRole,
   LangChainConfig,
   ModelProvider,
   AIModel,
-  TaskClassification
+
 } from '@/shared/types';
 import { IStructuredLogger } from '@/shared/observability/logger';
 import { IMetricsCollector } from '@/shared/observability/metrics';
@@ -281,9 +280,9 @@ export class QuickResponseHandler implements IQuickResponseHandler {
         processingTime: Date.now() - startTime
       });
 
-      this.metrics.increment('quick_response.errors', {
+      this.metrics.increment('quick_response.errors', 1, {
         modelId: model.id,
-        errorType: error.constructor.name
+        errorType: error instanceof Error ? error.constructor.name : 'UnknownError'
       });
 
       throw error;
@@ -329,7 +328,7 @@ export class QuickResponseHandler implements IQuickResponseHandler {
         metadata: { responseId, model: model.id }
       });
 
-      this.metrics.increment('quick_response.streaming_started', {
+      this.metrics.increment('quick_response.streaming_started', 1, {
         modelId: model.id
       });
 
@@ -627,7 +626,7 @@ export class QuickResponseHandler implements IQuickResponseHandler {
         subscriberCount: relevantSubscriptions.length
       });
 
-      this.metrics.increment('quick_response.updates_broadcast', {
+      this.metrics.increment('quick_response.updates_broadcast', 1, {
         updateType: update.type.toString(),
         subscriberCount: relevantSubscriptions.length.toString()
       });
@@ -819,7 +818,7 @@ export class QuickResponseHandler implements IQuickResponseHandler {
       modelId: model.id
     });
 
-    this.metrics.increment('quick_response.generated', {
+    this.metrics.increment('quick_response.generated', 1, {
       modelId: model.id,
       finishReason: response.metadata.finishReason.toString()
     });

@@ -47,5 +47,4 @@ export interface AuthenticatedResponse extends ExpressResponse {
 export type Request = any;
 export type Response = any;
 
-// Export enhanced types for explicit use
-export { AuthenticatedRequest, AuthenticatedResponse };
+// Enhanced types are already exported above

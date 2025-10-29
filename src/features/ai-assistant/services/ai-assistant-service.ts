@@ -362,7 +362,7 @@ export class AIAssistantService implements IAIAssistantService {
       // Store task for processing (in real implementation, this would trigger cloud function)
       await this.storeAgentTask(taskId, request, classification, routing, reservationId);
 
-      this.metrics.increment('ai_assistant.agent_tasks_initiated', {
+      this.metrics.increment('ai_assistant.agent_tasks_initiated', 1, {
         taskType: classification.type.toString(),
         executionPath: routing.executionPath.toString()
       });
@@ -644,7 +644,7 @@ export class AIAssistantService implements IAIAssistantService {
       'medium': 0.3,
       'high': 0.6
     };
-    return impacts[complexity] || 0.2;
+    return impacts[complexity as keyof typeof impacts] || 0.2;
   }
 
   private async generateCostAlternatives(userId: string, classification: TaskClassification, currentSelection: ModelSelection): Promise<CostAlternative[]> {
@@ -693,7 +693,7 @@ export class AIAssistantService implements IAIAssistantService {
   private recordProcessingMetrics(analysis: TaskAnalysisResult, processingTime: number, actualCost: number): void {
     this.metrics.histogram('ai_assistant.processing_time', processingTime);
     this.metrics.histogram('ai_assistant.actual_cost', actualCost);
-    this.metrics.increment('ai_assistant.tasks_processed', {
+    this.metrics.increment('ai_assistant.tasks_processed', 1, {
       taskType: analysis.classification.type.toString(),
       strategy: analysis.routing.strategy.toString()
     });

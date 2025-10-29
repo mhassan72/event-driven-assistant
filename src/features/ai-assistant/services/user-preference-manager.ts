@@ -528,7 +528,7 @@ export class UserPreferenceManager implements IUserPreferenceManager {
 
   async selectOptimalModel(userId: string, requirements: ModelRequirements, availableModels: AIModel[]): Promise<ModelSelection> {
     try {
-      const preferences = await this.getUserPreferences(userId);
+      // const preferences = await this.getUserPreferences(userId);
       const taskPreference = await this.getTaskPreference(userId, requirements.taskType);
       const usagePatterns = await this.analyzeUsagePatterns(userId);
       
@@ -813,7 +813,7 @@ export class UserPreferenceManager implements IUserPreferenceManager {
 
   async optimizeForCost(userId: string, taskType: TaskType): Promise<CostOptimizationSuggestion> {
     try {
-      const preferences = await this.getUserPreferences(userId);
+      // const preferences = await this.getUserPreferences(userId);
       const taskPreference = await this.getTaskPreference(userId, taskType);
       const availableModels = await this.getAvailableModelsForTask(taskType);
       

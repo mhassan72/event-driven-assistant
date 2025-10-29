@@ -269,6 +269,15 @@ export interface SagaDefinition {
 }
 
 /**
+ * Saga action definition
+ */
+export interface SagaAction {
+  type: string;
+  payload?: any;
+  handler: string;
+}
+
+/**
  * Saga step definition
  */
 export interface SagaStep {

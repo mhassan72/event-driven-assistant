@@ -724,3 +724,107 @@ export enum FindingSeverity {
   HIGH = 'high',
   CRITICAL = 'critical'
 }
+
+// ============================================================================
+// Service Interfaces
+// ============================================================================
+
+/**
+ * Credit service interface for managing user credits
+ */
+export interface ICreditService {
+  // Balance operations
+  getBalance(userId: string): Promise<CreditBalance>;
+  validateBalance(userId: string, amount: number): Promise<boolean>;
+  
+  // Credit operations
+  addCredits(userId: string, amount: number, source: CreditSource, reason: string, metadata?: TransactionMetadata): Promise<CreditTransaction>;
+  deductCredits(userId: string, amount: number, correlationId: string, metadata?: TransactionMetadata): Promise<CreditTransaction>;
+  
+  // Reservation operations
+  reserveCredits(userId: string, amount: number, correlationId: string): Promise<CreditReservation>;
+  releaseReservedCredits(userId: string, amount: number, correlationId: string): Promise<void>;
+  confirmReservedCredits(userId: string, reservationId: string, actualAmount?: number): Promise<CreditTransaction>;
+  
+  // Transaction history
+  getTransactionHistory(userId: string, options?: TransactionHistoryOptions): Promise<CreditTransaction[]>;
+  getTransaction(transactionId: string): Promise<CreditTransaction | null>;
+  
+  // Analytics and reporting
+  getUserUsageAnalytics(userId: string, timeRange: TimeRange): Promise<CreditUsageAnalytics>;
+  generateAuditReport(userId: string, timeRange: TimeRange): Promise<AuditReport>;
+  
+  // Health and monitoring
+  healthCheck(): Promise<HealthCheckResult>;
+  getSystemMetrics(): Promise<SystemMetrics>;
+}
+
+/**
+ * Credit reservation details
+ */
+export interface CreditReservation {
+  id: string;
+  userId: string;
+  amount: number;
+  correlationId: string;
+  status: ReservationStatus;
+  createdAt: Date;
+  expiresAt: Date;
+  metadata?: Record<string, any>;
+}
+
+export enum ReservationStatus {
+  ACTIVE = 'active',
+  CONFIRMED = 'confirmed',
+  RELEASED = 'released',
+  EXPIRED = 'expired'
+}
+
+/**
+ * Transaction history query options
+ */
+export interface TransactionHistoryOptions {
+  limit?: number;
+  offset?: number;
+  startDate?: Date;
+  endDate?: Date;
+  types?: TransactionType[];
+  status?: TransactionStatus[];
+  sortBy?: 'timestamp' | 'amount';
+  sortOrder?: 'asc' | 'desc';
+}
+
+/**
+ * Health check result
+ */
+export interface HealthCheckResult {
+  status: 'healthy' | 'degraded' | 'unhealthy';
+  timestamp: Date;
+  checks: HealthCheck[];
+  overallScore: number;
+}
+
+/**
+ * Individual health check
+ */
+export interface HealthCheck {
+  name: string;
+  status: 'pass' | 'warn' | 'fail';
+  responseTime?: number;
+  message?: string;
+  details?: Record<string, any>;
+}
+
+/**
+ * System metrics for monitoring
+ */
+export interface SystemMetrics {
+  timestamp: Date;
+  activeUsers: number;
+  totalTransactions: number;
+  totalCreditsInCirculation: number;
+  averageTransactionValue: number;
+  systemLoad: number;
+  errorRate: number;
+  responseTime: number;
+}

@@ -8,10 +8,7 @@ import {
   AgentConfig,
   Tool,
   MemoryConfig,
-  ConversationRequest,
-  ConversationResponse,
-  ModelProvider,
-  AIModel
+
 } from '@/shared/types';
 import { INebiusAIService } from './nebius-ai-service';
 import { IStructuredLogger } from '@/shared/observability/logger';
@@ -428,7 +425,7 @@ export class LangChainManager implements ILangChainManager {
       });
 
       this.metrics.histogram('langchain_manager.execution_time', executionTime);
-      this.metrics.increment('langchain_manager.executions', {
+      this.metrics.increment('langchain_manager.executions', 1, {
         agentId,
         success: result.success.toString()
       });
@@ -444,7 +441,7 @@ export class LangChainManager implements ILangChainManager {
         executionTime
       });
 
-      this.metrics.increment('langchain_manager.execution_errors', {
+      this.metrics.increment('langchain_manager.execution_errors', 1, {
         agentId
       });
 
@@ -660,7 +657,7 @@ export class LangChainManager implements ILangChainManager {
         id: executionId,
         agentId: agent.id,
         input,
-        output: `Execution failed: ${error.message}`,
+        output: `Execution failed: ${error instanceof Error ? error.message : String(error)}`,
         success: false,
         executionTime: Date.now() - startTime.getTime(),
         tokensUsed: { input: 0, output: 0, total: 0 },
@@ -672,7 +669,7 @@ export class LangChainManager implements ILangChainManager {
           model: agent.config.modelId,
           temperature: agent.config.temperature,
           steps,
-          reasoning: [`Error: ${error.message}`]
+          reasoning: [`Error: ${error instanceof Error ? error.message : String(error)}`]
         }
       };
     }
@@ -701,7 +698,7 @@ export class LangChainManager implements ILangChainManager {
         type: StepType.REASONING,
         description: 'Reasoning failed',
         input: { text: input },
-        output: { error: error.message },
+        output: { error: error instanceof Error ? error.message : String(error) },
         duration: Date.now() - stepStart,
         success: false
       };
@@ -744,7 +741,7 @@ export class LangChainManager implements ILangChainManager {
           type: StepType.TOOL_CALL,
           description: `Tool execution failed: ${tool.name}`,
           input: { toolId: tool.id, input },
-          output: { error: error.message },
+          output: { error: error instanceof Error ? error.message : String(error) },
           duration: Date.now() - stepStart,
           success: false
         });
@@ -756,7 +753,7 @@ export class LangChainManager implements ILangChainManager {
           output: null,
           executionTime: Date.now() - stepStart,
           success: false,
-          error: error.message
+          error: error instanceof Error ? error.message : String(error)
         });
       }
     }
@@ -820,7 +817,7 @@ export class LangChainManager implements ILangChainManager {
         type: StepType.RESPONSE_GENERATION,
         description: 'Response generation failed',
         input: { input },
-        output: { error: error.message },
+        output: { error: error instanceof Error ? error.message : String(error) },
         duration: Date.now() - stepStart,
         success: false
       };

@@ -46,6 +46,113 @@ export interface TaskClassification {
   reasoning: string;
 }
 
+/**
+ * Task routing result from intelligent routing system
+ */
+export interface TaskRoutingResult {
+  strategy: RoutingStrategy;
+  executionPath: ExecutionPath;
+  estimatedWaitTime: number;
+  queuePosition?: number;
+  routingReason: string;
+  fallbackOptions: RoutingOption[];
+  metadata: RoutingMetadata;
+}
+
+/**
+ * Response from AI conversation processing
+ */
+export interface ConversationResponse {
+  id: string;
+  conversationId: string;
+  message: ConversationMessage;
+  metadata: ResponseMetadata;
+  creditsUsed: number;
+  processingTime: number;
+  modelUsed: string;
+  qualityScore?: number;
+}
+
+/**
+ * Agent task initiation result
+ */
+export interface AgentTaskInitiation {
+  taskId: string;
+  status: TaskStatus;
+  estimatedCompletion: Date;
+  progressUrl: string;
+  creditsReserved: number;
+  metadata: TaskMetadata;
+}
+
+// ============================================================================
+// Task Routing Types
+// ============================================================================
+
+export enum RoutingStrategy {
+  SYNCHRONOUS = 'synchronous',
+  ASYNCHRONOUS = 'asynchronous',
+  HYBRID = 'hybrid',
+  QUEUED = 'queued'
+}
+
+export enum ExecutionPath {
+  QUICK_RESPONSE = 'quick_response',
+  AGENT_FUNCTION = 'agent_function',
+  BATCH_PROCESSING = 'batch_processing',
+  PRIORITY_QUEUE = 'priority_queue'
+}
+
+export interface RoutingOption {
+  strategy: RoutingStrategy;
+  executionPath: ExecutionPath;
+  estimatedWaitTime: number;
+  costAdjustment: number;
+  description: string;
+}
+
+export interface RoutingMetadata {
+  routedAt: Date;
+  routingVersion: string;
+  systemLoad: number;
+  userPriority: number;
+  resourceRequirements: ResourceRequirements;
+}
+
+export interface ResourceRequirements {
+  estimatedCpu: number;
+  estimatedMemory: number;
+  estimatedDuration: number;
+  requiresGpu: boolean;
+  requiresNetwork: boolean;
+  priority: TaskPriority;
+}
+
+// TaskPriority enum is defined later with string values
+
+export enum TaskStatus {
+  PENDING = 'pending',
+  RUNNING = 'running',
+  COMPLETED = 'completed',
+  FAILED = 'failed',
+  CANCELLED = 'cancelled'
+}
+
+export interface ResponseMetadata {
+  processingTime: number;
+  modelUsed: string;
+  tokensUsed: number;
+  qualityScore?: number;
+  confidence: number;
+}
+
+export interface TaskMetadata {
+  createdAt: Date;
+  estimatedCompletion: Date;
+  priority: TaskPriority;
+  resourceRequirements: ResourceRequirements;
+}
+
 // ============================================================================
 // AI Model Management Interfaces
 // ============================================================================

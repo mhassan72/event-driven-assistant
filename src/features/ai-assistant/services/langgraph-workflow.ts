@@ -9,9 +9,7 @@ import {
   WorkflowEdge,
   NodeType,
   NodeConfig,
-  AgentConfig,
-  ToolConfig,
-  ConditionConfig
+
 } from '@/shared/types';
 import { ILangChainManager } from './langchain-manager';
 import { IStructuredLogger } from '@/shared/observability/logger';
@@ -333,7 +331,8 @@ export class LangGraphWorkflowManager implements ILangGraphWorkflowManager {
 
   async deleteWorkflow(workflowId: string): Promise<void> {
     try {
-      const workflow = await this.getWorkflow(workflowId);
+      // Verify workflow exists
+      await this.getWorkflow(workflowId);
       
       // Cancel any active executions
       const activeExecutions = Array.from(this.activeExecutions.values())
@@ -500,7 +499,7 @@ export class LangGraphWorkflowManager implements ILangGraphWorkflowManager {
         isValid: false,
         errors: [{
           type: ValidationErrorType.MISSING_CONFIGURATION,
-          message: `Validation error: ${error.message}`,
+          message: `Validation error: ${error instanceof Error ? error.message : String(error)}`,
           severity: ErrorSeverity.CRITICAL
         }],
         warnings: [],
@@ -685,8 +684,8 @@ export class LangGraphWorkflowManager implements ILangGraphWorkflowManager {
       execution.duration = execution.endTime.getTime() - startTime.getTime();
       execution.error = {
         nodeId: execution.currentNode || 'unknown',
-        errorType: error.constructor.name,
-        message: error.message,
+        errorType: error instanceof Error ? error.constructor.name : 'UnknownError',
+        message: error instanceof Error ? error.message : String(error),
         timestamp: new Date(),
         recoverable: false
       };
@@ -694,7 +693,7 @@ export class LangGraphWorkflowManager implements ILangGraphWorkflowManager {
       this.logger.error('Workflow execution failed', {
         executionId,
         workflowId: workflow.id,
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
         duration: execution.duration
       });
 
@@ -787,7 +786,7 @@ export class LangGraphWorkflowManager implements ILangGraphWorkflowManager {
         endTime: new Date(),
         duration: Date.now() - nodeStartTime.getTime(),
         cost: 0,
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
         retryCount: 0
       };
 
@@ -873,7 +872,7 @@ export class LangGraphWorkflowManager implements ILangGraphWorkflowManager {
     }
 
     // Simple condition evaluation (in real implementation, would use proper expression evaluator)
-    const condition = node.config.condition.expression;
+    // const condition = node.config.condition.expression;
     const variables = { ...input.data, ...input.context?.variables };
     
     // Simulate condition evaluation

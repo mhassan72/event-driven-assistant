@@ -81,3 +81,109 @@ export const requestLogger = (req: Request, res: Response, next: NextFunction): 
   
   next();
 };
+
+/**
+ * Performance monitoring middleware
+ */
+export const performanceMonitor = (req: Request, res: Response, next: NextFunction): void => {
+  const startTime = process.hrtime.bigint();
+  
+  // Monitor memory usage
+  const memoryBefore = process.memoryUsage();
+  
+  // Override res.end to capture performance metrics
+  const originalEnd = res.end;
+  res.end = function(chunk?: any, encoding?: any): any {
+    const endTime = process.hrtime.bigint();
+    const duration = Number(endTime - startTime) / 1000000; // Convert to milliseconds
+    const memoryAfter = process.memoryUsage();
+    
+    // Calculate memory delta
+    const memoryDelta = {
+      rss: memoryAfter.rss - memoryBefore.rss,
+      heapUsed: memoryAfter.heapUsed - memoryBefore.heapUsed,
+      heapTotal: memoryAfter.heapTotal - memoryBefore.heapTotal,
+      external: memoryAfter.external - memoryBefore.external
+    };
+    
+    // Log performance metrics for slow requests
+    if (duration > 1000) { // Log requests slower than 1 second
+      logger.warn('Slow request detected', {
+        correlationId: req.correlationId,
+        method: req.method,
+        url: req.originalUrl,
+        duration,
+        memoryDelta,
+        statusCode: res.statusCode
+      });
+    }
+    
+    // Add performance headers
+    res.setHeader('X-Response-Time', `${duration.toFixed(2)}ms`);
+    res.setHeader('X-Memory-Usage', `${Math.round(memoryAfter.heapUsed / 1024 / 1024)}MB`);
+    
+    // Call original end method
+    originalEnd.call(this, chunk, encoding);
+  };
+  
+  next();
+};
+
+/**
+ * Health check middleware
+ */
+export const healthCheck = (req: Request, res: Response, next: NextFunction): void => {
+  if (req.path === '/health' || req.path === '/healthz') {
+    const healthStatus = {
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      version: process.env.npm_package_version || '1.0.0',
+      environment: process.env.NODE_ENV || 'development',
+      uptime: process.uptime(),
+      memory: process.memoryUsage(),
+      services: {
+        firestore: 'connected', // In production, check actual service health
+        realtimeDatabase: 'connected',
+        auth: 'connected'
+      }
+    };
+    
+    res.status(200).json(healthStatus);
+    return;
+  }
+  
+  next();
+};
+
+/**
+ * Request timeout middleware
+ */
+export function requestTimeout(timeoutMs: number = 30000) {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    const timeout = setTimeout(() => {
+      if (!res.headersSent) {
+        logger.error('Request timeout', {
+          correlationId: req.correlationId,
+          method: req.method,
+          url: req.originalUrl,
+          timeout: timeoutMs
+        });
+        
+        res.status(408).json({
+          error: 'REQUEST_TIMEOUT',
+          message: 'Request timed out',
+          timeout: timeoutMs
+        });
+      }
+    }, timeoutMs);
+    
+    // Clear timeout when response is sent
+    const originalEnd = res.end;
+    res.end = function(chunk?: any, encoding?: any): any {
+      clearTimeout(timeout);
+      originalEnd.call(this, chunk, encoding);
+    };
+    
+    next();
+  };
+}

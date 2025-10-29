@@ -169,7 +169,6 @@ PAYPAL_WEBHOOK_SECRET=your_paypal_webhook_secret
 │   │   └── api/                      # 🚧 RESTful API gateway layer
 │   ├── test/                         # ✅ Comprehensive quality assurance (240+ tests)
 │   └── lib/                          # Optimized production artifacts
-├── .kiro/specs/                      # Technical specifications and requirements
 └── README.md                         # Project documentation
 ```
 

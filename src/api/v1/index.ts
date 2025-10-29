@@ -15,7 +15,7 @@ import { UserRole, Permission } from '../../shared/types/firebase-auth';
 
 // Import route handlers
 import { creditsRouter } from './credits';
-// import { paymentsRouter } from './payments';
+import { paymentsRouter } from './payments';
 import { usersRouter } from './users';
 import { authRouter } from './auth';
 import { adminRouter } from './admin';
@@ -23,16 +23,18 @@ import { monitoringRouter } from './monitoring';
 import { chatRouter } from './chat';
 import { modelsRouter } from './models';
 import { imagesRouter } from './images';
+import { docsRouter } from './docs';
 
 const v1Router = Router();
 
 // Public routes (no authentication required)
 v1Router.use('/auth', authRouter);
 v1Router.use('/monitoring', monitoringRouter);
+v1Router.use('/docs', docsRouter);
 
 // Protected routes (authentication required)
 v1Router.use('/credits', requireAuth, creditsRouter);
-v1Router.use('/payments', requireAuth, creditsRouter);
+v1Router.use('/payments', requireAuth, paymentsRouter);
 v1Router.use('/users', requireAuth, usersRouter);
 
 // AI Assistant routes (authentication + AI permission required)

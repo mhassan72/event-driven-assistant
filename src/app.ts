@@ -14,9 +14,10 @@ import { getDatabase } from 'firebase-admin/database';
 
 // Import middleware
 import { errorHandler } from './api/middleware/error-handling';
-import { requestLogger } from './api/middleware/observability';
+import { requestLogger, performanceMonitor, healthCheck, requestTimeout } from './api/middleware/observability';
 import { securityHeaders } from './api/middleware/security';
 import { rateLimiter } from './api/middleware/rate-limiting';
+import { sanitizeRequest } from './api/middleware/validation';
 
 // Import API routes
 import { v1Router } from './api/v1';
@@ -108,8 +109,12 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Custom middleware
+app.use(healthCheck);
+app.use(requestTimeout(30000)); // 30 second timeout
 app.use(requestLogger);
+app.use(performanceMonitor);
 app.use(securityHeaders);
+app.use(sanitizeRequest);
 app.use(rateLimiter);
 
 // Health check endpoint

@@ -3,7 +3,9 @@
  * Central export point for all AI assistant services
  */
 
+export * from './admin-model-service';
 export * from './model-management-service';
+export * from './system-analytics-service';
 export * from './task-classifier';
 export * from './task-router';
 export * from './ai-assistant-service';

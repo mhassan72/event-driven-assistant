@@ -16,6 +16,12 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:security": "jest test/security-rules.test.js",
+    "test:integration": "jest test/integration/simple-integration.test.ts --verbose",
+    "test:integration:full": "ts-node test/integration/run-integration-tests.ts",
+    "test:integration:e2e": "jest test/integration/user-journey-e2e.test.ts --verbose --testTimeout=180000",
+    "test:integration:performance": "jest test/integration/performance-load.test.ts --verbose --testTimeout=240000",
+    "test:integration:security": "jest test/integration/security-compliance.test.ts --verbose --testTimeout=120000",
+    "test:all": "npm run test && npm run test:integration",
     "emulators:start": "firebase emulators:start",
     "emulators:test": "firebase emulators:exec --only database 'npm run test:security'"
   },

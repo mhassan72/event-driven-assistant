@@ -6,7 +6,7 @@
 import { IStructuredLogger } from '../observability/logger';
 import { IMetricsCollector } from '../observability/metrics';
 import { CategorizedError, ErrorSeverity, RecoveryStrategy } from './error-categories';
-import { CircuitBreaker, CircuitBreakerResult } from './circuit-breaker';
+import { CircuitBreaker } from './circuit-breaker';
 
 /**
  * Retry policy configuration

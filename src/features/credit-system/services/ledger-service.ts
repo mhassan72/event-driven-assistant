@@ -5,7 +5,6 @@
 
 import { logger } from '../../../shared/observability/logger';
 import { IMetricsCollector } from '../../../shared/observability/metrics';
-import { getFirestore } from 'firebase-admin/firestore';
 import { 
   CreditTransaction,
   LedgerEntry,
@@ -25,7 +24,6 @@ import {
   RecommendationCategory,
   RecommendationPriority,
   CheckStatus,
-  CheckResult,
   ComplianceLevel
 } from '../../../shared/types/credit-system';
 import { createHash, createHmac, randomBytes } from 'crypto';

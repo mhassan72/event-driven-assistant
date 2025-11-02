@@ -21,11 +21,32 @@ const metrics: IMetricsCollector = {
   increment: (name: string, value: number = 1, tags?: Record<string, string>) => {
     logger.info('Metric increment', { name, value, tags });
   },
+  counter: (name: string, value: number = 1, tags?: Record<string, string>) => {
+    logger.info('Metric counter', { name, value, tags });
+  },
+  incrementCounter: (name: string, tags?: Record<string, string>) => {
+    logger.info('Metric increment counter', { name, tags });
+  },
   histogram: (name: string, value: number, tags?: Record<string, string>) => {
     logger.info('Metric histogram', { name, value, tags });
   },
   gauge: (name: string, value: number, tags?: Record<string, string>) => {
     logger.info('Metric gauge', { name, value, tags });
+  },
+  recordHttpRequest: (metric) => {
+    logger.info('HTTP request metric', metric);
+  },
+  recordCreditOperation: (metric) => {
+    logger.info('Credit operation metric', metric);
+  },
+  recordPayment: (metric) => {
+    logger.info('Payment metric', metric);
+  },
+  getMetrics: (type?: string) => {
+    return [];
+  },
+  clearMetrics: (type?: string) => {
+    // No-op for this implementation
   }
 };
 

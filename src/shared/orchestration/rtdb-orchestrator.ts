@@ -5,7 +5,13 @@
 
 import { Database } from 'firebase-admin/database';
 import { Firestore } from 'firebase-admin/firestore';
-import { BaseOrchestrator, OrchestratorDependencies } from './base-orchestrator';
+import { 
+  BaseOrchestrator, 
+  OrchestratorDependencies,
+  ValidationResult,
+  ExecutionPath,
+  FailureResult
+} from './base-orchestrator';
 import {
   WorkflowDefinition,
   WorkflowResult,
@@ -190,7 +196,7 @@ export class RTDBOrchestrator extends BaseOrchestrator {
           retryableErrors: ['NETWORK_ERROR', 'TIMEOUT_ERROR']
         },
         compensationPolicy: {
-          strategy: 'rollback',
+          strategy: CompensationStrategy.ROLLBACK,
           timeoutMs: 15000,
           maxCompensationRetries: 2
         }
@@ -660,7 +666,7 @@ export class RTDBOrchestrator extends BaseOrchestrator {
         retryableErrors: ['NETWORK_ERROR', 'TIMEOUT_ERROR']
       },
       compensationPolicy: {
-        strategy: 'rollback',
+        strategy: CompensationStrategy.ROLLBACK,
         timeoutMs: 10000,
         maxCompensationRetries: 1
       }
@@ -844,28 +850,19 @@ interface CreditDeductionContext {
   reason: string;
   metadata?: any;
   correlationId: string;
+  transactionId?: string;
+  balanceBefore?: number;
+  balanceAfter?: number;
 }
 
 interface AIWorkflowContext {
   request: AIConversationRequest;
   classification: TaskClassification;
   correlationId: string;
+  creditsUsed?: number;
 }
 
-interface ValidationResult {
-  isValid: boolean;
-  errors: string[];
-}
-
-interface ExecutionPath {
-  type: 'cloud_function' | 'api_endpoint';
-  target: string;
-}
-
-interface FailureResult {
-  handled: boolean;
-  compensationRequired: boolean;
-}
+// ValidationResult, ExecutionPath, and FailureResult are defined in base-orchestrator.ts
 
 // Mock interfaces for dependencies (these would be implemented elsewhere)
 interface ITaskClassifier {

@@ -7,6 +7,7 @@ import { DatabaseEvent } from 'firebase-functions/v2/database';
 import { DataSnapshot } from 'firebase-admin/database';
 import { Database } from 'firebase-admin/database';
 import { Firestore } from 'firebase-admin/firestore';
+// Firebase instances will be injected when needed
 import { logger } from '../shared/observability/logger';
 import { metrics } from '../shared/observability/metrics';
 import { 

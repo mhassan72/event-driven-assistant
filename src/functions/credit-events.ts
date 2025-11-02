@@ -6,15 +6,7 @@
 import { FirestoreEvent } from 'firebase-functions/v2/firestore';
 import { QueryDocumentSnapshot } from 'firebase-admin/firestore';
 import { logger } from '../shared/observability/logger';
-
-interface CreditTransaction {
-  userId: string;
-  type: 'DEDUCTION' | 'ADDITION' | 'WELCOME_BONUS' | 'PURCHASE' | 'REFUND';
-  amount: number;
-  timestamp: any;
-  status: 'PENDING' | 'COMPLETED' | 'FAILED';
-  metadata?: any;
-}
+import { CreditTransaction } from '../shared/types/credit-system';
 
 class CreditEventHandler {
   async onTransactionCreated(event: FirestoreEvent<QueryDocumentSnapshot | undefined>): Promise<void> {

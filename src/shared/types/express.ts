@@ -48,3 +48,19 @@ export type Request = any;
 export type Response = any;
 
 // Enhanced types are already exported above
+
+// Extend the global Express namespace to include our custom properties
+declare global {
+  namespace Express {
+    interface Request {
+      user?: UserContext;
+      session?: UserSession;
+      securityAssessment?: SecurityAssessment;
+      rateLimitInfo?: RateLimitInfo;
+      mfaRequired?: boolean;
+      mfaChallenge?: MFAChallenge;
+      auditContext?: AuditContext;
+      correlationId?: string;
+    }
+  }
+}

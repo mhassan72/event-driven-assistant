@@ -17,7 +17,8 @@ import {
   SagaStatus,
   SagaEventType,
   CompensationStatus,
-  CompensationStrategy
+  CompensationStrategy,
+  SagaStep
 } from '../types/orchestration';
 import { IStructuredLogger } from '../observability/logger';
 import { IMetricsCollector } from '../observability/metrics';
@@ -40,7 +41,7 @@ export interface SagaManagerDependencies {
 export class SagaManager implements ISagaManager {
   private realtimeDB: Database;
   private firestore: Firestore;
-  private eventBus: IEventBus;
+  // private eventBus: IEventBus; // TODO: Use for publishing saga events
   private logger: IStructuredLogger;
   private metrics: IMetricsCollector;
   
@@ -52,7 +53,7 @@ export class SagaManager implements ISagaManager {
   constructor(dependencies: SagaManagerDependencies) {
     this.realtimeDB = dependencies.realtimeDB;
     this.firestore = dependencies.firestore;
-    this.eventBus = dependencies.eventBus;
+    // this.eventBus = dependencies.eventBus; // TODO: Use for publishing saga events
     this.logger = dependencies.logger;
     this.metrics = dependencies.metrics;
     
@@ -123,15 +124,16 @@ export class SagaManager implements ISagaManager {
       this.logger.error('Failed to start saga', {
         sagaId,
         definitionId: definition.id,
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       });
       
+      const errorInstance = error instanceof Error ? error : new Error(String(error));
       this.metrics.counter('saga.start_errors', 1, {
         definition_id: definition.id,
-        error_type: this.categorizeError(error)
+        error_type: this.categorizeError(errorInstance)
       });
       
-      throw error;
+      throw errorInstance;
     }
   }
   
@@ -180,7 +182,7 @@ export class SagaManager implements ISagaManager {
     } catch (error) {
       this.logger.error('Failed to continue saga', {
         sagaId,
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       });
       
       throw error;
@@ -237,14 +239,15 @@ export class SagaManager implements ISagaManager {
     } catch (error) {
       this.logger.error('Saga compensation failed', {
         sagaId,
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       });
       
+      const errorInstance = error instanceof Error ? error : new Error(String(error));
       this.metrics.counter('saga.compensation_errors', 1, {
-        error_type: this.categorizeError(error)
+        error_type: this.categorizeError(errorInstance)
       });
       
-      throw error;
+      throw errorInstance;
     }
   }
   
@@ -271,7 +274,7 @@ export class SagaManager implements ISagaManager {
     } catch (error) {
       this.logger.error('Failed to get saga state', {
         sagaId,
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       });
       
       throw error;
@@ -298,7 +301,7 @@ export class SagaManager implements ISagaManager {
     } catch (error) {
       this.logger.error('Failed to update saga state', {
         sagaId,
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       });
       
       throw error;
@@ -330,7 +333,9 @@ export class SagaManager implements ISagaManager {
       return metrics;
       
     } catch (error) {
-      this.logger.error('Failed to get saga metrics', { error: error.message });
+      this.logger.error('Failed to get saga metrics', { 
+        error: error instanceof Error ? error.message : String(error) 
+      });
       
       return {
         totalSagas: 0,
@@ -493,7 +498,9 @@ export class SagaManager implements ISagaManager {
       });
       
     } catch (error) {
-      this.logger.error('Failed to load saga definitions', { error: error.message });
+      this.logger.error('Failed to load saga definitions', { 
+        error: error instanceof Error ? error.message : String(error) 
+      });
     }
   }
   
@@ -533,7 +540,7 @@ export class SagaManager implements ISagaManager {
         } catch (error) {
           this.logger.error('Failed to recover saga', {
             sagaId: sagaState.id,
-            error: error.message
+            error: error instanceof Error ? error.message : String(error)
           });
         }
       }
@@ -543,7 +550,9 @@ export class SagaManager implements ISagaManager {
       });
       
     } catch (error) {
-      this.logger.error('Saga recovery failed', { error: error.message });
+      this.logger.error('Saga recovery failed', { 
+        error: error instanceof Error ? error.message : String(error) 
+      });
     }
   }
   
@@ -579,17 +588,18 @@ export class SagaManager implements ISagaManager {
           await this.persistSagaState(sagaExecution.instance);
           
         } catch (error) {
+          const errorInstance = error instanceof Error ? error : new Error(String(error));
           this.logger.error('Saga step failed', {
             sagaId: sagaExecution.instance.id,
             stepId: step.id,
-            error: error.message
+            error: errorInstance.message
           });
           
           // Mark step as failed
           sagaExecution.stepExecutions.push({
             stepId: step.id,
             status: 'failed',
-            error: error.message,
+            error: errorInstance.message,
             executedAt: new Date()
           });
           
@@ -612,15 +622,16 @@ export class SagaManager implements ISagaManager {
       });
       
     } catch (error) {
+      const errorInstance = error instanceof Error ? error : new Error(String(error));
       this.logger.error('Saga execution failed', {
         sagaId: sagaExecution.instance.id,
-        error: error.message
+        error: errorInstance.message
       });
       
       sagaExecution.instance.status = SagaStatus.FAILED;
       sagaExecution.instance.error = {
         code: 'SAGA_EXECUTION_FAILED',
-        message: error.message,
+        message: errorInstance.message,
         compensationRequired: true
       };
       
@@ -628,7 +639,7 @@ export class SagaManager implements ISagaManager {
     }
   }
   
-  private async executeSagaStep(step: any, sagaExecution: SagaExecution): Promise<any> {
+  private async executeSagaStep(step: SagaStep, sagaExecution: SagaExecution): Promise<any> {
     // This would execute the actual step logic
     // For now, return a mock result
     return {
@@ -692,15 +703,16 @@ export class SagaManager implements ISagaManager {
         }
         
       } catch (error) {
+        const errorInstance = error instanceof Error ? error : new Error(String(error));
         this.logger.error('Compensation step failed', {
           sagaId: sagaExecution.instance.id,
           stepId: step.id,
-          error: error.message
+          error: errorInstance.message
         });
         
         errors.push({
           stepId: step.id,
-          error: error.message,
+          error: errorInstance.message,
           timestamp: new Date()
         });
       }
@@ -795,7 +807,7 @@ export class SagaManager implements ISagaManager {
     } catch (error) {
       this.logger.error('Failed to load saga state', {
         sagaId,
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       });
       
       return null;

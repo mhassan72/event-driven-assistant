@@ -4,7 +4,7 @@
  */
 
 import { Database } from 'firebase-admin/database';
-import { Firestore } from 'firebase-admin/firestore';
+
 import { IStructuredLogger } from '@/shared/observability/logger';
 import { IMetricsCollector } from '@/shared/observability/metrics';
 import {
@@ -16,13 +16,10 @@ import {
   CompensationResult,
   CompensationStep,
   CompensationStatus,
-  SagaContext,
   SagaEvent,
   SagaEventType,
   SagaResult,
-  CompensationStrategy,
-  RetryPolicy,
-  ExecutionStatus
+  CompensationStrategy
 } from '@/shared/types/orchestration';
 import {
   TaskType,
@@ -444,22 +441,18 @@ export interface PerformanceTrend {
  */
 export class AgentWorkflowManager implements IAgentWorkflowManager {
   private realtimeDB: Database;
-  private firestore: Firestore;
   private logger: IStructuredLogger;
   private metrics: IMetricsCollector;
   
   private activeSagas: Map<string, SagaInstance> = new Map();
   private activeWorkflows: Map<string, AgentWorkflow> = new Map();
-  private monitoringIntervals: Map<string, NodeJS.Timeout> = new Map();
 
   constructor(
     realtimeDB: Database,
-    firestore: Firestore,
     logger: IStructuredLogger,
     metrics: IMetricsCollector
   ) {
     this.realtimeDB = realtimeDB;
-    this.firestore = firestore;
     this.logger = logger;
     this.metrics = metrics;
     

@@ -30,9 +30,9 @@ import {
   SyncStatus,
   BroadcastStatus,
   HealthStatus,
-  SecurityLevel,
   SecureOperationType,
-  PublicOperationType
+  PublicOperationType,
+  ErrorSeverity
 } from '../types/orchestration';
 import { IStructuredLogger } from '../observability/logger';
 import { IMetricsCollector } from '../observability/metrics';
@@ -57,7 +57,7 @@ export abstract class BaseOrchestrator implements IRTDBOrchestrator {
   protected metrics: IMetricsCollector;
   
   // Internal state
-  private activeWorkflows: Map<string, WorkflowExecution> = new Map();
+  private activeWorkflows: Map<string, WorkflowExecution<any>> = new Map();
   private eventHandlers: Map<string, EventHandler[]> = new Map();
   
   constructor(dependencies: OrchestratorDependencies) {
@@ -93,7 +93,7 @@ export abstract class BaseOrchestrator implements IRTDBOrchestrator {
       });
       
       // Create workflow execution context
-      const execution: WorkflowExecution = {
+      const execution: WorkflowExecution<T> = {
         id: workflow.id,
         definition: workflow,
         status: WorkflowStatus.PENDING,
@@ -123,11 +123,11 @@ export abstract class BaseOrchestrator implements IRTDBOrchestrator {
     } catch (error) {
       this.logger.error('Workflow orchestration failed', {
         workflowId: workflow.id,
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         correlationId
       });
       
-      await this.handleFailure(workflow.id, error as Error);
+      await this.handleFailure(workflow.id, error instanceof Error ? error : new Error('Unknown error'));
       throw error;
     } finally {
       this.activeWorkflows.delete(workflow.id);
@@ -188,7 +188,7 @@ export abstract class BaseOrchestrator implements IRTDBOrchestrator {
     } catch (error) {
       this.logger.error('Event handling failed', {
         eventId: event.id,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
       
       return {
@@ -197,10 +197,10 @@ export abstract class BaseOrchestrator implements IRTDBOrchestrator {
         processedAt: new Date(),
         error: {
           code: 'EVENT_HANDLING_FAILED',
-          message: error.message,
-          cause: error,
+          message: error instanceof Error ? error.message : 'Unknown error',
+          cause: error instanceof Error ? error : new Error('Unknown error'),
           retryable: true,
-          severity: 'high'
+          severity: ErrorSeverity.HIGH
         }
       };
     }
@@ -227,8 +227,7 @@ export abstract class BaseOrchestrator implements IRTDBOrchestrator {
         throw new Error(`Operation validation failed: ${validation.errors.join(', ')}`);
       }
       
-      // Determine execution path
-      const executionPath = this.determineExecutionPath(operation);
+
       
       // Route to appropriate cloud function
       const functionName = this.getFunctionNameForOperation(operation.type);
@@ -246,7 +245,7 @@ export abstract class BaseOrchestrator implements IRTDBOrchestrator {
     } catch (error) {
       this.logger.error('Secure operation routing failed', {
         operationId: operation.id,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
       
       return {
@@ -255,10 +254,10 @@ export abstract class BaseOrchestrator implements IRTDBOrchestrator {
         status: ExecutionStatus.FAILURE,
         error: {
           code: 'SECURE_OPERATION_FAILED',
-          message: error.message,
-          cause: error,
+          message: error instanceof Error ? error.message : 'Unknown error',
+          cause: error instanceof Error ? error : new Error('Unknown error'),
           retryable: true,
-          severity: 'high'
+          severity: ErrorSeverity.HIGH
         },
         executionTime: Date.now() - startTime,
         resourcesUsed: {
@@ -304,7 +303,7 @@ export abstract class BaseOrchestrator implements IRTDBOrchestrator {
     } catch (error) {
       this.logger.error('Public operation routing failed', {
         operationId: operation.id,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
       
       return {
@@ -313,10 +312,10 @@ export abstract class BaseOrchestrator implements IRTDBOrchestrator {
         status: ExecutionStatus.FAILURE,
         error: {
           code: 'PUBLIC_OPERATION_FAILED',
-          message: error.message,
-          cause: error,
+          message: error instanceof Error ? error.message : 'Unknown error',
+          cause: error instanceof Error ? error : new Error('Unknown error'),
           retryable: true,
-          severity: 'medium'
+          severity: ErrorSeverity.MEDIUM
         },
         responseTime: Date.now() - startTime
       };
@@ -367,7 +366,7 @@ export abstract class BaseOrchestrator implements IRTDBOrchestrator {
     } catch (error) {
       this.logger.error('State synchronization failed', {
         changeId: stateChange.id,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
       
       return {
@@ -377,7 +376,7 @@ export abstract class BaseOrchestrator implements IRTDBOrchestrator {
         clientsNotified: 0,
         errors: [{
           clientId: 'system',
-          error: error.message,
+          error: error instanceof Error ? error.message : 'Unknown error',
           timestamp: new Date()
         }]
       };
@@ -428,7 +427,7 @@ export abstract class BaseOrchestrator implements IRTDBOrchestrator {
     } catch (error) {
       this.logger.error('Event broadcast failed', {
         eventId: event.id,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
       
       return {
@@ -438,7 +437,7 @@ export abstract class BaseOrchestrator implements IRTDBOrchestrator {
         recipientsReached: 0,
         errors: [{
           recipientId: 'system',
-          error: error.message,
+          error: error instanceof Error ? error.message : 'Unknown error',
           timestamp: new Date()
         }]
       };
@@ -478,7 +477,9 @@ export abstract class BaseOrchestrator implements IRTDBOrchestrator {
       };
       
     } catch (error) {
-      this.logger.error('Health check failed', { error: error.message });
+      this.logger.error('Health check failed', { 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
       
       return {
         overall: HealthStatus.CRITICAL,
@@ -499,7 +500,9 @@ export abstract class BaseOrchestrator implements IRTDBOrchestrator {
       return metrics;
       
     } catch (error) {
-      this.logger.error('Failed to get workflow metrics', { error: error.message });
+      this.logger.error('Failed to get workflow metrics', { 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
       
       return {
         totalWorkflows: 0,
@@ -533,7 +536,7 @@ export abstract class BaseOrchestrator implements IRTDBOrchestrator {
     });
   }
   
-  protected async executeWorkflowSteps<T>(execution: WorkflowExecution): Promise<WorkflowResult<T>> {
+  protected async executeWorkflowSteps<T>(execution: WorkflowExecution<T>): Promise<WorkflowResult<T>> {
     execution.status = WorkflowStatus.RUNNING;
     await this.storeWorkflowState(execution);
     
@@ -575,7 +578,7 @@ export abstract class BaseOrchestrator implements IRTDBOrchestrator {
       execution.status = WorkflowStatus.FAILED;
       execution.error = {
         code: 'WORKFLOW_EXECUTION_FAILED',
-        message: error.message,
+        message: error instanceof Error ? error.message : 'Unknown error',
         retryable: true
       };
       
@@ -682,7 +685,7 @@ export abstract class BaseOrchestrator implements IRTDBOrchestrator {
     } catch (error) {
       this.logger.error('Failed to process operation request', {
         operationId,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   }
@@ -789,9 +792,9 @@ export abstract class BaseOrchestrator implements IRTDBOrchestrator {
 // Supporting Types and Interfaces
 // ============================================================================
 
-interface WorkflowExecution {
+interface WorkflowExecution<T = any> {
   id: string;
-  definition: WorkflowDefinition;
+  definition: WorkflowDefinition<T>;
   status: WorkflowStatus;
   startedAt: Date;
   completedAt?: Date;
@@ -801,17 +804,17 @@ interface WorkflowExecution {
   error?: any;
 }
 
-interface ValidationResult {
+export interface ValidationResult {
   isValid: boolean;
   errors: string[];
 }
 
-interface ExecutionPath {
+export interface ExecutionPath {
   type: 'cloud_function' | 'api_endpoint';
   target: string;
 }
 
-interface FailureResult {
+export interface FailureResult {
   handled: boolean;
   compensationRequired: boolean;
 }

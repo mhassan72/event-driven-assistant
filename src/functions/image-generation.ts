@@ -5,7 +5,7 @@
 
 import { DatabaseEvent } from 'firebase-functions/v2/database';
 import { DataSnapshot } from 'firebase-admin/database';
-import { getDatabase } from 'firebase-admin/database';
+import { realtimeDb } from '../app';
 import { logger } from '../shared/observability/logger';
 import { ImageGenerationService } from '../features/ai-assistant/services/image-generation-service';
 import { IMetricsCollector } from '../shared/observability/metrics';
@@ -46,13 +46,19 @@ interface ImageGenerationTask {
 
 class ImageGenerationHandler {
   private imageService: ImageGenerationService;
-  private database = getDatabase();
+  private database = realtimeDb;
 
   constructor() {
     // Initialize services with placeholder metrics
     const metrics: IMetricsCollector = {
       increment: (name: string, value: number = 1, labels?: Record<string, string>) => {
         logger.debug('Metrics increment', { name, value, labels });
+      },
+      counter: (name: string, value: number = 1, labels?: Record<string, string>) => {
+        logger.debug('Metrics counter', { name, value, labels });
+      },
+      incrementCounter: (name: string, labels?: Record<string, string>) => {
+        logger.debug('Metrics increment counter', { name, labels });
       },
       histogram: (name: string, value: number, labels?: Record<string, string>) => {
         logger.debug('Metrics histogram', { name, value, labels });

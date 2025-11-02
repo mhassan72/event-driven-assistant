@@ -8,6 +8,7 @@ import { asyncHandler, ValidationError, NotFoundError } from '../middleware/erro
 import { firestore, realtimeDb } from '../../app';
 import { logger } from '../../shared/observability/logger';
 import { AuthenticatedRequest } from '../../shared/types/firebase-auth';
+import { FieldValue } from 'firebase-admin/firestore';
 
 const chatRouter = Router();
 
@@ -131,7 +132,7 @@ chatRouter.post('/conversations/:conversationId/messages', asyncHandler(async (r
 
     if (firestore) {
       await firestore.collection('conversations').doc(conversationId).update({
-        messages: firestore.FieldValue.arrayUnion(userMessage),
+        messages: FieldValue.arrayUnion(userMessage),
         lastMessageAt: timestamp.toISOString()
       });
     }

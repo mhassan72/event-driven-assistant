@@ -5,8 +5,6 @@
 
 import { logger } from '../../../shared/observability/logger';
 import { IMetricsCollector } from '../../../shared/observability/metrics';
-import { getFirestore } from 'firebase-admin/firestore';
-import { getDatabase } from 'firebase-admin/database';
 import { 
   ICreditService,
   CreditBalance,

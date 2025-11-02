@@ -5,14 +5,11 @@
 
 import { logger } from '../../../shared/observability/logger';
 import { IMetricsCollector } from '../../../shared/observability/metrics';
-import { getFirestore } from 'firebase-admin/firestore';
-import { getDatabase } from 'firebase-admin/database';
 import { 
   CreditBalance,
   CreditReservation,
   ReservationStatus,
   PendingOperation,
-  OperationStatus,
   TransactionType,
   BalanceHealthStatus
 } from '../../../shared/types/credit-system';
@@ -793,8 +790,6 @@ export class BalanceSyncService implements IBalanceSyncService {
       
       const listener = balanceRef.on('value', async (snapshot) => {
         if (snapshot.exists()) {
-          const realtimeData = snapshot.val();
-          
           // Get full balance data from Firestore
           const fullBalance = await this.getFirestoreBalance(userId);
           if (fullBalance) {

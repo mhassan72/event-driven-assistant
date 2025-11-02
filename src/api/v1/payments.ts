@@ -8,8 +8,7 @@ import { asyncHandler } from '../middleware/error-handling';
 import { paymentLimiter } from '../middleware/rate-limiting';
 import { 
   TraditionalPaymentRequest, 
-  PaymentMethod,
-  PaymentErrorType 
+  PaymentMethod
 } from '../../shared/types/payment-system';
 import { PaymentOrchestrator } from '../../features/payment-processing/services/payment-orchestrator';
 import { TraditionalPaymentService } from '../../features/payment-processing/services/traditional-payments';
@@ -17,8 +16,8 @@ import { PaymentValidator } from '../../features/payment-processing/services/pay
 import { PaymentWebhookHandler } from '../../features/payment-processing/services/payment-webhook-handler';
 import { StripeService } from '../../features/payment-processing/services/stripe-service';
 import { PayPalService } from '../../features/payment-processing/services/paypal-service';
-import { Logger } from '../../shared/observability/logger';
-import { Metrics } from '../../shared/observability/metrics';
+import { logger } from '../../shared/observability/logger';
+import { metrics } from '../../shared/observability/metrics';
 
 const paymentsRouter = Router();
 
@@ -26,8 +25,7 @@ const paymentsRouter = Router();
 paymentsRouter.use(paymentLimiter.middleware);
 
 // Initialize services (in production, these would be injected via DI container)
-const logger = new Logger('PaymentsAPI');
-const metrics = new Metrics();
+// Using imported logger and metrics
 
 const stripeService = new StripeService(
   process.env.STRIPE_SECRET_KEY || 'sk_test_mock',
@@ -245,7 +243,8 @@ paymentsRouter.post('/confirm', asyncHandler(async (req: any, res: any) => {
 }));
 
 // Initialize Web3 payment service
-const web3PaymentService = new (await import('../../features/payment-processing/services/web3-payments')).Web3PaymentService(
+import { Web3PaymentService } from '../../features/payment-processing/services/web3-payments';
+const web3PaymentService = new Web3PaymentService(
   logger,
   metrics
 );

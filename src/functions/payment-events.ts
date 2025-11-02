@@ -7,13 +7,10 @@ import { onRequest } from 'firebase-functions/v2/https';
 import { onDocumentCreated, onDocumentUpdated } from 'firebase-functions/v2/firestore';
 import { PaymentProvider } from '../shared/types/payment-system';
 import { PaymentWebhookHandler } from '../features/payment-processing/services/payment-webhook-handler';
-import { PaymentOrchestrator } from '../features/payment-processing/services/payment-orchestrator';
-import { Logger } from '../shared/observability/logger';
-import { Metrics } from '../shared/observability/metrics';
+import { logger } from '../shared/observability/logger';
+import { metrics } from '../shared/observability/metrics';
 
-// Initialize services
-const logger = new Logger('PaymentEvents');
-const metrics = new Metrics();
+// Services are imported as singletons
 
 /**
  * Stripe webhook endpoint
@@ -555,3 +552,13 @@ async function handleSagaCompensated(sagaId: string, sagaData: any): Promise<voi
   // Update compensation metrics
   // Notify completion
 }
+
+// Export default for compatibility
+export default {
+  stripeWebhook,
+  paypalWebhook,
+  onPaymentCreated,
+  onPaymentUpdated,
+  onPaymentSagaCreated,
+  onPaymentSagaUpdated
+};

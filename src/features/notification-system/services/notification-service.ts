@@ -7,7 +7,7 @@ import {
   INotificationService,
   NotificationRequest,
   Notification,
-  NotificationPreferences,
+  UserNotificationPreferences,
   NotificationAnalytics,
   GetNotificationsOptions,
   AnalyticsOptions,
@@ -15,7 +15,6 @@ import {
   NotificationChannel,
   NotificationPriority,
   NotificationStatus,
-  DeliveryStatus,
   NotificationError,
   NotificationErrorCode,
   NotificationFrequency
@@ -384,13 +383,13 @@ export class NotificationService implements INotificationService {
     }
   }
 
-  async getPreferences(userId: string): Promise<NotificationPreferences> {
+  async getPreferences(userId: string): Promise<UserNotificationPreferences> {
     try {
       const preferencesRef = this.firestore.collection('notification_preferences').doc(userId);
       const preferences = await preferencesRef.get();
 
       if (preferences.exists) {
-        return preferences.data() as NotificationPreferences;
+        return preferences.data() as UserNotificationPreferences;
       }
 
       // Return default preferences
@@ -402,12 +401,12 @@ export class NotificationService implements INotificationService {
     }
   }
 
-  async updatePreferences(userId: string, preferences: Partial<NotificationPreferences>): Promise<NotificationPreferences> {
+  async updatePreferences(userId: string, preferences: Partial<UserNotificationPreferences>): Promise<UserNotificationPreferences> {
     try {
       const preferencesRef = this.firestore.collection('notification_preferences').doc(userId);
       const currentPreferences = await this.getPreferences(userId);
 
-      const updatedPreferences: NotificationPreferences = {
+      const updatedPreferences: UserNotificationPreferences = {
         ...currentPreferences,
         ...preferences,
         userId,
@@ -496,7 +495,7 @@ export class NotificationService implements INotificationService {
     }
   }
 
-  private applyUserPreferences(request: NotificationRequest, preferences: NotificationPreferences): NotificationChannel[] {
+  private applyUserPreferences(request: NotificationRequest, preferences: UserNotificationPreferences): NotificationChannel[] {
     const requestChannels = request.channels || Object.values(NotificationChannel);
     const enabledChannels: NotificationChannel[] = [];
 
@@ -524,7 +523,7 @@ export class NotificationService implements INotificationService {
     return priorityOrder[requestPriority] >= priorityOrder[minPriority];
   }
 
-  private isInQuietHours(preferences: NotificationPreferences): boolean {
+  private isInQuietHours(preferences: UserNotificationPreferences): boolean {
     if (!preferences.quietHours?.enabled) {
       return false;
     }
@@ -546,11 +545,11 @@ export class NotificationService implements INotificationService {
     return currentTime >= startTime && currentTime <= endTime;
   }
 
-  private bypassesQuietHours(type: NotificationType, preferences: NotificationPreferences): boolean {
+  private bypassesQuietHours(type: NotificationType, preferences: UserNotificationPreferences): boolean {
     return preferences.quietHours?.exceptions?.includes(type) || false;
   }
 
-  private calculateNextDeliveryTime(preferences: NotificationPreferences): Date {
+  private calculateNextDeliveryTime(preferences: UserNotificationPreferences): Date {
     if (!preferences.quietHours?.enabled) {
       return new Date();
     }
@@ -612,7 +611,7 @@ export class NotificationService implements INotificationService {
     await this.realtimeDb.ref(`notifications/${notification.userId}/${notification.id}`).set(realtimeData);
   }
 
-  private getDefaultPreferences(userId: string): NotificationPreferences {
+  private getDefaultPreferences(userId: string): UserNotificationPreferences {
     return {
       userId,
       channels: {

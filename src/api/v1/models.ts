@@ -20,7 +20,7 @@ modelsRouter.get('/', asyncHandler(async (req: AuthenticatedRequest, res: any) =
 
     const { category, provider, isActive = 'true' } = req.query;
 
-    let query = firestore.collection('available_models');
+    let query: any = firestore.collection('available_models');
 
     // Apply filters
     if (category) {
@@ -34,7 +34,7 @@ modelsRouter.get('/', asyncHandler(async (req: AuthenticatedRequest, res: any) =
     }
 
     const snapshot = await query.get();
-    const models = snapshot.docs.map(doc => {
+    const models = snapshot.docs.map((doc: any) => {
       const data = doc.data();
       return {
         id: data.id,
@@ -69,7 +69,7 @@ modelsRouter.get('/', asyncHandler(async (req: AuthenticatedRequest, res: any) =
         modelsByCategory,
         totalCount: models.length,
         categories: Object.keys(modelsByCategory),
-        providers: [...new Set(models.map(m => m.provider))]
+        providers: [...new Set(models.map((m: any) => m.provider))]
       }
     });
   } catch (error) {
@@ -359,7 +359,7 @@ modelsRouter.get('/:modelId/analytics', asyncHandler(async (req: AuthenticatedRe
     // Get analytics data
     const analyticsDoc = await firestore.collection('model_analytics').doc(modelId).get();
     
-    const analytics = analyticsDoc.exists ? analyticsDoc.data() : {
+    const defaultAnalytics = {
       usage: {
         totalRequests: 0,
         totalTokensProcessed: 0,
@@ -373,6 +373,8 @@ modelsRouter.get('/:modelId/analytics', asyncHandler(async (req: AuthenticatedRe
         userSatisfactionScore: 0
       }
     };
+    
+    const analytics = analyticsDoc.exists ? { ...defaultAnalytics, ...(analyticsDoc.data() || {}) } : defaultAnalytics;
 
     // Calculate time-based metrics (simplified for this implementation)
     const timeRangeData = {
@@ -393,7 +395,7 @@ modelsRouter.get('/:modelId/analytics', asyncHandler(async (req: AuthenticatedRe
           ...analytics,
           timeRangeData: timeRangeData[timeRange as keyof typeof timeRangeData] || timeRangeData['30d']
         },
-        lastUpdated: analytics.lastUpdated || null
+        lastUpdated: (analytics as any).lastUpdated || null
       }
     });
   } catch (error) {

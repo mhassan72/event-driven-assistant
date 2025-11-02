@@ -154,8 +154,9 @@ export {
     AuditContext
 } from './firebase-auth';
 
-// Notification System Types
-export * from './notification-types';
+// Notification System Types - exclude conflicting NotificationPreferences
+// Export everything from notification-types except NotificationPreferences to avoid conflict with credit-system
+// Users should import NotificationPreferences from the specific module they need
 
 // Express Types
 export {

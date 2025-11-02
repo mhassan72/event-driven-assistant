@@ -15,7 +15,7 @@ import { Request, Response, NextFunction } from 'express';
 export interface UserContext {
   uid: string;
   email?: string;
-  emailVerified: boolean;
+  emailVerified?: boolean;
   name?: string;
   picture?: string;
   phoneNumber?: string;

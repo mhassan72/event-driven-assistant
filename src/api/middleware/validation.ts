@@ -6,6 +6,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { ValidationError } from './error-handling';
 import { logger } from '../../shared/observability/logger';
+import { z } from 'zod';
 
 export interface ValidationRule {
   field: string;
@@ -24,29 +25,60 @@ export interface ValidationSchema {
   params?: ValidationRule[];
 }
 
+export type ZodValidationSchema = z.ZodSchema<any>;
+
 /**
  * Create validation middleware for request validation
  */
-export function validateRequest(schema: ValidationSchema) {
+export function validateRequest(schema: ValidationSchema | ZodValidationSchema) {
   return (req: Request, res: Response, next: NextFunction): void => {
     try {
+      // Check if it's a Zod schema
+      if ('parse' in schema) {
+        // Handle Zod schema
+        try {
+          (schema as ZodValidationSchema).parse(req.body);
+          next();
+          return;
+        } catch (error) {
+          if (error instanceof z.ZodError) {
+            const errors = error.issues.map((err: any) => `${err.path.join('.')}: ${err.message}`);
+            logger.warn('Zod validation failed', {
+              errors,
+              method: req.method,
+              url: req.originalUrl,
+            });
+            
+            res.status(400).json({
+              success: false,
+              error: 'Validation failed',
+              details: errors
+            });
+            return;
+          }
+          throw error;
+        }
+      }
+
+      // Handle legacy ValidationSchema
+      const validationSchema = schema as ValidationSchema;
       const errors: string[] = [];
 
       // Validate body
-      if (schema.body) {
-        const bodyErrors = validateObject(req.body || {}, schema.body, 'body');
+      if (validationSchema.body) {
+        const bodyErrors = validateObject(req.body || {}, validationSchema.body, 'body');
         errors.push(...bodyErrors);
       }
 
       // Validate query parameters
-      if (schema.query) {
-        const queryErrors = validateObject(req.query || {}, schema.query, 'query');
+      if (validationSchema.query) {
+        const queryErrors = validateObject(req.query || {}, validationSchema.query, 'query');
         errors.push(...queryErrors);
       }
 
       // Validate URL parameters
-      if (schema.params) {
-        const paramErrors = validateObject(req.params || {}, schema.params, 'params');
+      if (validationSchema.params) {
+        const paramErrors = validateObject(req.params || {}, validationSchema.params, 'params');
         errors.push(...paramErrors);
       }
 

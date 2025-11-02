@@ -7,13 +7,10 @@ import { Router } from 'express';
 import { 
   AuthenticatedRequest, 
   AuthenticatedResponse,
-  UserRole,
-  Permission
+  UserRole
 } from '../../shared/types';
 import { 
-  requireAuth, 
   requireRole, 
-  requirePermission,
   rateLimitByUser 
 } from '../middleware/auth';
 import { validateRequest } from '../middleware/validation';
@@ -27,16 +24,16 @@ import {
   WebhookProvider,
   INotificationService,
   NotificationRequest,
-  NotificationPreferences,
   NotificationType,
   NotificationChannel,
   NotificationPriority,
   GetNotificationsOptions,
   AnalyticsOptions
 } from '../../features/notification-system';
-import { Logger } from '../../shared/observability/logger';
-import { Metrics } from '../../shared/observability/metrics';
-import { admin } from 'firebase-admin';
+import { logger } from '../../shared/observability/logger';
+import { metrics } from '../../shared/observability/metrics';
+import { firestore, realtimeDb } from '../../app';
+import { getMessaging } from 'firebase-admin/messaging';
 import { z } from 'zod';
 
 const notificationsRouter = Router();
@@ -100,10 +97,10 @@ let notificationService: INotificationService;
 
 function getNotificationService(): INotificationService {
   if (!notificationService) {
-    const firestore = admin.firestore();
-    const realtimeDb = admin.database();
-    const logger = Logger.getInstance();
-    const metrics = Metrics.getInstance();
+    // Use imported firestore and realtimeDb instances
+    if (!firestore || !realtimeDb) {
+      throw new Error('Firebase services not initialized');
+    }
     
     // Initialize providers
     const emailProvider = new EmailProvider(logger, metrics, {
@@ -112,7 +109,7 @@ function getNotificationService(): INotificationService {
       fromName: process.env.FROM_NAME || 'AI Assistant'
     });
     
-    const pushProvider = new PushProvider(logger, metrics, admin.messaging());
+    const pushProvider = new PushProvider(logger, metrics, getMessaging());
     
     const smsProvider = new SMSProvider(logger, metrics, {
       apiKey: process.env.SMS_API_KEY || '',
@@ -183,7 +180,8 @@ notificationsRouter.get('/',
       });
 
     } catch (error) {
-      Logger.getInstance().error('Failed to get user notifications', error, {
+      logger.error('Failed to get user notifications', {
+        error: error instanceof Error ? error.message : 'Unknown error',
         userId: req.user?.uid,
         query: req.query
       });
@@ -227,7 +225,8 @@ notificationsRouter.post('/send',
       });
 
     } catch (error) {
-      Logger.getInstance().error('Failed to send notification', error, {
+      logger.error('Failed to send notification', {
+        error: error instanceof Error ? error.message : 'Unknown error',
         adminId: req.user?.uid,
         body: req.body
       });
@@ -267,7 +266,8 @@ notificationsRouter.patch('/:notificationId/read',
       });
 
     } catch (error) {
-      Logger.getInstance().error('Failed to mark notification as read', error, {
+      logger.error('Failed to mark notification as read', {
+        error: error instanceof Error ? error.message : 'Unknown error',
         userId: req.user?.uid,
         notificationId: req.params.notificationId
       });
@@ -299,7 +299,8 @@ notificationsRouter.patch('/read-all',
       });
 
     } catch (error) {
-      Logger.getInstance().error('Failed to mark all notifications as read', error, {
+      logger.error('Failed to mark all notifications as read', {
+        error: error instanceof Error ? error.message : 'Unknown error',
         userId: req.user?.uid
       });
 
@@ -338,7 +339,8 @@ notificationsRouter.delete('/:notificationId',
       });
 
     } catch (error) {
-      Logger.getInstance().error('Failed to delete notification', error, {
+      logger.error('Failed to delete notification', {
+        error: error instanceof Error ? error.message : 'Unknown error',
         userId: req.user?.uid,
         notificationId: req.params.notificationId
       });
@@ -370,7 +372,8 @@ notificationsRouter.get('/preferences',
       });
 
     } catch (error) {
-      Logger.getInstance().error('Failed to get notification preferences', error, {
+      logger.error('Failed to get notification preferences', {
+        error: error instanceof Error ? error.message : 'Unknown error',
         userId: req.user?.uid
       });
 
@@ -403,7 +406,8 @@ notificationsRouter.put('/preferences',
       });
 
     } catch (error) {
-      Logger.getInstance().error('Failed to update notification preferences', error, {
+      logger.error('Failed to update notification preferences', {
+        error: error instanceof Error ? error.message : 'Unknown error',
         userId: req.user?.uid,
         updates: req.body
       });
@@ -440,7 +444,8 @@ notificationsRouter.get('/analytics',
       });
 
     } catch (error) {
-      Logger.getInstance().error('Failed to get notification analytics', error, {
+      logger.error('Failed to get notification analytics', {
+        error: error instanceof Error ? error.message : 'Unknown error',
         adminId: req.user?.uid,
         query: req.query
       });

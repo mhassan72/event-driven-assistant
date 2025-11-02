@@ -104,7 +104,7 @@ export enum DeliveryStatus {
 }
 
 // User notification preferences
-export interface NotificationPreferences {
+export interface UserNotificationPreferences {
   userId: string;
   channels: NotificationChannelPreferences;
   types: NotificationTypePreferences;
@@ -230,8 +230,8 @@ export interface INotificationService {
   deleteNotification(notificationId: string, userId: string): Promise<boolean>;
   
   // Preferences management
-  getPreferences(userId: string): Promise<NotificationPreferences>;
-  updatePreferences(userId: string, preferences: Partial<NotificationPreferences>): Promise<NotificationPreferences>;
+  getPreferences(userId: string): Promise<UserNotificationPreferences>;
+  updatePreferences(userId: string, preferences: Partial<UserNotificationPreferences>): Promise<UserNotificationPreferences>;
   
   // Analytics
   getAnalytics(options: AnalyticsOptions): Promise<NotificationAnalytics>;

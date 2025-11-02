@@ -18,8 +18,7 @@ import {
   DLQFilter,
   PublishStatus,
   DLQStatus,
-  EventPriority,
-  ErrorSeverity
+  EventPriority
 } from '../types/orchestration';
 import { IStructuredLogger } from '../observability/logger';
 import { IMetricsCollector } from '../observability/metrics';
@@ -99,17 +98,18 @@ export class EventBus implements IEventBus {
           await this.notifySubscriber(subscription, event);
           successfulNotifications++;
         } catch (error) {
+          const errorInstance = error instanceof Error ? error : new Error(String(error));
           this.logger.error('Failed to notify subscriber', {
             eventId: event.id,
             subscriptionId: subscription.id,
-            error: error.message
+            error: errorInstance.message
           });
           
           // Add to retry queue if retryable
-          if (this.isRetryableError(error)) {
-            await this.addToRetryQueue(event, subscription, error);
+          if (this.isRetryableError(errorInstance)) {
+            await this.addToRetryQueue(event, subscription, errorInstance);
           } else {
-            await this.sendToDLQ(event, subscription, error);
+            await this.sendToDLQ(event, subscription, errorInstance);
           }
         }
       });
@@ -139,7 +139,7 @@ export class EventBus implements IEventBus {
     } catch (error) {
       this.logger.error('Event publishing failed', {
         eventId: event.id,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
       
       this.metrics.counter('event_bus.publish_errors', 1, {
@@ -213,7 +213,7 @@ export class EventBus implements IEventBus {
     } catch (error) {
       this.logger.error('Batch event publishing failed', {
         batchId,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
       
       return {
@@ -254,6 +254,7 @@ export class EventBus implements IEventBus {
       
       // Add to internal subscriptions
       const subscriptionInfo: SubscriptionInfo = {
+        id: subscriptionId,
         subscription,
         retryPolicy: this.getDefaultRetryPolicy()
       };
@@ -272,13 +273,14 @@ export class EventBus implements IEventBus {
       return subscription;
       
     } catch (error) {
+      const errorInstance = error instanceof Error ? error : new Error(String(error));
       this.logger.error('Failed to create subscription', {
         subscriptionId,
         eventType,
-        error: error.message
+        error: errorInstance.message
       });
       
-      throw error;
+      throw errorInstance;
     }
   }
   
@@ -344,9 +346,10 @@ export class EventBus implements IEventBus {
       };
       
     } catch (error) {
+      const errorInstance = error instanceof Error ? error : new Error(String(error));
       this.logger.error('Failed to handle failed event', {
         eventId: event.id,
-        error: error.message
+        error: errorInstance.message
       });
       
       return {
@@ -380,9 +383,10 @@ export class EventBus implements IEventBus {
             failedMessages++;
           }
         } catch (error) {
+          const errorInstance = error instanceof Error ? error : new Error(String(error));
           this.logger.error('Failed to reprocess DLQ message', {
             messageId: message.id,
-            error: error.message
+            error: errorInstance.message
           });
           
           results.push({
@@ -408,7 +412,8 @@ export class EventBus implements IEventBus {
       };
       
     } catch (error) {
-      this.logger.error('DLQ reprocessing failed', { error: error.message });
+      const errorInstance = error instanceof Error ? error : new Error(String(error));
+      this.logger.error('DLQ reprocessing failed', { error: errorInstance.message });
       
       return {
         totalMessages: 0,
@@ -485,14 +490,15 @@ export class EventBus implements IEventBus {
       });
       
     } catch (error) {
+      const errorInstance = error instanceof Error ? error : new Error(String(error));
       // Update error metrics
       this.metrics.counter('event_bus.handler_errors', 1, {
         event_type: event.type,
         subscription_id: subscription.subscription.id,
-        error_type: this.categorizeError(error)
+        error_type: this.categorizeError(errorInstance)
       });
       
-      throw error;
+      throw errorInstance;
     }
   }
   
@@ -516,17 +522,18 @@ export class EventBus implements IEventBus {
           await this.notifySubscriber(subscription, event);
           
         } catch (error) {
+          const errorInstance = error instanceof Error ? error : new Error(String(error));
           this.logger.error('Realtime event handler failed', {
             eventId: eventData.id,
             subscriptionId: subscription.subscription.id,
-            error: error.message
+            error: errorInstance.message
           });
           
           // Handle retry logic
-          if (this.isRetryableError(error)) {
-            await this.addToRetryQueue(eventData, subscription, error);
+          if (this.isRetryableError(errorInstance)) {
+            await this.addToRetryQueue(eventData, subscription, errorInstance);
           } else {
-            await this.sendToDLQ(eventData, subscription, error);
+            await this.sendToDLQ(eventData, subscription, errorInstance);
           }
         }
       }
@@ -561,9 +568,10 @@ export class EventBus implements IEventBus {
         try {
           await this.processRetryQueue(queueKey, retryQueue);
         } catch (error) {
+          const errorInstance = error instanceof Error ? error : new Error(String(error));
           this.logger.error('Retry queue processing failed', {
             queueKey,
-            error: error.message
+            error: errorInstance.message
           });
         }
       }
@@ -579,11 +587,12 @@ export class EventBus implements IEventBus {
         await retryQueue.removeItem(item);
         
       } catch (error) {
+        const errorInstance = error instanceof Error ? error : new Error(String(error));
         item.retryCount++;
         
         if (item.retryCount >= item.subscription.retryPolicy.maxRetries) {
           // Max retries exceeded, send to DLQ
-          await this.sendToDLQ(item.event, item.subscription, error);
+          await this.sendToDLQ(item.event, item.subscription, errorInstance);
           await retryQueue.removeItem(item);
         } else {
           // Schedule next retry
@@ -634,12 +643,13 @@ export class EventBus implements IEventBus {
       }
       
     } catch (error) {
+      const errorInstance = error instanceof Error ? error : new Error(String(error));
       this.logger.error('DLQ message reprocessing failed', {
         messageId: message.id,
-        error: error.message
+        error: errorInstance.message
       });
       
-      throw error;
+      throw errorInstance;
     }
   }
   
@@ -737,6 +747,7 @@ export class EventBus implements IEventBus {
 // ============================================================================
 
 interface SubscriptionInfo {
+  id: string;
   subscription: Subscription;
   retryPolicy: RetryPolicy;
 }
@@ -766,10 +777,9 @@ interface DLQMessage {
 
 class RetryQueue {
   private items: Map<string, RetryItem> = new Map();
-  private retryPolicy: RetryPolicy;
   
-  constructor(retryPolicy: RetryPolicy) {
-    this.retryPolicy = retryPolicy;
+  constructor(_retryPolicy: RetryPolicy) {
+    // RetryPolicy is handled at the subscription level
   }
   
   async addItem(item: RetryItem): Promise<void> {
@@ -889,7 +899,8 @@ class DLQProcessor {
       this.logger.info('Loaded DLQ messages', { count: this.messages.size });
       
     } catch (error) {
-      this.logger.error('Failed to load DLQ messages', { error: error.message });
+      const errorInstance = error instanceof Error ? error : new Error(String(error));
+      this.logger.error('Failed to load DLQ messages', { error: errorInstance.message });
     }
   }
   
@@ -899,7 +910,8 @@ class DLQProcessor {
       try {
         await this.processReadyMessages();
       } catch (error) {
-        this.logger.error('DLQ periodic processing failed', { error: error.message });
+        const errorInstance = error instanceof Error ? error : new Error(String(error));
+        this.logger.error('DLQ periodic processing failed', { error: errorInstance.message });
       }
     }, 30000);
   }

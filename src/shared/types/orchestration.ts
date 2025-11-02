@@ -275,6 +275,7 @@ export interface SagaAction {
   type: string;
   payload?: any;
   handler: string;
+  parameters?: Record<string, any>;
 }
 
 /**
@@ -412,9 +413,9 @@ export enum EventPriority {
 }
 
 export enum CompensationStrategy {
-  ROLLBACK = 'rollback',
-  FORWARD_RECOVERY = 'forward_recovery',
-  MANUAL_INTERVENTION = 'manual_intervention'
+  ROLLBACK = 'ROLLBACK',
+  FORWARD_RECOVERY = 'FORWARD_RECOVERY',
+  MANUAL_INTERVENTION = 'MANUAL_INTERVENTION'
 }
 
 // ============================================================================
@@ -596,6 +597,7 @@ export interface EventError {
   message: string;
   cause?: Error;
   retryable: boolean;
+  severity?: ErrorSeverity;
 }
 
 /**

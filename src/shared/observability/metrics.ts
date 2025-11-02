@@ -5,8 +5,10 @@
 
 export interface IMetricsCollector {
   increment(name: string, value?: number, labels?: Record<string, string>): void;
+  counter(name: string, value?: number, labels?: Record<string, string>): void;
+  incrementCounter(name: string, labels?: Record<string, string>): void;
   histogram(name: string, value: number, labels?: Record<string, string>): void;
-  gauge(name: string, value: number, labels?: Record<string, string>): void;
+  gauge(name: string, value: number | (() => number), labels?: Record<string, string>): void;
   recordHttpRequest(metric: HttpRequestMetric): void;
   recordCreditOperation(metric: CreditOperationMetric): void;
   recordPayment(metric: PaymentMetric): void;
@@ -52,6 +54,14 @@ class MetricsCollector implements IMetricsCollector {
     }));
   }
 
+  counter(name: string, value: number = 1, labels?: Record<string, string>): void {
+    this.increment(name, value, labels);
+  }
+
+  incrementCounter(name: string, labels?: Record<string, string>): void {
+    this.counter(name, 1, labels);
+  }
+
   histogram(name: string, value: number, labels?: Record<string, string>): void {
     console.log(JSON.stringify({
       type: 'metric',
@@ -63,12 +73,13 @@ class MetricsCollector implements IMetricsCollector {
     }));
   }
 
-  gauge(name: string, value: number, labels?: Record<string, string>): void {
+  gauge(name: string, value: number | (() => number), labels?: Record<string, string>): void {
+    const actualValue = typeof value === 'function' ? value() : value;
     console.log(JSON.stringify({
       type: 'metric',
       name: 'gauge',
       metric_name: name,
-      value,
+      value: actualValue,
       labels: labels || {},
       timestamp: new Date().toISOString()
     }));

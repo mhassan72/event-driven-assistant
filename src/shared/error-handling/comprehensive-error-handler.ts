@@ -12,9 +12,9 @@ import {
   ErrorSeverity,
   RecoveryStrategy 
 } from './error-categories';
-import { CircuitBreaker, CircuitBreakerManager, CircuitBreakerConfig } from './circuit-breaker';
-import { RetryExecutor, RetryManager, RetryPolicy, DEFAULT_RETRY_POLICIES } from './retry-mechanism';
-import { DeadLetterQueueManager, DLQItem } from './dead-letter-queue';
+import { CircuitBreakerManager, CircuitBreakerConfig } from './circuit-breaker';
+import { RetryManager, RetryPolicy, DEFAULT_RETRY_POLICIES } from './retry-mechanism';
+import { DeadLetterQueueManager } from './dead-letter-queue';
 import { Database } from 'firebase-admin/database';
 import { Firestore } from 'firebase-admin/firestore';
 

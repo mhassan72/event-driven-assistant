@@ -196,7 +196,9 @@ export class ModelManagementService implements IModelManagementService {
       
       return discoveredModels;
     } catch (error) {
-      this.logger.error('Model discovery failed', { error });
+      this.logger.error('Model discovery failed', { 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
       this.metrics.increment('model_discovery.errors');
       throw error;
     }
@@ -223,7 +225,10 @@ export class ModelManagementService implements IModelManagementService {
       this.metrics.increment('model_management.models_registered');
       
     } catch (error) {
-      this.logger.error('Model registration failed', { modelId: model.id, error });
+      this.logger.error('Model registration failed', { 
+        modelId: model.id, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
       this.metrics.increment('model_management.registration_errors');
       throw error;
     }
@@ -244,7 +249,10 @@ export class ModelManagementService implements IModelManagementService {
       this.metrics.increment('model_management.models_updated');
       
     } catch (error) {
-      this.logger.error('Model update failed', { modelId, error });
+      this.logger.error('Model update failed', { 
+        modelId, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
       this.metrics.increment('model_management.update_errors');
       throw error;
     }
@@ -279,7 +287,10 @@ export class ModelManagementService implements IModelManagementService {
       return models;
       
     } catch (error) {
-      this.logger.error('Failed to retrieve available models', { category, error });
+      this.logger.error('Failed to retrieve available models', { 
+        category, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
       throw error;
     }
   }
@@ -295,7 +306,10 @@ export class ModelManagementService implements IModelManagementService {
       return { id: doc.id, ...doc.data() } as AIModel;
       
     } catch (error) {
-      this.logger.error('Failed to retrieve model by ID', { modelId, error });
+      this.logger.error('Failed to retrieve model by ID', { 
+        modelId, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
       throw error;
     }
   }
@@ -360,7 +374,10 @@ export class ModelManagementService implements IModelManagementService {
       return healthStatus;
       
     } catch (error) {
-      this.logger.error('Health check failed', { modelId, error });
+      this.logger.error('Health check failed', { 
+        modelId, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
       throw error;
     }
   }
@@ -428,7 +445,9 @@ export class ModelManagementService implements IModelManagementService {
       return report;
       
     } catch (error) {
-      this.logger.error('Failed to check all models health', { error });
+      this.logger.error('Failed to check all models health', { 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
       throw error;
     }
   }
@@ -443,7 +462,11 @@ export class ModelManagementService implements IModelManagementService {
       this.logger.info('Model availability updated', { modelId, isAvailable });
       
     } catch (error) {
-      this.logger.error('Failed to update model availability', { modelId, isAvailable, error });
+      this.logger.error('Failed to update model availability', { 
+        modelId, 
+        isAvailable, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
       throw error;
     }
   }
@@ -480,7 +503,10 @@ export class ModelManagementService implements IModelManagementService {
       return analyticsData;
       
     } catch (error) {
-      this.logger.error('Failed to get model analytics', { modelId, error });
+      this.logger.error('Failed to get model analytics', { 
+        modelId, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
       throw error;
     }
   }
@@ -501,7 +527,10 @@ export class ModelManagementService implements IModelManagementService {
       this.logger.info('Model performance updated', { modelId });
       
     } catch (error) {
-      this.logger.error('Failed to update model performance', { modelId, error });
+      this.logger.error('Failed to update model performance', { 
+        modelId, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
       throw error;
     }
   }
@@ -521,7 +550,10 @@ export class ModelManagementService implements IModelManagementService {
       this.metrics.increment('model_usage.recorded');
       
     } catch (error) {
-      this.logger.error('Failed to record model usage', { modelId, error });
+      this.logger.error('Failed to record model usage', { 
+        modelId, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
       throw error;
     }
   }
@@ -545,7 +577,11 @@ export class ModelManagementService implements IModelManagementService {
       this.logger.info('Model version created', { modelId, version: version.version });
       
     } catch (error) {
-      this.logger.error('Failed to create model version', { modelId, version: version.version, error });
+      this.logger.error('Failed to create model version', { 
+        modelId, 
+        version: version.version, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
       throw error;
     }
   }
@@ -562,7 +598,10 @@ export class ModelManagementService implements IModelManagementService {
       return snapshot.docs.map((doc: any) => ({ ...doc.data() } as ModelVersion));
       
     } catch (error) {
-      this.logger.error('Failed to get model versions', { modelId, error });
+      this.logger.error('Failed to get model versions', { 
+        modelId, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
       throw error;
     }
   }
@@ -596,7 +635,11 @@ export class ModelManagementService implements IModelManagementService {
       this.logger.info('Active model version updated', { modelId, version });
       
     } catch (error) {
-      this.logger.error('Failed to set active version', { modelId, version, error });
+      this.logger.error('Failed to set active version', { 
+        modelId, 
+        version, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
       throw error;
     }
   }
@@ -618,7 +661,10 @@ export class ModelManagementService implements IModelManagementService {
       this.logger.info('Model feedback recorded', { modelId: feedback.modelId });
       
     } catch (error) {
-      this.logger.error('Failed to record model feedback', { modelId: feedback.modelId, error });
+      this.logger.error('Failed to record model feedback', { 
+        modelId: feedback.modelId, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
       throw error;
     }
   }
@@ -646,7 +692,10 @@ export class ModelManagementService implements IModelManagementService {
       return doc.data() as ModelFeedbackSummary;
       
     } catch (error) {
-      this.logger.error('Failed to get model feedback summary', { modelId, error });
+      this.logger.error('Failed to get model feedback summary', { 
+        modelId, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
       throw error;
     }
   }
@@ -816,7 +865,9 @@ export class ModelManagementService implements IModelManagementService {
       try {
         await this.checkAllModelsHealth();
       } catch (error) {
-        this.logger.error('Periodic health check failed', { error });
+        this.logger.error('Periodic health check failed', { 
+          error: error instanceof Error ? error.message : 'Unknown error' 
+        });
       }
     }, 5 * 60 * 1000); // Every 5 minutes
   }

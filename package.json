@@ -22,6 +22,12 @@
     "test:integration:performance": "jest test/integration/performance-load.test.ts --verbose --testTimeout=240000",
     "test:integration:security": "jest test/integration/security-compliance.test.ts --verbose --testTimeout=120000",
     "test:all": "npm run test && npm run test:integration",
+    "test:deployment": "jest --selectProjects deployment-tests --verbose",
+    "test:deployment:smoke": "jest test/deployment/smoke-tests.test.ts --verbose --testTimeout=300000",
+    "test:deployment:monitoring": "jest test/deployment/monitoring-validation.test.ts --verbose --testTimeout=300000",
+    "test:deployment:recovery": "jest test/deployment/disaster-recovery-validation.test.ts --verbose --testTimeout=300000",
+    "test:deployment:security": "jest test/deployment/security-compliance-validation.test.ts --verbose --testTimeout=300000",
+    "validate:deployment": "./scripts/validate-deployment.sh",
     "emulators:start": "firebase emulators:start",
     "emulators:test": "firebase emulators:exec --only database 'npm run test:security'"
   },
@@ -39,7 +45,8 @@
     "helmet": "^8.1.0",
     "inversify": "^6.0.2",
     "p-retry": "^6.2.0",
-    "reflect-metadata": "^0.2.2"
+    "reflect-metadata": "^0.2.2",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^3.0.3",

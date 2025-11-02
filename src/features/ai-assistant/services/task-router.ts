@@ -182,7 +182,10 @@ export class TaskRouter implements ITaskRouter {
       return this.getDefaultStrategy(classification, systemLoad);
 
     } catch (error) {
-      this.logger.error('Failed to determine routing strategy', { classification, error });
+      this.logger.error('Failed to determine routing strategy', { 
+        classification, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
       // Fallback to synchronous for safety
       return RoutingStrategy.SYNCHRONOUS;
     }
@@ -297,7 +300,9 @@ export class TaskRouter implements ITaskRouter {
       return load;
 
     } catch (error) {
-      this.logger.error('Failed to check system load', { error });
+      this.logger.error('Failed to check system load', { 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
       // Return safe defaults
       return {
         cpuUsage: 50,

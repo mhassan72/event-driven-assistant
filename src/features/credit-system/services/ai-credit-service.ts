@@ -7,7 +7,7 @@ import { logger } from '../../../shared/observability/logger';
 import { IMetricsCollector } from '../../../shared/observability/metrics';
 import { CreditService } from './credit-service';
 import { ILedgerService, LedgerService } from './ledger-service';
-import { IBalanceSyncService, BalanceSyncService, BalanceChangeType } from './balance-sync-service';
+import { IBalanceSyncService, BalanceSyncService } from './balance-sync-service';
 import { 
   ICreditService,
   CreditBalance,
@@ -18,20 +18,12 @@ import {
   LowBalanceAlert,
   AlertLevel,
   CreditUsageAnalytics,
-  TimeRange,
-  FeatureUsage,
-  DailyUsage,
-  ModelUsage
+  TimeRange
 } from '../../../shared/types/credit-system';
 import {
-  ConversationRequest,
-  AgentTaskRequest,
-  TaskType,
-  ModelCategory,
-  AIModel
+  TaskType
 } from '../../../shared/types/ai-assistant';
-import { getFirestore } from 'firebase-admin/firestore';
-import { getDatabase } from 'firebase-admin/database';
+// Firebase instances should be injected via constructor
 import { v4 as uuidv4 } from 'uuid';
 
 /**
@@ -157,7 +149,6 @@ export interface IAICreditService extends ICreditService {
  */
 export class AICreditService extends CreditService implements IAICreditService {
   private firestore = getFirestore();
-  private database = getDatabase();
   private ledgerService: ILedgerService;
   private balanceSyncService: IBalanceSyncService;
   private welcomeBonusConfig: WelcomeBonusConfig;

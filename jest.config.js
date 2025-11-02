@@ -27,5 +27,23 @@ module.exports = {
   testPathIgnorePatterns: [
     '/node_modules/',
     '/test/shared/orchestration/'
+  ],
+  // Deployment test configuration
+  projects: [
+    {
+      displayName: 'unit-tests',
+      testMatch: ['<rootDir>/test/**/*.test.ts'],
+      testPathIgnorePatterns: [
+        '/node_modules/',
+        '/test/shared/orchestration/',
+        '/test/deployment/'
+      ]
+    },
+    {
+      displayName: 'deployment-tests',
+      testMatch: ['<rootDir>/test/deployment/**/*.test.ts'],
+      testTimeout: 300000, // 5 minutes for deployment tests
+      setupFilesAfterEnv: ['<rootDir>/test/setup.ts']
+    }
   ]
 };

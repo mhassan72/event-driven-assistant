@@ -1083,7 +1083,7 @@ export class SystemAnalyticsService implements ISystemAnalyticsService {
         .filter(t => t.type === 'credit_addition')
         .reduce((sum, t) => sum + t.amount, 0);
       
-      const uniqueUsers = new Set(transactions.map(t => t.userId)).size;
+
       
       const analytics: CreditUsageAnalytics = {
         userId: 'system', // System-wide analytics
@@ -1107,7 +1107,9 @@ export class SystemAnalyticsService implements ISystemAnalyticsService {
       return analytics;
       
     } catch (error) {
-      this.logger.error('Failed to get credit usage analytics', { error });
+      this.logger.error('Failed to get credit usage analytics', { 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
       throw error;
     }
   }
@@ -1155,7 +1157,9 @@ export class SystemAnalyticsService implements ISystemAnalyticsService {
       return report;
       
     } catch (error) {
-      this.logger.error('Failed to get financial reporting', { error });
+      this.logger.error('Failed to get financial reporting', { 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
       throw error;
     }
   }
@@ -1213,7 +1217,9 @@ export class SystemAnalyticsService implements ISystemAnalyticsService {
       return metrics;
       
     } catch (error) {
-      this.logger.error('Failed to get user engagement metrics', { error });
+      this.logger.error('Failed to get user engagement metrics', { 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
       throw error;
     }
   }
@@ -1241,7 +1247,9 @@ export class SystemAnalyticsService implements ISystemAnalyticsService {
       return analysis;
       
     } catch (error) {
-      this.logger.error('Failed to get user segment analysis', { error });
+      this.logger.error('Failed to get user segment analysis', { 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
       throw error;
     }
   }
@@ -1272,7 +1280,9 @@ export class SystemAnalyticsService implements ISystemAnalyticsService {
       return report;
       
     } catch (error) {
-      this.logger.error('Failed to get system performance report', { error });
+      this.logger.error('Failed to get system performance report', { 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
       throw error;
     }
   }
@@ -1298,7 +1308,9 @@ export class SystemAnalyticsService implements ISystemAnalyticsService {
       return metrics;
       
     } catch (error) {
-      this.logger.error('Failed to get system reliability metrics', { error });
+      this.logger.error('Failed to get system reliability metrics', { 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
       throw error;
     }
   }
@@ -1329,7 +1341,9 @@ export class SystemAnalyticsService implements ISystemAnalyticsService {
       return report;
       
     } catch (error) {
-      this.logger.error('Failed to get business intelligence report', { error });
+      this.logger.error('Failed to get business intelligence report', { 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
       throw error;
     }
   }
@@ -1348,7 +1362,9 @@ export class SystemAnalyticsService implements ISystemAnalyticsService {
       return dashboard;
       
     } catch (error) {
-      this.logger.error('Failed to get KPI dashboard', { error });
+      this.logger.error('Failed to get KPI dashboard', { 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
       throw error;
     }
   }
@@ -1375,7 +1391,9 @@ export class SystemAnalyticsService implements ISystemAnalyticsService {
       return metrics;
       
     } catch (error) {
-      this.logger.error('Failed to get real-time metrics', { error });
+      this.logger.error('Failed to get real-time metrics', { 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
       throw error;
     }
   }
@@ -1396,7 +1414,9 @@ export class SystemAnalyticsService implements ISystemAnalyticsService {
       return status;
       
     } catch (error) {
-      this.logger.error('Failed to get system health status', { error });
+      this.logger.error('Failed to get system health status', { 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
       throw error;
     }
   }

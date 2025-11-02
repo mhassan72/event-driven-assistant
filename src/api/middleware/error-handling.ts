@@ -80,13 +80,15 @@ export class InternalServerError extends Error implements AppError {
 }
 
 export const errorHandler = (
-  error: AppError,
+  error: Error | AppError,
   req: Request,
   res: Response,
   next: NextFunction
 ): void => {
-  const statusCode = error.statusCode || 500;
-  const code = error.code || 'UNKNOWN_ERROR';
+  // Ensure we're working with an AppError
+  const appError = error as AppError;
+  const statusCode = appError.statusCode || 500;
+  const code = appError.code || 'UNKNOWN_ERROR';
   
   // Log error details
   logger.error('API Error', {
@@ -96,14 +98,14 @@ export const errorHandler = (
       code,
       statusCode,
       stack: error.stack,
-      details: error.details
+      details: appError.details
     },
     request: {
       method: req.method,
       url: req.originalUrl,
       headers: req.headers,
       body: req.body,
-      user: req.user?.uid
+      user: (req as any).user?.uid
     }
   });
 
@@ -117,9 +119,9 @@ export const errorHandler = (
   };
 
   // Add details for non-production environments or operational errors
-  if (!isProduction || error.isOperational) {
-    if (error.details) {
-      response.details = error.details;
+  if (!isProduction || appError.isOperational) {
+    if (appError.details) {
+      response.details = appError.details;
     }
   }
 

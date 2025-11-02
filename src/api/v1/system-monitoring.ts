@@ -18,14 +18,13 @@ import { validateRequest } from '../middleware/validation';
 import { 
   SystemMonitoringService,
   DashboardService,
-  AlertThreshold,
   AlertSeverity,
   ISystemMonitoringService,
   IDashboardService
 } from '../../features/notification-system';
-import { Logger } from '../../shared/observability/logger';
-import { Metrics } from '../../shared/observability/metrics';
-import { admin } from 'firebase-admin';
+import { logger } from '../../shared/observability/logger';
+import { metrics } from '../../shared/observability/metrics';
+import { firestore, realtimeDb } from '../../app';
 import { z } from 'zod';
 
 const systemMonitoringRouter = Router();
@@ -54,10 +53,10 @@ let dashboardService: IDashboardService;
 
 function getMonitoringService(): ISystemMonitoringService {
   if (!monitoringService) {
-    const firestore = admin.firestore();
-    const realtimeDb = admin.database();
-    const logger = Logger.getInstance();
-    const metrics = Metrics.getInstance();
+    // Use imported firestore and realtimeDb instances
+    if (!firestore || !realtimeDb) {
+      throw new Error('Firebase services not initialized');
+    }
     
     // Note: In a real implementation, you'd inject the NotificationService
     monitoringService = new SystemMonitoringService(
@@ -99,7 +98,8 @@ systemMonitoringRouter.get('/health',
       });
 
     } catch (error) {
-      Logger.getInstance().error('Failed to get system health', error, {
+      logger.error('Failed to get system health', {
+        error: error instanceof Error ? error.message : 'Unknown error',
         adminId: req.user?.uid
       });
 
@@ -230,7 +230,8 @@ systemMonitoringRouter.patch('/alerts/:alertId/acknowledge',
       });
 
     } catch (error) {
-      Logger.getInstance().error('Failed to acknowledge alert', error, {
+      logger.error('Failed to acknowledge alert', {
+        error: error instanceof Error ? error.message : 'Unknown error',
         adminId: req.user?.uid,
         alertId: req.params.alertId
       });
@@ -268,7 +269,8 @@ systemMonitoringRouter.patch('/alerts/:alertId/resolve',
       });
 
     } catch (error) {
-      Logger.getInstance().error('Failed to resolve alert', error, {
+      logger.error('Failed to resolve alert', {
+        error: error instanceof Error ? error.message : 'Unknown error',
         adminId: req.user?.uid,
         alertId: req.params.alertId
       });
@@ -396,7 +398,8 @@ systemMonitoringRouter.delete('/thresholds/:thresholdId',
       });
 
     } catch (error) {
-      Logger.getInstance().error('Failed to delete alert threshold', error, {
+      logger.error('Failed to delete alert threshold', {
+        error: error instanceof Error ? error.message : 'Unknown error',
         adminId: req.user?.uid,
         thresholdId: req.params.thresholdId
       });

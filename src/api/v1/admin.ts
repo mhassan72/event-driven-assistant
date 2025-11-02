@@ -11,7 +11,7 @@ import { ModelManagementService } from '@/features/ai-assistant/services/model-m
 import { SystemAnalyticsService, ISystemAnalyticsService } from '@/features/ai-assistant/services/system-analytics-service';
 import { logger } from '@/shared/observability/logger';
 import { metrics } from '@/shared/observability/metrics';
-import * as admin from 'firebase-admin';
+import { firestore } from '../../app';
 
 const adminRouter = Router();
 
@@ -19,7 +19,9 @@ const adminRouter = Router();
 adminRouter.use(requireAdmin);
 
 // Initialize services
-const firestore = admin.firestore();
+if (!firestore) {
+  throw new Error('Firestore not initialized');
+}
 const modelManagementService = new ModelManagementService(firestore, logger, metrics);
 const adminModelService: IAdminModelService = new AdminModelService(
   firestore,
@@ -717,9 +719,13 @@ adminRouter.get('/monitoring/health', asyncHandler(async (req: any, res: any) =>
 // User management endpoints
 adminRouter.get('/users', asyncHandler(async (req: any, res: any) => {
   try {
-    const { limit = 50, offset = 0, segment, status } = req.query;
+    if (!firestore) {
+      throw new Error('Firestore not available');
+    }
     
-    let query = firestore.collection('users');
+    const { limit = 50, offset = 0, status } = req.query;
+    
+    let query: any = firestore.collection('users');
     
     if (status) {
       query = query.where('status', '==', status);
@@ -736,7 +742,7 @@ adminRouter.get('/users', asyncHandler(async (req: any, res: any) => {
     }));
     
     // Get total count
-    const totalSnapshot = await firestore.collection('users').get();
+    const totalSnapshot = await firestore!.collection('users').get();
     const totalCount = totalSnapshot.size;
     
     res.json({
@@ -762,6 +768,10 @@ adminRouter.get('/users', asyncHandler(async (req: any, res: any) => {
 
 adminRouter.get('/users/:userId/credits', asyncHandler(async (req: any, res: any) => {
   try {
+    if (!firestore) {
+      throw new Error('Firestore not available');
+    }
+    
     const { userId } = req.params;
     
     // Get user credit balance

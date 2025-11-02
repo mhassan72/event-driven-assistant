@@ -21,6 +21,7 @@ import { sanitizeRequest } from './api/middleware/validation';
 
 // Import API routes
 import { v1Router } from './api/v1';
+import { monitoringRoutes } from './api/monitoring/routes';
 
 // Initialize Firebase Admin SDK with graceful error handling
 let firebaseInitialized = false;
@@ -134,6 +135,7 @@ app.get('/health', (req, res) => {
 
 // API routes
 app.use('/v1', v1Router);
+app.use('/monitoring', monitoringRoutes);
 
 // 404 handler
 app.use((req, res) => {

@@ -4,12 +4,9 @@
  */
 
 import {
-  SystemHealthMetrics,
   SystemHealthStatus,
   AlertSeverity,
-  SystemAlert,
-  FraudAlert,
-  ModelPerformanceAlert
+  SystemAlert
 } from './system-monitoring-service';
 import { IStructuredLogger } from '../../../shared/observability/logger';
 import { IMetricsCollector } from '../../../shared/observability/metrics';

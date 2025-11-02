@@ -211,15 +211,16 @@ export class OperationQueue {
     } catch (error) {
       this.logger.error('Failed to enqueue operation', {
         operationId,
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       });
       
+      const errorInstance = error instanceof Error ? error : new Error(String(error));
       this.metrics.counter('operation_queue.enqueue_errors', 1, {
         operation_type: operation.type,
-        error_type: this.categorizeError(error)
+        error_type: this.categorizeError(errorInstance)
       });
       
-      throw error;
+      throw errorInstance;
     }
   }
   
@@ -255,7 +256,7 @@ export class OperationQueue {
     } catch (error) {
       this.logger.error('Failed to get operation status', {
         operationId,
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       });
       
       return null;
@@ -293,7 +294,7 @@ export class OperationQueue {
     } catch (error) {
       this.logger.error('Failed to cancel operation', {
         operationId,
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       });
       
       return false;
@@ -327,7 +328,9 @@ export class OperationQueue {
         }
       }
     } catch (error) {
-      this.logger.error('Operation processing loop failed', { error: error.message });
+      this.logger.error('Operation processing loop failed', { 
+        error: error instanceof Error ? error.message : String(error) 
+      });
     } finally {
       this.isProcessing = false;
     }
@@ -402,7 +405,8 @@ export class OperationQueue {
       
     } catch (error) {
       // Handle operation failure
-      await this.handleOperationFailure(operation, error, Date.now() - startTime);
+      const errorInstance = error instanceof Error ? error : new Error(String(error));
+      await this.handleOperationFailure(operation, errorInstance, Date.now() - startTime);
     }
   }
   
@@ -469,7 +473,7 @@ export class OperationQueue {
     } catch (error) {
       this.logger.error('Failed to handle operation success', {
         operationId: operation.id,
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       });
     }
   }
@@ -483,20 +487,21 @@ export class OperationQueue {
     executionTime: number
   ): Promise<void> {
     try {
+      const errorInstance = error instanceof Error ? error : new Error(String(error));
       this.logger.error('Operation failed', {
         operationId: operation.id,
         attempt: operation.attemptCount,
-        error: error.message,
+        error: errorInstance.message,
         executionTime
       });
       
       // Create operation error
       const operationError: OperationError = {
-        code: this.getErrorCode(error),
-        message: error.message,
+        code: this.getErrorCode(errorInstance),
+        message: errorInstance.message,
         timestamp: new Date(),
-        retryable: this.isRetryableError(error),
-        severity: this.getErrorSeverity(error),
+        retryable: this.isRetryableError(errorInstance),
+        severity: this.getErrorSeverity(errorInstance),
         context: {
           attempt: operation.attemptCount,
           executionTime
@@ -551,14 +556,14 @@ export class OperationQueue {
       // Update metrics
       this.metrics.counter('operation_queue.failed', 1, {
         operation_type: operation.type,
-        error_type: this.categorizeError(error),
+        error_type: this.categorizeError(errorInstance),
         retryable: operationError.retryable.toString()
       });
       
     } catch (error) {
       this.logger.error('Failed to handle operation failure', {
         operationId: operation.id,
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       });
     }
   }
@@ -658,7 +663,9 @@ export class OperationQueue {
       this.logger.info('Operation recovery completed');
       
     } catch (error) {
-      this.logger.error('Failed to recover pending operations', { error: error.message });
+      this.logger.error('Failed to recover pending operations', { 
+        error: error instanceof Error ? error.message : String(error) 
+      });
     }
   }
   
@@ -749,10 +756,10 @@ export class OperationQueue {
     return 'unknown';
   }
   
-  private async getTotalQueueDepth(): Promise<number> {
+  private getTotalQueueDepth(): number {
     let total = 0;
     for (const queue of this.queues.values()) {
-      total += await queue.size();
+      total += queue.size();
     }
     return total;
   }
@@ -773,11 +780,11 @@ export class OperationQueue {
 // ============================================================================
 
 class PriorityQueue {
-  private priority: OperationPriority;
+  private _priority: OperationPriority; // Stored for potential future use
   private operations: QueuedOperation[] = [];
   
   constructor(priority: OperationPriority) {
-    this.priority = priority;
+    this._priority = priority;
   }
   
   async enqueue(operation: QueuedOperation): Promise<void> {
@@ -802,7 +809,7 @@ class PriorityQueue {
     return null;
   }
   
-  async size(): Promise<number> {
+  size(): number {
     return this.operations.length;
   }
 }

@@ -10,9 +10,9 @@ import {
   FeatureUsage,
   DailyUsage,
   ModelUsage
-} from '@/shared/types';
-import { IStructuredLogger } from '@/shared/observability/logger';
-import { IMetricsCollector } from '@/shared/observability/metrics';
+} from '../../../shared/types';
+import { IStructuredLogger } from '../../../shared/observability/logger';
+import { IMetricsCollector } from '../../../shared/observability/metrics';
 import * as admin from 'firebase-admin';
 
 /**

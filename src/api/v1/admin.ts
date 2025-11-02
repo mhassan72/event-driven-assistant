@@ -6,11 +6,11 @@
 import { Router } from 'express';
 import { asyncHandler } from '../middleware/error-handling';
 import { requireAdmin } from '../middleware/auth';
-import { AdminModelService, IAdminModelService } from '@/features/ai-assistant/services/admin-model-service';
-import { ModelManagementService } from '@/features/ai-assistant/services/model-management-service';
-import { SystemAnalyticsService, ISystemAnalyticsService } from '@/features/ai-assistant/services/system-analytics-service';
-import { logger } from '@/shared/observability/logger';
-import { metrics } from '@/shared/observability/metrics';
+import { AdminModelService, IAdminModelService } from '../../features/ai-assistant/services/admin-model-service';
+import { ModelManagementService } from '../../features/ai-assistant/services/model-management-service';
+import { SystemAnalyticsService, ISystemAnalyticsService } from '../../features/ai-assistant/services/system-analytics-service';
+import { logger } from '../../shared/observability/logger';
+import { metrics } from '../../shared/observability/metrics';
 import { firestore } from '../../app';
 
 const adminRouter = Router();

@@ -3,6 +3,7 @@
  * Manages credit deduction for AI interactions with dynamic pricing
  */
 
+import { getFirestore } from 'firebase-admin/firestore';
 import { logger } from '../../../shared/observability/logger';
 import { IMetricsCollector } from '../../../shared/observability/metrics';
 import { CreditService } from './credit-service';
@@ -148,7 +149,7 @@ export interface IAICreditService extends ICreditService {
  * AI-specific credit service implementation
  */
 export class AICreditService extends CreditService implements IAICreditService {
-  private firestore = getFirestore();
+  private firestore: any;
   private ledgerService: ILedgerService;
   private balanceSyncService: IBalanceSyncService;
   private welcomeBonusConfig: WelcomeBonusConfig;
@@ -159,8 +160,13 @@ export class AICreditService extends CreditService implements IAICreditService {
     lowBalance?: Partial<LowBalanceConfig>;
     ledgerService?: ILedgerService;
     balanceSyncService?: IBalanceSyncService;
+    firestore?: any;
+    database?: any;
   }) {
-    super(metrics);
+    super(metrics, undefined, config?.firestore, config?.database);
+    
+    // Initialize Firebase services
+    this.firestore = config?.firestore !== undefined ? config.firestore : getFirestore();
     
     // Initialize services
     this.ledgerService = config?.ledgerService || new LedgerService(metrics);

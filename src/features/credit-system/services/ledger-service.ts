@@ -3,6 +3,7 @@
  * Implements cryptographic transaction recording with hash chain validation
  */
 
+import { getFirestore } from 'firebase-admin/firestore';
 import { logger } from '../../../shared/observability/logger';
 import { IMetricsCollector } from '../../../shared/observability/metrics';
 import { 
@@ -278,7 +279,11 @@ export class CryptoUtils implements ICryptoUtils {
  */
 export class IntegrityMonitor implements IIntegrityMonitor {
   private activeSessions = new Map<string, MonitoringSession>();
-  private firestore = getFirestore();
+  private firestore: any;
+
+  constructor(firestore?: any) {
+    this.firestore = firestore !== undefined ? firestore : getFirestore();
+  }
 
   async startMonitoring(userId: string): Promise<MonitoringSession> {
     const sessionId = uuidv4();
@@ -327,7 +332,7 @@ export class IntegrityMonitor implements IIntegrityMonitor {
  * Blockchain-style ledger service implementation
  */
 export class LedgerService implements ILedgerService {
-  private firestore = getFirestore();
+  private firestore: any;
   private cryptoUtils: ICryptoUtils;
   private integrityMonitor: IIntegrityMonitor;
   private metrics: IMetricsCollector;
@@ -336,11 +341,13 @@ export class LedgerService implements ILedgerService {
   constructor(
     metrics: IMetricsCollector,
     cryptoUtils?: ICryptoUtils,
-    integrityMonitor?: IIntegrityMonitor
+    integrityMonitor?: IIntegrityMonitor,
+    firestore?: any
   ) {
+    this.firestore = firestore !== undefined ? firestore : getFirestore();
     this.metrics = metrics;
     this.cryptoUtils = cryptoUtils || new CryptoUtils();
-    this.integrityMonitor = integrityMonitor || new IntegrityMonitor();
+    this.integrityMonitor = integrityMonitor || new IntegrityMonitor(this.firestore);
     
     // In production, this would be securely managed
     this.signingKey = process.env.LEDGER_SIGNING_KEY || 'default-signing-key';

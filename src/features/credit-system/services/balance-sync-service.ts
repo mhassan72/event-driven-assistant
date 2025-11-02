@@ -3,6 +3,8 @@
  * Manages real-time balance updates and credit reservations
  */
 
+import { getFirestore } from 'firebase-admin/firestore';
+import { getDatabase } from 'firebase-admin/database';
 import { logger } from '../../../shared/observability/logger';
 import { IMetricsCollector } from '../../../shared/observability/metrics';
 import { 
@@ -167,14 +169,16 @@ export interface PaymentOption {
  * Real-time balance synchronization service implementation
  */
 export class BalanceSyncService implements IBalanceSyncService {
-  private firestore = getFirestore();
-  private database = getDatabase();
+  private firestore: any;
+  private database: any;
   private metrics: IMetricsCollector;
   private config: BalanceSyncConfig;
   private healthMonitoringInterval?: NodeJS.Timeout;
   private activeSubscriptions = new Map<string, () => void>();
 
-  constructor(metrics: IMetricsCollector, config?: Partial<BalanceSyncConfig>) {
+  constructor(metrics: IMetricsCollector, config?: Partial<BalanceSyncConfig>, firestore?: any, database?: any) {
+    this.firestore = firestore !== undefined ? firestore : getFirestore();
+    this.database = database !== undefined ? database : getDatabase();
     this.metrics = metrics;
     this.config = {
       syncIntervalMs: 5000, // 5 seconds

@@ -50,7 +50,21 @@ const metrics: IMetricsCollector = {
   }
 };
 
-const aiCreditService = new AICreditService(metrics);
+// Import Firebase instances from app
+import { firestore, realtimeDb } from '../../app';
+
+// Lazy initialization of the service to avoid Firebase initialization issues
+let aiCreditService: AICreditService | null = null;
+
+function getAICreditService(): AICreditService {
+  if (!aiCreditService) {
+    aiCreditService = new AICreditService(metrics, {
+      firestore,
+      database: realtimeDb
+    });
+  }
+  return aiCreditService;
+}
 
 // Get current credit balance
 creditsRouter.get('/balance', asyncHandler(async (req: any, res: any) => {
@@ -64,7 +78,7 @@ creditsRouter.get('/balance', asyncHandler(async (req: any, res: any) => {
   }
 
   try {
-    const balance = await aiCreditService.getBalance(userId);
+    const balance = await getAICreditService().getBalance(userId);
     
     res.json({
       success: true,
@@ -122,7 +136,7 @@ creditsRouter.get('/history', asyncHandler(async (req: any, res: any) => {
       sortOrder
     };
 
-    const transactions = await aiCreditService.getTransactionHistory(userId, options);
+    const transactions = await getAICreditService().getTransactionHistory(userId, options);
     
     res.json({
       success: true,
@@ -172,7 +186,7 @@ creditsRouter.get('/analytics', asyncHandler(async (req: any, res: any) => {
       granularity: TimeGranularity.DAY
     };
 
-    const analytics = await aiCreditService.getAIUsageAnalytics(userId, timeRange);
+    const analytics = await getAICreditService().getAIUsageAnalytics(userId, timeRange);
     
     res.json({
       success: true,
@@ -203,7 +217,7 @@ creditsRouter.get('/low-balance-check', asyncHandler(async (req: any, res: any) 
   }
 
   try {
-    const alert = await aiCreditService.checkLowBalanceThreshold(userId);
+    const alert = await getAICreditService().checkLowBalanceThreshold(userId);
     
     res.json({
       success: true,
@@ -239,7 +253,7 @@ creditsRouter.post('/welcome-bonus', asyncHandler(async (req: any, res: any) => 
   try {
     const { deviceFingerprint } = req.body;
     
-    const transaction = await aiCreditService.grantWelcomeBonus(userId, deviceFingerprint);
+    const transaction = await getAICreditService().grantWelcomeBonus(userId, deviceFingerprint);
     
     res.json({
       success: true,

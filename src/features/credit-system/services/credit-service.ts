@@ -3,6 +3,8 @@
  * Manages user credits, transactions, and reservations
  */
 
+import { getFirestore } from 'firebase-admin/firestore';
+import { getDatabase } from 'firebase-admin/database';
 import { logger } from '../../../shared/observability/logger';
 import { IMetricsCollector } from '../../../shared/observability/metrics';
 import { 
@@ -40,12 +42,15 @@ export interface CreditServiceConfig {
  * Credit service implementation
  */
 export class CreditService implements ICreditService {
-  private firestore = getFirestore();
-  private database = getDatabase();
+  private firestore: any;
+  private database: any;
   private metrics: IMetricsCollector;
   private config: CreditServiceConfig;
 
-  constructor(metrics: IMetricsCollector, config?: Partial<CreditServiceConfig>) {
+  constructor(metrics: IMetricsCollector, config?: Partial<CreditServiceConfig>, firestore?: any, database?: any) {
+    // Initialize Firebase services - use provided instances or get from Firebase Admin
+    this.firestore = firestore !== undefined ? firestore : getFirestore();
+    this.database = database !== undefined ? database : getDatabase();
     this.metrics = metrics;
     this.config = {
       welcomeBonusAmount: 1000,

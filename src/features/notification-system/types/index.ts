@@ -1,6 +1,7 @@
 /**
  * Notification System Types Index
- * Central export point for notification type definitions
+ * Central export point for all notification system type definitions
  */
 
-export * from './notification-types';
+// Notification Interfaces
+export * from './notification-interfaces';

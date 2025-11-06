@@ -3,6 +3,8 @@
  * Global test setup for Jest environment
  */
 
+import { jest } from '@jest/globals';
+
 // Set test environment variables
 process.env.NODE_ENV = 'test';
 process.env.FIREBASE_PROJECT_ID = 'test-project';
@@ -10,6 +12,34 @@ process.env.FIREBASE_CLIENT_EMAIL = 'test@test-project.iam.gserviceaccount.com';
 process.env.FIREBASE_PRIVATE_KEY = '-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC7VJTUt9Us8cKB\nxIuOiQ4jofNjRbQlSdKn6krl7l1dqtdhhN39Q3yR58BdNpwZeI+DDMoQHuA==\n-----END PRIVATE KEY-----';
 process.env.FIREBASE_DATABASE_URL = 'https://test-project.firebaseio.com';
 process.env.FIREBASE_STORAGE_BUCKET = 'test-project.appspot.com';
+
+// Mock Firebase Admin
+jest.mock('firebase-admin', () => ({
+  initializeApp: jest.fn(),
+  credential: {
+    cert: jest.fn()
+  },
+  firestore: jest.fn(() => ({
+    collection: jest.fn().mockReturnThis(),
+    doc: jest.fn().mockReturnThis(),
+    get: jest.fn(),
+    set: jest.fn(),
+    update: jest.fn(),
+    add: jest.fn(),
+    where: jest.fn().mockReturnThis(),
+    orderBy: jest.fn().mockReturnThis(),
+    limit: jest.fn().mockReturnThis(),
+    runTransaction: jest.fn()
+  })),
+  database: jest.fn(() => ({
+    ref: jest.fn().mockReturnThis(),
+    once: jest.fn(),
+    set: jest.fn(),
+    update: jest.fn(),
+    on: jest.fn(),
+    off: jest.fn()
+  }))
+}));
 
 // Mock console methods to reduce noise in tests
 const originalConsoleWarn = console.warn;
@@ -24,15 +54,14 @@ afterAll(() => {
   console.error = originalConsoleError;
 });
 
-// Global test timeout
+// Set global test timeout (moved from jest config)
 jest.setTimeout(30000);
 
-// Mock timers for consistent testing
+// Global setup and cleanup
 beforeEach(() => {
-  jest.useFakeTimers();
+  jest.clearAllMocks();
 });
 
 afterEach(() => {
-  jest.useRealTimers();
-  jest.clearAllMocks();
+  jest.restoreAllMocks();
 });

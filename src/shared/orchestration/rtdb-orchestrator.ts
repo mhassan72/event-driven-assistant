@@ -3,8 +3,7 @@
  * Concrete implementation of the orchestrator for AI assistant and credit system workflows
  */
 
-import { Database } from 'firebase-admin/database';
-import { Firestore } from 'firebase-admin/firestore';
+
 import { 
   BaseOrchestrator, 
   OrchestratorDependencies,
@@ -14,8 +13,6 @@ import {
 } from './base-orchestrator';
 import {
   WorkflowDefinition,
-  WorkflowResult,
-  SystemEvent,
   SecureOperation,
   PublicOperation,
   SagaDefinition,
@@ -27,12 +24,12 @@ import {
   ExecutionStatus,
   SagaStatus,
   CompensationStatus,
+  CompensationStrategy,
   SecurityLevel,
   SecureOperationType,
   PublicOperationType
 } from '../types/orchestration';
-import { TaskType, TaskClassification } from '../types/ai-assistant';
-import { TransactionType, CreditTransaction } from '../types/credit-system';
+import { TaskClassification } from '../types/ai-assistant';
 
 /**
  * AI Assistant and Credit System specific orchestrator
@@ -40,16 +37,13 @@ import { TransactionType, CreditTransaction } from '../types/credit-system';
 export class RTDBOrchestrator extends BaseOrchestrator {
   private sagaInstances: Map<string, SagaInstance> = new Map();
   private taskClassifier: ITaskClassifier;
-  private _creditService: ICreditService;
   
   constructor(
     dependencies: OrchestratorDependencies,
-    taskClassifier: ITaskClassifier,
-    creditService: ICreditService
+    taskClassifier: ITaskClassifier
   ) {
     super(dependencies);
     this.taskClassifier = taskClassifier;
-    this._creditService = creditService;
     
     this.initializeAIOrchestrator();
   }
@@ -537,7 +531,7 @@ export class RTDBOrchestrator extends BaseOrchestrator {
           code: 'STEP_EXECUTION_FAILED',
           message: error instanceof Error ? error.message : 'Unknown error',
           cause: error,
-          retryable: this.isRetryableError(error)
+          retryable: this.isRetryableError(error instanceof Error ? error : new Error(String(error)))
         },
         startedAt: new Date(startTime),
         completedAt: new Date(),
@@ -869,7 +863,3 @@ interface ITaskClassifier {
   classifyTask(request: any): Promise<TaskClassification>;
 }
 
-interface ICreditService {
-  validateBalance(userId: string, amount: number): Promise<boolean>;
-  deductCredits(userId: string, amount: number, reason: string): Promise<CreditTransaction>;
-}

@@ -1,0 +1,365 @@
+src/features/ai-assistant/services/admin-model-service.ts(43,11): error TS6133: '_firestore' is declared but its value is never read.
+src/features/ai-assistant/services/admin-model-service.ts(45,11): error TS6133: '_metrics' is declared but its value is never read.
+src/features/ai-assistant/services/admin-model-service.ts(46,11): error TS6133: '_modelManagementService' is declared but its value is never read.
+src/features/ai-assistant/services/system-analytics-service.ts(1041,11): error TS6133: '_metrics' is declared but its value is never read.
+src/features/credit-system/services/ai-credit-service.ts(168,10): error TS2341: Property 'firestore' is private and only accessible within class 'CreditService'.
+src/features/credit-system/services/ai-credit-service.ts(287,26): error TS2341: Property 'categorizeError' is private and only accessible within class 'CreditService'.
+src/features/credit-system/services/ai-credit-service.ts(351,31): error TS2341: Property 'firestore' is private and only accessible within class 'CreditService'.
+src/features/credit-system/services/ai-credit-service.ts(384,18): error TS2341: Property 'firestore' is private and only accessible within class 'CreditService'.
+src/features/credit-system/services/ai-credit-service.ts(391,18): error TS2341: Property 'firestore' is private and only accessible within class 'CreditService'.
+src/features/credit-system/services/ai-credit-service.ts(419,26): error TS2341: Property 'categorizeError' is private and only accessible within class 'CreditService'.
+src/features/credit-system/services/ai-credit-service.ts(436,31): error TS2341: Property 'firestore' is private and only accessible within class 'CreditService'.
+src/features/credit-system/services/ai-credit-service.ts(443,39): error TS2341: Property 'firestore' is private and only accessible within class 'CreditService'.
+src/features/credit-system/services/ai-credit-service.ts(450,40): error TS2341: Property 'firestore' is private and only accessible within class 'CreditService'.
+src/features/credit-system/services/ai-credit-service.ts(464,45): error TS2341: Property 'firestore' is private and only accessible within class 'CreditService'.
+src/features/credit-system/services/ai-credit-service.ts(501,41): error TS2341: Property 'firestore' is private and only accessible within class 'CreditService'.
+src/features/credit-system/services/ai-credit-service.ts(680,18): error TS2341: Property 'firestore' is private and only accessible within class 'CreditService'.
+src/features/credit-system/services/ai-credit-service.ts(708,20): error TS2341: Property 'firestore' is private and only accessible within class 'CreditService'.
+src/features/credit-system/services/ai-credit-service.ts(761,35): error TS2341: Property 'firestore' is private and only accessible within class 'CreditService'.
+src/features/credit-system/services/ai-credit-service.ts(790,45): error TS2341: Property 'firestore' is private and only accessible within class 'CreditService'.
+src/features/credit-system/services/ai-credit-service.ts(881,18): error TS2341: Property 'firestore' is private and only accessible within class 'CreditService'.
+src/features/credit-system/services/ai-credit-service.ts(883,12): error TS2339: Property 'logger' does not exist on type 'AICreditService'.
+src/features/credit-system/services/ai-credit-service.ts(885,12): error TS2339: Property 'logger' does not exist on type 'AICreditService'.
+src/features/credit-system/services/ai-credit-service.ts(899,18): error TS2341: Property 'firestore' is private and only accessible within class 'CreditService'.
+src/features/credit-system/services/ai-credit-service.ts(904,12): error TS2339: Property 'logger' does not exist on type 'AICreditService'.
+src/features/credit-system/services/ai-credit-service.ts(906,12): error TS2339: Property 'logger' does not exist on type 'AICreditService'.
+src/features/credit-system/services/balance-sync-service.ts(319,41): error TS7006: Parameter 'userId' implicitly has an 'any' type.
+src/features/credit-system/services/balance-sync-service.ts(388,50): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
+src/features/credit-system/services/balance-sync-service.ts(478,50): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
+src/features/credit-system/services/balance-sync-service.ts(563,50): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
+src/features/credit-system/services/balance-sync-service.ts(795,54): error TS7006: Parameter 'snapshot' implicitly has an 'any' type.
+src/features/credit-system/services/credit-service.ts(170,50): error TS7006: Parameter 'firestoreTransaction' implicitly has an 'any' type.
+src/features/credit-system/services/credit-service.ts(277,50): error TS7006: Parameter 'firestoreTransaction' implicitly has an 'any' type.
+src/features/credit-system/services/credit-service.ts(368,50): error TS7006: Parameter 'firestoreTransaction' implicitly has an 'any' type.
+src/features/credit-system/services/credit-service.ts(440,50): error TS7006: Parameter 'firestoreTransaction' implicitly has an 'any' type.
+src/features/credit-system/services/credit-service.ts(686,48): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
+src/features/credit-system/services/ledger-service.ts(406,50): error TS7006: Parameter 'firestoreTransaction' implicitly has an 'any' type.
+src/features/credit-system/services/ledger-service.ts(899,63): error TS7006: Parameter 't' implicitly has an 'any' type.
+src/features/credit-system/services/ledger-service.ts(943,31): error TS2693: 'ComplianceStatus' only refers to a type, but is being used as a value here.
+src/features/credit-system/services/ledger-service.ts(1323,15): error TS2693: 'ComplianceStatus' only refers to a type, but is being used as a value here.
+src/features/index.ts(8,1): error TS2308: Module './credit-system' has already exported a member named 'ComplianceResult'. Consider explicitly re-exporting to resolve the ambiguity.
+src/features/index.ts(8,1): error TS2308: Module './credit-system' has already exported a member named 'CryptoUtils'. Consider explicitly re-exporting to resolve the ambiguity.
+src/features/index.ts(9,1): error TS2308: Module './ai-assistant' has already exported a member named 'AlertSeverity'. Consider explicitly re-exporting to resolve the ambiguity.
+src/features/index.ts(9,1): error TS2308: Module './ai-assistant' has already exported a member named 'ModelUsageStats'. Consider explicitly re-exporting to resolve the ambiguity.
+src/features/index.ts(9,1): error TS2308: Module './payment-processing' has already exported a member named 'TimeRange'. Consider explicitly re-exporting to resolve the ambiguity.
+src/features/notification-system/services/dashboard-service.ts(138,11): error TS6133: '_firestore' is declared but its value is never read.
+src/features/notification-system/services/dashboard-service.ts(140,11): error TS6133: '_metrics' is declared but its value is never read.
+src/features/notification-system/services/dashboard-service.ts(180,60): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogContext | undefined'.
+src/features/notification-system/services/index.ts(7,1): error TS2308: Module './notification-service' has already exported a member named 'INotificationDeliveryService'. Consider explicitly re-exporting to resolve the ambiguity.
+src/features/notification-system/services/index.ts(8,1): error TS2308: Module './notification-service' has already exported a member named 'INotificationTemplateService'. Consider explicitly re-exporting to resolve the ambiguity.
+src/features/notification-system/services/notification-service.ts(28,11): error TS2564: Property '_firestore' has no initializer and is not definitely assigned in the constructor.
+src/features/notification-system/services/notification-service.ts(28,11): error TS6133: '_firestore' is declared but its value is never read.
+src/features/notification-system/services/notification-service.ts(31,11): error TS2564: Property '_metrics' has no initializer and is not definitely assigned in the constructor.
+src/features/notification-system/services/notification-service.ts(31,11): error TS6133: '_metrics' is declared but its value is never read.
+src/features/notification-system/services/notification-service.ts(32,11): error TS6133: '_templateService' is declared but its value is never read.
+src/features/notification-system/services/notification-service.ts(43,10): error TS2551: Property 'firestore' does not exist on type 'NotificationService'. Did you mean '_firestore'?
+src/features/notification-system/services/notification-service.ts(46,10): error TS2551: Property 'metrics' does not exist on type 'NotificationService'. Did you mean '_metrics'?
+src/features/notification-system/services/notification-service.ts(94,12): error TS2551: Property 'metrics' does not exist on type 'NotificationService'. Did you mean '_metrics'?
+src/features/notification-system/services/notification-service.ts(115,12): error TS2551: Property 'metrics' does not exist on type 'NotificationService'. Did you mean '_metrics'?
+src/features/notification-system/services/notification-service.ts(143,18): error TS2551: Property 'firestore' does not exist on type 'NotificationService'. Did you mean '_firestore'?
+src/features/notification-system/services/notification-service.ts(149,12): error TS2551: Property 'metrics' does not exist on type 'NotificationService'. Did you mean '_metrics'?
+src/features/notification-system/services/notification-service.ts(168,36): error TS2551: Property 'firestore' does not exist on type 'NotificationService'. Did you mean '_firestore'?
+src/features/notification-system/services/notification-service.ts(190,20): error TS2551: Property 'firestore' does not exist on type 'NotificationService'. Did you mean '_firestore'?
+src/features/notification-system/services/notification-service.ts(194,12): error TS2551: Property 'metrics' does not exist on type 'NotificationService'. Did you mean '_metrics'?
+src/features/notification-system/services/notification-service.ts(224,10): error TS2551: Property 'metrics' does not exist on type 'NotificationService'. Did you mean '_metrics'?
+src/features/notification-system/services/notification-service.ts(234,24): error TS2551: Property 'firestore' does not exist on type 'NotificationService'. Did you mean '_firestore'?
+src/features/notification-system/services/notification-service.ts(275,36): error TS2551: Property 'firestore' does not exist on type 'NotificationService'. Did you mean '_firestore'?
+src/features/notification-system/services/notification-service.ts(301,12): error TS2551: Property 'metrics' does not exist on type 'NotificationService'. Did you mean '_metrics'?
+src/features/notification-system/services/notification-service.ts(315,32): error TS2551: Property 'firestore' does not exist on type 'NotificationService'. Did you mean '_firestore'?
+src/features/notification-system/services/notification-service.ts(320,26): error TS2551: Property 'firestore' does not exist on type 'NotificationService'. Did you mean '_firestore'?
+src/features/notification-system/services/notification-service.ts(322,29): error TS7006: Parameter 'doc' implicitly has an 'any' type.
+src/features/notification-system/services/notification-service.ts(333,29): error TS7006: Parameter 'doc' implicitly has an 'any' type.
+src/features/notification-system/services/notification-service.ts(342,12): error TS2551: Property 'metrics' does not exist on type 'NotificationService'. Did you mean '_metrics'?
+src/features/notification-system/services/notification-service.ts(356,36): error TS2551: Property 'firestore' does not exist on type 'NotificationService'. Did you mean '_firestore'?
+src/features/notification-system/services/notification-service.ts(376,12): error TS2551: Property 'metrics' does not exist on type 'NotificationService'. Did you mean '_metrics'?
+src/features/notification-system/services/notification-service.ts(388,35): error TS2551: Property 'firestore' does not exist on type 'NotificationService'. Did you mean '_firestore'?
+src/features/notification-system/services/notification-service.ts(406,35): error TS2551: Property 'firestore' does not exist on type 'NotificationService'. Did you mean '_firestore'?
+src/features/notification-system/services/notification-service.ts(419,12): error TS2551: Property 'metrics' does not exist on type 'NotificationService'. Did you mean '_metrics'?
+src/features/notification-system/services/notification-service.ts(431,24): error TS2551: Property 'firestore' does not exist on type 'NotificationService'. Did you mean '_firestore'?
+src/features/notification-system/services/notification-service.ts(449,41): error TS7006: Parameter 'n' implicitly has an 'any' type.
+src/features/notification-system/services/notification-service.ts(450,36): error TS7006: Parameter 'n' implicitly has an 'any' type.
+src/features/notification-system/services/notification-service.ts(451,38): error TS7006: Parameter 'n' implicitly has an 'any' type.
+src/features/notification-system/services/notification-service.ts(487,26): error TS2551: Property 'firestore' does not exist on type 'NotificationService'. Did you mean '_firestore'?
+src/features/notification-system/services/notification-service.ts(578,16): error TS2551: Property 'firestore' does not exist on type 'NotificationService'. Did you mean '_firestore'?
+src/features/notification-system/services/notification-service.ts(594,16): error TS2551: Property 'firestore' does not exist on type 'NotificationService'. Did you mean '_firestore'?
+src/features/notification-system/services/notification-template-service.ts(159,32): error TS2345: Argument of type 'NotificationTemplate' is not assignable to parameter of type '{ [x: string]: any; } & AddPrefixToKeys<string, any>'.
+  Type 'NotificationTemplate' is not assignable to type 'AddPrefixToKeys<string, any>'.
+    Index signature for type '`${string}.${string}`' is missing in type 'NotificationTemplate'.
+src/features/notification-system/services/providers/email-provider.ts(12,11): error TS2564: Property '_metrics' has no initializer and is not definitely assigned in the constructor.
+src/features/notification-system/services/providers/email-provider.ts(12,11): error TS6133: '_metrics' is declared but its value is never read.
+src/features/notification-system/services/providers/email-provider.ts(13,11): error TS6133: '_apiKey' is declared but its value is never read.
+src/features/notification-system/services/providers/email-provider.ts(14,11): error TS6133: '_fromEmail' is declared but its value is never read.
+src/features/notification-system/services/providers/email-provider.ts(15,11): error TS6133: '_fromName' is declared but its value is never read.
+src/features/notification-system/services/providers/email-provider.ts(27,10): error TS2551: Property 'metrics' does not exist on type 'EmailProvider'. Did you mean '_metrics'?
+src/features/notification-system/services/providers/email-provider.ts(53,12): error TS2551: Property 'metrics' does not exist on type 'EmailProvider'. Did you mean '_metrics'?
+src/features/notification-system/services/providers/email-provider.ts(76,12): error TS2551: Property 'metrics' does not exist on type 'EmailProvider'. Did you mean '_metrics'?
+src/features/notification-system/services/providers/sms-provider.ts(12,11): error TS2564: Property '_metrics' has no initializer and is not definitely assigned in the constructor.
+src/features/notification-system/services/providers/sms-provider.ts(12,11): error TS6133: '_metrics' is declared but its value is never read.
+src/features/notification-system/services/providers/sms-provider.ts(13,11): error TS6133: '_apiKey' is declared but its value is never read.
+src/features/notification-system/services/providers/sms-provider.ts(14,11): error TS6133: '_fromNumber' is declared but its value is never read.
+src/features/notification-system/services/providers/sms-provider.ts(25,10): error TS2551: Property 'metrics' does not exist on type 'SMSProvider'. Did you mean '_metrics'?
+src/features/notification-system/services/providers/sms-provider.ts(66,12): error TS2551: Property 'metrics' does not exist on type 'SMSProvider'. Did you mean '_metrics'?
+src/features/notification-system/services/providers/sms-provider.ts(90,12): error TS2551: Property 'metrics' does not exist on type 'SMSProvider'. Did you mean '_metrics'?
+src/features/notification-system/services/system-monitoring-service.ts(7,3): error TS2724: '"../types"' has no exported member named 'NotificationService'. Did you mean 'INotificationService'?
+src/features/notification-system/services/system-monitoring-service.ts(187,11): error TS2564: Property '_firestore' has no initializer and is not definitely assigned in the constructor.
+src/features/notification-system/services/system-monitoring-service.ts(187,11): error TS6133: '_firestore' is declared but its value is never read.
+src/features/notification-system/services/system-monitoring-service.ts(190,11): error TS2564: Property '_metrics' has no initializer and is not definitely assigned in the constructor.
+src/features/notification-system/services/system-monitoring-service.ts(190,11): error TS6133: '_metrics' is declared but its value is never read.
+src/features/notification-system/services/system-monitoring-service.ts(201,10): error TS2551: Property 'firestore' does not exist on type 'SystemMonitoringService'. Did you mean '_firestore'?
+src/features/notification-system/services/system-monitoring-service.ts(204,10): error TS2551: Property 'metrics' does not exist on type 'SystemMonitoringService'. Did you mean '_metrics'?
+src/features/notification-system/services/system-monitoring-service.ts(218,13): error TS2322: Type '{ creditSystemHealth: CreditSystemHealth; modelPerformance: ModelPerformanceMetrics[]; paymentSystemHealth: PaymentSystemHealth; ... 8 more ...; queueDepth?: number | undefined; }' is not assignable to type 'SystemHealthMetrics'.
+  Types of property 'cpuUsage' are incompatible.
+    Type 'number | undefined' is not assignable to type 'number'.
+      Type 'undefined' is not assignable to type 'number'.
+src/features/notification-system/services/system-monitoring-service.ts(232,61): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogContext | undefined'.
+src/features/notification-system/services/system-monitoring-service.ts(258,56): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogContext | undefined'.
+src/features/notification-system/services/system-monitoring-service.ts(267,18): error TS2551: Property 'firestore' does not exist on type 'SystemMonitoringService'. Did you mean '_firestore'?
+src/features/notification-system/services/system-monitoring-service.ts(272,18): error TS2551: Property 'firestore' does not exist on type 'SystemMonitoringService'. Did you mean '_firestore'?
+src/features/notification-system/services/system-monitoring-service.ts(285,33): error TS2551: Property 'firestore' does not exist on type 'SystemMonitoringService'. Did you mean '_firestore'?
+src/features/notification-system/services/system-monitoring-service.ts(313,33): error TS2551: Property 'firestore' does not exist on type 'SystemMonitoringService'. Did you mean '_firestore'?
+src/features/notification-system/services/system-monitoring-service.ts(333,35): error TS2551: Property 'firestore' does not exist on type 'SystemMonitoringService'. Did you mean '_firestore'?
+src/features/notification-system/services/system-monitoring-service.ts(337,59): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogContext | undefined'.
+src/features/notification-system/services/system-monitoring-service.ts(377,55): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogContext | undefined'.
+src/features/notification-system/services/system-monitoring-service.ts(384,29): error TS2551: Property 'firestore' does not exist on type 'SystemMonitoringService'. Did you mean '_firestore'?
+src/features/notification-system/services/system-monitoring-service.ts(408,29): error TS2551: Property 'firestore' does not exist on type 'SystemMonitoringService'. Did you mean '_firestore'?
+src/features/notification-system/services/system-monitoring-service.ts(430,35): error TS2551: Property 'firestore' does not exist on type 'SystemMonitoringService'. Did you mean '_firestore'?
+src/features/notification-system/services/system-monitoring-service.ts(438,56): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogContext | undefined'.
+src/features/notification-system/services/system-monitoring-service.ts(468,65): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogContext | undefined'.
+src/features/notification-system/services/system-monitoring-service.ts(516,64): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogContext | undefined'.
+src/features/notification-system/services/system-monitoring-service.ts(541,42): error TS2551: Property 'firestore' does not exist on type 'SystemMonitoringService'. Did you mean '_firestore'?
+src/features/notification-system/services/system-monitoring-service.ts(545,62): error TS7006: Parameter 'doc' implicitly has an 'any' type.
+src/features/notification-system/services/system-monitoring-service.ts(549,63): error TS7006: Parameter 'doc' implicitly has an 'any' type.
+src/features/notification-system/services/system-monitoring-service.ts(565,36): error TS2551: Property 'firestore' does not exist on type 'SystemMonitoringService'. Did you mean '_firestore'?
+src/features/notification-system/services/system-monitoring-service.ts(590,38): error TS2551: Property 'firestore' does not exist on type 'SystemMonitoringService'. Did you mean '_firestore'?
+src/features/notification-system/services/system-monitoring-service.ts(595,58): error TS7006: Parameter 'doc' implicitly has an 'any' type.
+src/features/notification-system/services/system-monitoring-service.ts(598,54): error TS7006: Parameter 'doc' implicitly has an 'any' type.
+src/features/notification-system/services/system-monitoring-service.ts(601,55): error TS7006: Parameter 'doc' implicitly has an 'any' type.
+src/features/notification-system/services/system-monitoring-service.ts(631,16): error TS2551: Property 'firestore' does not exist on type 'SystemMonitoringService'. Did you mean '_firestore'?
+src/features/notification-system/services/system-monitoring-service.ts(672,16): error TS2551: Property 'firestore' does not exist on type 'SystemMonitoringService'. Did you mean '_firestore'?
+src/features/notification-system/services/system-monitoring-service.ts(683,16): error TS2551: Property 'firestore' does not exist on type 'SystemMonitoringService'. Did you mean '_firestore'?
+src/features/notification-system/services/system-monitoring-service.ts(737,16): error TS2551: Property 'firestore' does not exist on type 'SystemMonitoringService'. Did you mean '_firestore'?
+src/features/notification-system/services/system-monitoring-service.ts(766,16): error TS2551: Property 'firestore' does not exist on type 'SystemMonitoringService'. Did you mean '_firestore'?
+src/features/notification-system/services/system-monitoring-service.ts(776,16): error TS2551: Property 'firestore' does not exist on type 'SystemMonitoringService'. Did you mean '_firestore'?
+src/features/payment-processing/events/payment-events.ts(8,1): error TS6133: 'IStructuredLogger' is declared but its value is never read.
+src/features/payment-processing/events/payment-events.ts(9,1): error TS6133: 'IMetricsCollector' is declared but its value is never read.
+src/features/payment-processing/index.ts(8,1): error TS2308: Module './services' has already exported a member named 'WalletValidationResult'. Consider explicitly re-exporting to resolve the ambiguity.
+src/features/payment-processing/services/payment-orchestrator.ts(9,3): error TS6133: 'Web3PaymentRequest' is declared but its value is never read.
+src/features/payment-processing/services/payment-orchestrator.ts(14,3): error TS6133: 'PaymentErrorType' is declared but its value is never read.
+src/features/payment-processing/services/payment-orchestrator.ts(16,63): error TS6133: 'PaymentConfirmationData' is declared but its value is never read.
+src/features/payment-processing/services/payment-orchestrator.ts(205,11): error TS6133: '_webhookHandler' is declared but its value is never read.
+src/features/payment-processing/services/payment-orchestrator.ts(207,11): error TS2564: Property '_metrics' has no initializer and is not definitely assigned in the constructor.
+src/features/payment-processing/services/payment-orchestrator.ts(207,11): error TS6133: '_metrics' is declared but its value is never read.
+src/features/payment-processing/services/payment-orchestrator.ts(221,10): error TS2551: Property 'metrics' does not exist on type 'PaymentOrchestrator'. Did you mean '_metrics'?
+src/features/payment-processing/services/payment-orchestrator.ts(252,14): error TS2551: Property 'metrics' does not exist on type 'PaymentOrchestrator'. Did you mean '_metrics'?
+src/features/payment-processing/services/payment-orchestrator.ts(287,12): error TS2551: Property 'metrics' does not exist on type 'PaymentOrchestrator'. Did you mean '_metrics'?
+src/features/payment-processing/services/payment-orchestrator.ts(313,12): error TS2551: Property 'metrics' does not exist on type 'PaymentOrchestrator'. Did you mean '_metrics'?
+src/features/payment-processing/services/payment-orchestrator.ts(363,12): error TS2551: Property 'metrics' does not exist on type 'PaymentOrchestrator'. Did you mean '_metrics'?
+src/features/payment-processing/services/payment-orchestrator.ts(528,12): error TS2551: Property 'metrics' does not exist on type 'PaymentOrchestrator'. Did you mean '_metrics'?
+src/features/payment-processing/services/payment-validator.ts(91,11): error TS2564: Property '_metrics' has no initializer and is not definitely assigned in the constructor.
+src/features/payment-processing/services/payment-validator.ts(91,11): error TS6133: '_metrics' is declared but its value is never read.
+src/features/payment-processing/services/payment-validator.ts(92,11): error TS6133: '_fraudThreshold' is declared but its value is never read.
+src/features/payment-processing/services/payment-validator.ts(100,10): error TS2551: Property 'metrics' does not exist on type 'PaymentValidator'. Did you mean '_metrics'?
+src/features/payment-processing/services/payment-validator.ts(174,12): error TS2551: Property 'metrics' does not exist on type 'PaymentValidator'. Did you mean '_metrics'?
+src/features/payment-processing/services/payment-validator.ts(199,12): error TS2551: Property 'metrics' does not exist on type 'PaymentValidator'. Did you mean '_metrics'?
+src/features/payment-processing/services/payment-validator.ts(300,11): error TS6133: 'startTime' is declared but its value is never read.
+src/features/payment-processing/services/payment-validator.ts(389,12): error TS2551: Property 'metrics' does not exist on type 'PaymentValidator'. Did you mean '_metrics'?
+src/features/payment-processing/services/payment-validator.ts(547,5): error TS2322: Type 'string | boolean' is not assignable to type 'boolean'.
+  Type 'string' is not assignable to type 'boolean'.
+src/features/payment-processing/services/payment-validator.ts(597,34): error TS2322: Type '"identity_verification"' is not assignable to type 'VerificationType'.
+src/features/payment-processing/services/payment-validator.ts(597,59): error TS2322: Type '"phone_verification"' is not assignable to type 'VerificationType'.
+src/features/payment-processing/services/payment-validator.ts(604,34): error TS2322: Type '"two_factor_auth"' is not assignable to type 'VerificationType'.
+src/features/payment-processing/services/payment-validator.ts(604,53): error TS2322: Type '"email_verification"' is not assignable to type 'VerificationType'.
+src/features/payment-processing/services/paypal-service.ts(51,11): error TS6133: '_clientId' is declared but its value is never read.
+src/features/payment-processing/services/paypal-service.ts(52,11): error TS6133: '_clientSecret' is declared but its value is never read.
+src/features/payment-processing/services/paypal-service.ts(55,11): error TS2564: Property '_metrics' has no initializer and is not definitely assigned in the constructor.
+src/features/payment-processing/services/paypal-service.ts(55,11): error TS6133: '_metrics' is declared but its value is never read.
+src/features/payment-processing/services/paypal-service.ts(68,10): error TS2551: Property 'metrics' does not exist on type 'PayPalService'. Did you mean '_metrics'?
+src/features/payment-processing/services/paypal-service.ts(126,12): error TS2551: Property 'metrics' does not exist on type 'PayPalService'. Did you mean '_metrics'?
+src/features/payment-processing/services/paypal-service.ts(146,12): error TS2551: Property 'metrics' does not exist on type 'PayPalService'. Did you mean '_metrics'?
+src/features/payment-processing/services/paypal-service.ts(224,12): error TS2551: Property 'metrics' does not exist on type 'PayPalService'. Did you mean '_metrics'?
+src/features/payment-processing/services/paypal-service.ts(247,12): error TS2551: Property 'metrics' does not exist on type 'PayPalService'. Did you mean '_metrics'?
+src/features/payment-processing/services/paypal-service.ts(289,12): error TS2551: Property 'metrics' does not exist on type 'PayPalService'. Did you mean '_metrics'?
+src/features/payment-processing/services/paypal-service.ts(350,12): error TS2551: Property 'metrics' does not exist on type 'PayPalService'. Did you mean '_metrics'?
+src/features/payment-processing/services/paypal-service.ts(361,12): error TS2551: Property 'metrics' does not exist on type 'PayPalService'. Did you mean '_metrics'?
+src/features/payment-processing/services/saga-manager.ts(8,3): error TS6133: 'SagaStep' is declared but its value is never read.
+src/features/payment-processing/services/saga-manager.ts(9,3): error TS6133: 'CompensationStep' is declared but its value is never read.
+src/features/payment-processing/services/saga-manager.ts(141,11): error TS2564: Property '_metrics' has no initializer and is not definitely assigned in the constructor.
+src/features/payment-processing/services/saga-manager.ts(141,11): error TS6133: '_metrics' is declared but its value is never read.
+src/features/payment-processing/services/saga-manager.ts(148,10): error TS2551: Property 'metrics' does not exist on type 'SagaManager'. Did you mean '_metrics'?
+src/features/payment-processing/services/saga-manager.ts(195,12): error TS2551: Property 'metrics' does not exist on type 'SagaManager'. Did you mean '_metrics'?
+src/features/payment-processing/services/saga-manager.ts(216,12): error TS2551: Property 'metrics' does not exist on type 'SagaManager'. Did you mean '_metrics'?
+src/features/payment-processing/services/saga-manager.ts(297,12): error TS2551: Property 'metrics' does not exist on type 'SagaManager'. Did you mean '_metrics'?
+src/features/payment-processing/services/saga-manager.ts(324,12): error TS2551: Property 'metrics' does not exist on type 'SagaManager'. Did you mean '_metrics'?
+src/features/payment-processing/services/saga-manager.ts(444,12): error TS2551: Property 'metrics' does not exist on type 'SagaManager'. Did you mean '_metrics'?
+src/features/payment-processing/services/stripe-service.ts(10,3): error TS6133: 'PaymentError' is declared but its value is never read.
+src/features/payment-processing/services/stripe-service.ts(11,3): error TS6133: 'PaymentErrorType' is declared but its value is never read.
+src/features/payment-processing/services/stripe-service.ts(131,11): error TS6133: '_stripe' is declared but its value is never read.
+src/features/payment-processing/services/stripe-service.ts(132,11): error TS6133: '_webhookSecret' is declared but its value is never read.
+src/features/payment-processing/services/stripe-service.ts(134,11): error TS2564: Property '_metrics' has no initializer and is not definitely assigned in the constructor.
+src/features/payment-processing/services/stripe-service.ts(134,11): error TS6133: '_metrics' is declared but its value is never read.
+src/features/payment-processing/services/stripe-service.ts(146,10): error TS2551: Property 'metrics' does not exist on type 'StripeService'. Did you mean '_metrics'?
+src/features/payment-processing/services/stripe-service.ts(199,12): error TS2551: Property 'metrics' does not exist on type 'StripeService'. Did you mean '_metrics'?
+src/features/payment-processing/services/stripe-service.ts(219,12): error TS2551: Property 'metrics' does not exist on type 'StripeService'. Did you mean '_metrics'?
+src/features/payment-processing/services/stripe-service.ts(291,12): error TS2551: Property 'metrics' does not exist on type 'StripeService'. Did you mean '_metrics'?
+src/features/payment-processing/services/stripe-service.ts(314,12): error TS2551: Property 'metrics' does not exist on type 'StripeService'. Did you mean '_metrics'?
+src/features/payment-processing/services/stripe-service.ts(360,12): error TS2551: Property 'metrics' does not exist on type 'StripeService'. Did you mean '_metrics'?
+src/features/payment-processing/services/stripe-service.ts(431,12): error TS2551: Property 'metrics' does not exist on type 'StripeService'. Did you mean '_metrics'?
+src/features/payment-processing/services/stripe-service.ts(443,12): error TS2551: Property 'metrics' does not exist on type 'StripeService'. Did you mean '_metrics'?
+src/features/payment-processing/services/traditional-payments.ts(10,3): error TS6133: 'PaymentStatus' is declared but its value is never read.
+src/features/payment-processing/services/traditional-payments.ts(11,3): error TS6133: 'PaymentError' is declared but its value is never read.
+src/features/payment-processing/services/traditional-payments.ts(12,3): error TS6133: 'PaymentErrorType' is declared but its value is never read.
+src/features/payment-processing/services/traditional-payments.ts(14,26): error TS6133: 'StripePaymentIntent' is declared but its value is never read.
+src/features/payment-processing/services/traditional-payments.ts(15,26): error TS6133: 'PayPalOrder' is declared but its value is never read.
+src/features/payment-processing/services/traditional-payments.ts(95,11): error TS2564: Property 'stripeService' has no initializer and is not definitely assigned in the constructor.
+src/features/payment-processing/services/traditional-payments.ts(95,11): error TS6133: 'stripeService' is declared but its value is never read.
+src/features/payment-processing/services/traditional-payments.ts(98,11): error TS2564: Property '_metrics' has no initializer and is not definitely assigned in the constructor.
+src/features/payment-processing/services/traditional-payments.ts(98,11): error TS6133: '_metrics' is declared but its value is never read.
+src/features/payment-processing/services/traditional-payments.ts(106,10): error TS2551: Property '_stripeService' does not exist on type 'TraditionalPaymentService'. Did you mean 'stripeService'?
+src/features/payment-processing/services/traditional-payments.ts(109,10): error TS2551: Property 'metrics' does not exist on type 'TraditionalPaymentService'. Did you mean '_metrics'?
+src/features/payment-processing/services/traditional-payments.ts(142,12): error TS2551: Property 'metrics' does not exist on type 'TraditionalPaymentService'. Did you mean '_metrics'?
+src/features/payment-processing/services/traditional-payments.ts(166,12): error TS2551: Property 'metrics' does not exist on type 'TraditionalPaymentService'. Did you mean '_metrics'?
+src/features/payment-processing/services/traditional-payments.ts(177,38): error TS2551: Property '_stripeService' does not exist on type 'TraditionalPaymentService'. Did you mean 'stripeService'?
+src/features/payment-processing/services/traditional-payments.ts(226,31): error TS2551: Property '_stripeService' does not exist on type 'TraditionalPaymentService'. Did you mean 'stripeService'?
+src/features/payment-processing/services/traditional-payments.ts(237,12): error TS2551: Property 'metrics' does not exist on type 'TraditionalPaymentService'. Did you mean '_metrics'?
+src/features/payment-processing/services/traditional-payments.ts(263,12): error TS2551: Property 'metrics' does not exist on type 'TraditionalPaymentService'. Did you mean '_metrics'?
+src/features/payment-processing/services/traditional-payments.ts(291,43): error TS2551: Property '_stripeService' does not exist on type 'TraditionalPaymentService'. Did you mean 'stripeService'?
+src/features/payment-processing/services/traditional-payments.ts(315,12): error TS2551: Property 'metrics' does not exist on type 'TraditionalPaymentService'. Did you mean '_metrics'?
+src/features/payment-processing/services/traditional-payments.ts(349,17): error TS2551: Property '_stripeService' does not exist on type 'TraditionalPaymentService'. Did you mean 'stripeService'?
+src/features/payment-processing/services/traditional-payments.ts(354,17): error TS2551: Property '_stripeService' does not exist on type 'TraditionalPaymentService'. Did you mean 'stripeService'?
+src/features/payment-processing/services/traditional-payments.ts(360,41): error TS2551: Property '_stripeService' does not exist on type 'TraditionalPaymentService'. Did you mean 'stripeService'?
+src/features/payment-processing/services/web3-payments.ts(127,11): error TS2564: Property '_metrics' has no initializer and is not definitely assigned in the constructor.
+src/features/payment-processing/services/web3-payments.ts(127,11): error TS6133: '_metrics' is declared but its value is never read.
+src/features/payment-processing/services/web3-payments.ts(136,10): error TS2551: Property 'metrics' does not exist on type 'Web3PaymentService'. Did you mean '_metrics'?
+src/features/payment-processing/services/web3-payments.ts(183,12): error TS2551: Property 'metrics' does not exist on type 'Web3PaymentService'. Did you mean '_metrics'?
+src/features/payment-processing/services/web3-payments.ts(205,12): error TS2551: Property 'metrics' does not exist on type 'Web3PaymentService'. Did you mean '_metrics'?
+src/features/payment-processing/services/web3-payments.ts(320,12): error TS2551: Property 'metrics' does not exist on type 'Web3PaymentService'. Did you mean '_metrics'?
+src/features/payment-processing/services/web3-payments.ts(344,12): error TS2551: Property 'metrics' does not exist on type 'Web3PaymentService'. Did you mean '_metrics'?
+src/features/payment-processing/services/web3-payments.ts(508,12): error TS2551: Property 'metrics' does not exist on type 'Web3PaymentService'. Did you mean '_metrics'?
+src/features/payment-processing/services/web3-payments.ts(532,12): error TS2551: Property 'metrics' does not exist on type 'Web3PaymentService'. Did you mean '_metrics'?
+src/features/payment-processing/services/web3-payments.ts(650,11): error TS6133: 'paymentData' is declared but its value is never read.
+src/functions/agent-execution.ts(16,3): error TS6133: 'AgentTaskRequest' is declared but its value is never read.
+src/functions/agent-execution.ts(17,3): error TS2305: Module '"../shared/types/ai-assistant"' has no exported member 'WorkflowDefinition'.
+src/functions/agent-execution.ts(18,3): error TS2305: Module '"../shared/types/ai-assistant"' has no exported member 'WorkflowNodeDefinition'.
+src/functions/agent-execution.ts(18,3): error TS6133: 'WorkflowNodeDefinition' is declared but its value is never read.
+src/functions/agent-execution.ts(19,3): error TS2305: Module '"../shared/types/ai-assistant"' has no exported member 'WorkflowEdgeDefinition'.
+src/functions/agent-execution.ts(19,3): error TS6133: 'WorkflowEdgeDefinition' is declared but its value is never read.
+src/functions/agent-execution.ts(25,3): error TS6133: 'WorkflowType' is declared but its value is never read.
+src/functions/agent-execution.ts(27,3): error TS6133: 'StepType' is declared but its value is never read.
+src/functions/agent-execution.ts(184,11): error TS2564: Property '_firestore' has no initializer and is not definitely assigned in the constructor.
+src/functions/agent-execution.ts(184,11): error TS6133: '_firestore' is declared but its value is never read.
+src/functions/agent-execution.ts(187,11): error TS6133: '_nebiusService' is declared but its value is never read.
+src/functions/agent-execution.ts(199,10): error TS2551: Property 'firestore' does not exist on type 'AgentExecutionHandler'. Did you mean '_firestore'?
+src/functions/agent-execution.ts(248,38): error TS2339: Property 'creditsUsed' does not exist on type 'TaskResultMetadata'.
+src/functions/agent-execution.ts(262,27): error TS2339: Property 'creditsUsed' does not exist on type 'TaskResultMetadata'.
+src/functions/agent-execution.ts(265,27): error TS2339: Property 'creditsUsed' does not exist on type 'TaskResultMetadata'.
+src/functions/agent-execution.ts(275,38): error TS2339: Property 'creditsUsed' does not exist on type 'TaskResultMetadata'.
+src/functions/agent-execution.ts(298,11): error TS6133: 'startTime' is declared but its value is never read.
+src/functions/agent-execution.ts(436,11): error TS2353: Object literal may only specify known properties, and 'creditsUsed' does not exist in type 'TaskResultMetadata'.
+src/functions/agent-execution.ts(522,11): error TS2353: Object literal may only specify known properties, and 'creditsUsed' does not exist in type 'TaskResultMetadata'.
+src/functions/agent-execution.ts(598,11): error TS2353: Object literal may only specify known properties, and 'creditsUsed' does not exist in type 'TaskResultMetadata'.
+src/functions/agent-execution.ts(674,11): error TS2353: Object literal may only specify known properties, and 'creditsUsed' does not exist in type 'TaskResultMetadata'.
+src/functions/agent-execution.ts(741,11): error TS2353: Object literal may only specify known properties, and 'creditsUsed' does not exist in type 'TaskResultMetadata'.
+src/functions/agent-execution.ts(809,18): error TS2551: Property 'firestore' does not exist on type 'AgentExecutionHandler'. Did you mean '_firestore'?
+src/functions/image-generation.ts(233,23): error TS2531: Object is possibly 'null'.
+src/index.ts(56,18): error TS2551: Property 'onPaymentCompleted' does not exist on type '{ stripeWebhook: HttpsFunction; paypalWebhook: HttpsFunction; onPaymentCreated: CloudFunction<FirestoreEvent<QueryDocumentSnapshot | undefined, { ...; }>>; onPaymentUpdated: CloudFunction<...>; onPaymentSagaCreated: CloudFunction<...>; onPaymentSagaUpdated: CloudFunction<...>; }'. Did you mean 'onPaymentCreated'?
+src/index.ts(86,18): error TS2339: Property 'executeAgentTask' does not exist on type 'typeof AgentExecutionHandler'.
+src/shared/error-handling/comprehensive-error-handler.ts(234,7): error TS2322: Type '{ success: boolean; result: T; error?: CategorizedError | undefined; executionTime: number; attempts?: number | undefined; recoveryMethod?: RecoveryStrategy | undefined; ... 7 more ...; context: Record<string, any>; }' is not assignable to type 'ErrorHandlingResult<T>'.
+  Types of property 'attempts' are incompatible.
+    Type 'number | undefined' is not assignable to type 'number'.
+      Type 'undefined' is not assignable to type 'number'.
+src/shared/error-handling/comprehensive-error-handler.ts(438,7): error TS2322: Type 'number | boolean | undefined' is not assignable to type 'boolean'.
+  Type 'undefined' is not assignable to type 'boolean'.
+src/shared/orchestration/operation-queue.ts(127,11): error TS2564: Property '_firestore' has no initializer and is not definitely assigned in the constructor.
+src/shared/orchestration/operation-queue.ts(127,11): error TS6133: '_firestore' is declared but its value is never read.
+src/shared/orchestration/operation-queue.ts(130,11): error TS2564: Property '_metrics' has no initializer and is not definitely assigned in the constructor.
+src/shared/orchestration/operation-queue.ts(130,11): error TS6133: '_metrics' is declared but its value is never read.
+src/shared/orchestration/operation-queue.ts(141,10): error TS2551: Property 'firestore' does not exist on type 'OperationQueue'. Did you mean '_firestore'?
+src/shared/orchestration/operation-queue.ts(144,10): error TS2551: Property 'metrics' does not exist on type 'OperationQueue'. Did you mean '_metrics'?
+src/shared/orchestration/operation-queue.ts(197,12): error TS2551: Property 'metrics' does not exist on type 'OperationQueue'. Did you mean '_metrics'?
+src/shared/orchestration/operation-queue.ts(202,12): error TS2551: Property 'metrics' does not exist on type 'OperationQueue'. Did you mean '_metrics'?
+src/shared/orchestration/operation-queue.ts(218,12): error TS2551: Property 'metrics' does not exist on type 'OperationQueue'. Did you mean '_metrics'?
+src/shared/orchestration/operation-queue.ts(241,30): error TS2551: Property 'firestore' does not exist on type 'OperationQueue'. Did you mean '_firestore'?
+src/shared/orchestration/operation-queue.ts(284,16): error TS2551: Property 'metrics' does not exist on type 'OperationQueue'. Did you mean '_metrics'?
+src/shared/orchestration/operation-queue.ts(464,12): error TS2551: Property 'metrics' does not exist on type 'OperationQueue'. Did you mean '_metrics'?
+src/shared/orchestration/operation-queue.ts(468,12): error TS2551: Property 'metrics' does not exist on type 'OperationQueue'. Did you mean '_metrics'?
+src/shared/orchestration/operation-queue.ts(557,12): error TS2551: Property 'metrics' does not exist on type 'OperationQueue'. Did you mean '_metrics'?
+src/shared/orchestration/operation-queue.ts(594,10): error TS2551: Property 'metrics' does not exist on type 'OperationQueue'. Did you mean '_metrics'?
+src/shared/orchestration/operation-queue.ts(645,42): error TS2551: Property 'firestore' does not exist on type 'OperationQueue'. Did you mean '_firestore'?
+src/shared/orchestration/operation-queue.ts(682,16): error TS2551: Property 'firestore' does not exist on type 'OperationQueue'. Did you mean '_firestore'?
+src/shared/orchestration/operation-queue.ts(768,10): error TS2551: Property 'metrics' does not exist on type 'OperationQueue'. Did you mean '_metrics'?
+src/shared/orchestration/operation-queue.ts(769,10): error TS2551: Property 'metrics' does not exist on type 'OperationQueue'. Did you mean '_metrics'?
+src/shared/orchestration/operation-queue.ts(770,10): error TS2551: Property 'metrics' does not exist on type 'OperationQueue'. Did you mean '_metrics'?
+src/shared/orchestration/rtdb-orchestrator.ts(6,1): error TS6133: 'Database' is declared but its value is never read.
+src/shared/orchestration/rtdb-orchestrator.ts(7,1): error TS6133: 'Firestore' is declared but its value is never read.
+src/shared/orchestration/rtdb-orchestrator.ts(17,3): error TS6133: 'WorkflowResult' is declared but its value is never read.
+src/shared/orchestration/rtdb-orchestrator.ts(18,3): error TS6133: 'SystemEvent' is declared but its value is never read.
+src/shared/orchestration/rtdb-orchestrator.ts(34,10): error TS6133: 'TaskType' is declared but its value is never read.
+src/shared/orchestration/rtdb-orchestrator.ts(35,10): error TS6133: 'TransactionType' is declared but its value is never read.
+src/shared/orchestration/rtdb-orchestrator.ts(43,11): error TS6133: '_creditService' is declared but its value is never read.
+src/shared/orchestration/rtdb-orchestrator.ts(199,21): error TS2552: Cannot find name 'CompensationStrategy'. Did you mean 'CompensationStatus'?
+src/shared/orchestration/rtdb-orchestrator.ts(540,44): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Error'.
+src/shared/orchestration/rtdb-orchestrator.ts(669,19): error TS2552: Cannot find name 'CompensationStrategy'. Did you mean 'CompensationStatus'?
+src/shared/resilience/data-consistency.ts(530,9): error TS2740: Type '{}' is missing the following properties from type 'RepairChange[]': length, pop, push, concat, and 29 more.
+src/shared/resilience/data-consistency.ts(546,40): error TS2339: Property 'length' does not exist on type '{}'.
+src/shared/resilience/data-consistency.ts(778,67): error TS7006: Parameter 'violation' implicitly has an 'any' type.
+src/shared/resilience/data-consistency.ts(778,78): error TS7006: Parameter 'rule' implicitly has an 'any' type.
+src/shared/resilience/data-consistency.ts(796,66): error TS7006: Parameter 'violation' implicitly has an 'any' type.
+src/shared/resilience/data-consistency.ts(796,77): error TS7006: Parameter 'rule' implicitly has an 'any' type.
+src/shared/resilience/distributed-locks.ts(83,11): error TS2564: Property '_firestore' has no initializer and is not definitely assigned in the constructor.
+src/shared/resilience/distributed-locks.ts(83,11): error TS6133: '_firestore' is declared but its value is never read.
+src/shared/resilience/distributed-locks.ts(85,11): error TS2564: Property '_metrics' has no initializer and is not definitely assigned in the constructor.
+src/shared/resilience/distributed-locks.ts(85,11): error TS6133: '_metrics' is declared but its value is never read.
+src/shared/resilience/distributed-locks.ts(91,11): error TS6133: '_lockQueues' is declared but its value is never read.
+src/shared/resilience/distributed-locks.ts(116,10): error TS2551: Property 'firestore' does not exist on type 'DistributedLockManager'. Did you mean '_firestore'?
+src/shared/resilience/distributed-locks.ts(118,10): error TS2551: Property 'metrics' does not exist on type 'DistributedLockManager'. Did you mean '_metrics'?
+src/shared/resilience/distributed-locks.ts(185,16): error TS2551: Property 'metrics' does not exist on type 'DistributedLockManager'. Did you mean '_metrics'?
+src/shared/resilience/distributed-locks.ts(190,16): error TS2551: Property 'metrics' does not exist on type 'DistributedLockManager'. Did you mean '_metrics'?
+src/shared/resilience/distributed-locks.ts(205,16): error TS2551: Property 'metrics' does not exist on type 'DistributedLockManager'. Did you mean '_metrics'?
+src/shared/resilience/distributed-locks.ts(227,14): error TS2551: Property 'metrics' does not exist on type 'DistributedLockManager'. Did you mean '_metrics'?
+src/shared/resilience/distributed-locks.ts(311,11): error TS6133: 'lockRef' is declared but its value is never read.
+src/shared/resilience/distributed-locks.ts(414,14): error TS2551: Property 'metrics' does not exist on type 'DistributedLockManager'. Did you mean '_metrics'?
+src/shared/resilience/distributed-locks.ts(476,16): error TS2551: Property 'metrics' does not exist on type 'DistributedLockManager'. Did you mean '_metrics'?
+src/shared/resilience/distributed-locks.ts(637,16): error TS2551: Property 'metrics' does not exist on type 'DistributedLockManager'. Did you mean '_metrics'?
+src/shared/resilience/distributed-locks.ts(774,11): error TS2564: Property '_firestore' has no initializer and is not definitely assigned in the constructor.
+src/shared/resilience/distributed-locks.ts(774,11): error TS6133: '_firestore' is declared but its value is never read.
+src/shared/resilience/distributed-locks.ts(776,11): error TS2564: Property '_metrics' has no initializer and is not definitely assigned in the constructor.
+src/shared/resilience/distributed-locks.ts(776,11): error TS6133: '_metrics' is declared but its value is never read.
+src/shared/resilience/distributed-locks.ts(783,10): error TS2551: Property 'firestore' does not exist on type 'OptimisticConcurrencyManager'. Did you mean '_firestore'?
+src/shared/resilience/distributed-locks.ts(785,10): error TS2551: Property 'metrics' does not exist on type 'OptimisticConcurrencyManager'. Did you mean '_metrics'?
+src/shared/resilience/distributed-locks.ts(796,30): error TS2551: Property 'firestore' does not exist on type 'OptimisticConcurrencyManager'. Did you mean '_firestore'?
+src/shared/resilience/distributed-locks.ts(834,27): error TS2551: Property 'firestore' does not exist on type 'OptimisticConcurrencyManager'. Did you mean '_firestore'?
+src/shared/resilience/distributed-locks.ts(836,33): error TS2551: Property 'firestore' does not exist on type 'OptimisticConcurrencyManager'. Did you mean '_firestore'?
+src/shared/resilience/distributed-locks.ts(836,65): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
+src/shared/resilience/distributed-locks.ts(860,16): error TS2551: Property 'metrics' does not exist on type 'OptimisticConcurrencyManager'. Did you mean '_metrics'?
+src/shared/resilience/distributed-locks.ts(908,14): error TS2551: Property 'metrics' does not exist on type 'OptimisticConcurrencyManager'. Did you mean '_metrics'?
+src/shared/resilience/distributed-locks.ts(924,12): error TS2551: Property 'metrics' does not exist on type 'OptimisticConcurrencyManager'. Did you mean '_metrics'?
+src/shared/resilience/failover-recovery.ts(128,11): error TS2564: Property '_firestore' has no initializer and is not definitely assigned in the constructor.
+src/shared/resilience/failover-recovery.ts(128,11): error TS6133: '_firestore' is declared but its value is never read.
+src/shared/resilience/failover-recovery.ts(130,11): error TS2564: Property '_metrics' has no initializer and is not definitely assigned in the constructor.
+src/shared/resilience/failover-recovery.ts(130,11): error TS6133: '_metrics' is declared but its value is never read.
+src/shared/resilience/failover-recovery.ts(151,10): error TS2551: Property 'firestore' does not exist on type 'FailoverRecoveryManager'. Did you mean '_firestore'?
+src/shared/resilience/failover-recovery.ts(153,10): error TS2551: Property 'metrics' does not exist on type 'FailoverRecoveryManager'. Did you mean '_metrics'?
+src/shared/resilience/failover-recovery.ts(203,18): error TS2551: Property 'firestore' does not exist on type 'FailoverRecoveryManager'. Did you mean '_firestore'?
+src/shared/resilience/failover-recovery.ts(212,12): error TS2551: Property 'metrics' does not exist on type 'FailoverRecoveryManager'. Did you mean '_metrics'?
+src/shared/resilience/failover-recovery.ts(252,18): error TS2551: Property 'firestore' does not exist on type 'FailoverRecoveryManager'. Did you mean '_firestore'?
+src/shared/resilience/failover-recovery.ts(254,12): error TS2551: Property 'metrics' does not exist on type 'FailoverRecoveryManager'. Did you mean '_metrics'?
+src/shared/resilience/failover-recovery.ts(404,13): error TS6133: 'testDoc' is declared but its value is never read.
+src/shared/resilience/failover-recovery.ts(404,34): error TS2551: Property 'firestore' does not exist on type 'FailoverRecoveryManager'. Did you mean '_firestore'?
+src/shared/resilience/failover-recovery.ts(492,12): error TS2551: Property 'metrics' does not exist on type 'FailoverRecoveryManager'. Did you mean '_metrics'?
+src/shared/resilience/failover-recovery.ts(505,10): error TS2551: Property 'metrics' does not exist on type 'FailoverRecoveryManager'. Did you mean '_metrics'?
+src/shared/resilience/failover-recovery.ts(509,10): error TS2551: Property 'metrics' does not exist on type 'FailoverRecoveryManager'. Did you mean '_metrics'?
+src/shared/resilience/failover-recovery.ts(559,14): error TS2551: Property 'metrics' does not exist on type 'FailoverRecoveryManager'. Did you mean '_metrics'?
+src/shared/resilience/failover-recovery.ts(617,18): error TS2551: Property 'firestore' does not exist on type 'FailoverRecoveryManager'. Did you mean '_firestore'?
+src/shared/resilience/failover-recovery.ts(630,14): error TS2551: Property 'metrics' does not exist on type 'FailoverRecoveryManager'. Did you mean '_metrics'?
+src/shared/resilience/failover-recovery.ts(636,14): error TS2551: Property 'metrics' does not exist on type 'FailoverRecoveryManager'. Did you mean '_metrics'?
+src/shared/resilience/failover-recovery.ts(652,14): error TS2551: Property 'metrics' does not exist on type 'FailoverRecoveryManager'. Did you mean '_metrics'?
+src/shared/resilience/failover-recovery.ts(764,18): error TS2551: Property 'firestore' does not exist on type 'FailoverRecoveryManager'. Did you mean '_firestore'?
+src/shared/resilience/failover-recovery.ts(924,18): error TS2551: Property 'firestore' does not exist on type 'FailoverRecoveryManager'. Did you mean '_firestore'?
+src/shared/resilience/failover-recovery.ts(943,14): error TS2551: Property 'metrics' does not exist on type 'FailoverRecoveryManager'. Did you mean '_metrics'?
+src/shared/resilience/failover-recovery.ts(955,14): error TS2551: Property 'metrics' does not exist on type 'FailoverRecoveryManager'. Did you mean '_metrics'?
+src/shared/resilience/failover-recovery.ts(1027,18): error TS2551: Property 'firestore' does not exist on type 'FailoverRecoveryManager'. Did you mean '_firestore'?
+src/shared/resilience/failover-recovery.ts(1065,18): error TS2551: Property 'firestore' does not exist on type 'FailoverRecoveryManager'. Did you mean '_firestore'?
+src/shared/resilience/failover-recovery.ts(1099,35): error TS2551: Property 'firestore' does not exist on type 'FailoverRecoveryManager'. Did you mean '_firestore'?
+src/shared/resilience/failover-recovery.ts(1101,24): error TS7006: Parameter 'doc' implicitly has an 'any' type.
+src/shared/resilience/graceful-degradation.ts(427,20): error TS6133: 'rule' is declared but its value is never read.
+src/shared/types/express.ts(56,7): error TS2717: Subsequent property declarations must have the same type.  Property 'user' must be of type '{ uid: string; email?: string | undefined; emailVerified?: boolean | undefined; customClaims?: Record<string, any> | undefined; authTime: number; issuedAt: number; expiresAt: number; } | undefined', but here has type 'UserContext | undefined'.

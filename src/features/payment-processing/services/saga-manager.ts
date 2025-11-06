@@ -5,8 +5,6 @@
 
 import { 
   PaymentSaga, 
-  SagaStep, 
-  CompensationStep, 
   SagaStatus, 
   StepStatus,
   CompensationResult
@@ -145,7 +143,7 @@ export class SagaManager implements ISagaManager {
     metrics: IMetricsCollector
   ) {
     this.logger = logger;
-    this.metrics = metrics;
+    this._metrics = metrics;
     this.initializeHandlers();
   }
 
@@ -192,7 +190,7 @@ export class SagaManager implements ISagaManager {
       // Store saga
       this.sagas.set(sagaId, saga);
 
-      this.metrics.incrementCounter('saga_created', {
+      this._metrics.incrementCounter('saga_created', {
         type: sagaDefinition.type,
         stepCount: sagaDefinition.steps.length.toString()
       });
@@ -213,7 +211,7 @@ export class SagaManager implements ISagaManager {
         processingTime: Date.now() - startTime
       });
 
-      this.metrics.incrementCounter('saga_creation_failed', {
+      this._metrics.incrementCounter('saga_creation_failed', {
         type: sagaDefinition.type,
         errorType: error instanceof Error ? error.constructor.name : 'UnknownError'
       });
@@ -294,7 +292,7 @@ export class SagaManager implements ISagaManager {
         retryCount: step.retryCount
       };
 
-      this.metrics.incrementCounter('saga_step_executed', {
+      this._metrics.incrementCounter('saga_step_executed', {
         sagaId,
         stepId,
         status: 'completed'
@@ -321,7 +319,7 @@ export class SagaManager implements ISagaManager {
 
       await this.failStep(sagaId, stepId, errorMessage);
 
-      this.metrics.incrementCounter('saga_step_executed', {
+      this._metrics.incrementCounter('saga_step_executed', {
         sagaId,
         stepId,
         status: 'failed'
@@ -441,7 +439,7 @@ export class SagaManager implements ISagaManager {
         completedAt: new Date()
       };
 
-      this.metrics.incrementCounter('saga_compensation_completed', {
+      this._metrics.incrementCounter('saga_compensation_completed', {
         sagaId,
         compensatedSteps: compensatedSteps.length.toString(),
         failedCompensations: failedCompensations.length.toString()

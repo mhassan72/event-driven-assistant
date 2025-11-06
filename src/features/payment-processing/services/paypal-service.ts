@@ -65,7 +65,7 @@ export class PayPalService implements IPayPalService {
     this._clientSecret = clientSecret;
     this.environment = environment;
     this.logger = logger;
-    this.metrics = metrics;
+    this._metrics = metrics;
   }
 
   async createOrder(request: TraditionalPaymentRequest): Promise<PayPalOrder> {
@@ -123,7 +123,7 @@ export class PayPalService implements IPayPalService {
         createdAt: new Date()
       };
 
-      this.metrics.incrementCounter('paypal_order_created', {
+      this._metrics.incrementCounter('paypal_order_created', {
         userId: request.userId,
         amount: request.amount.toString()
       });
@@ -143,7 +143,7 @@ export class PayPalService implements IPayPalService {
         processingTime: Date.now() - startTime
       });
 
-      this.metrics.incrementCounter('paypal_order_creation_failed', {
+      this._metrics.incrementCounter('paypal_order_creation_failed', {
         userId: request.userId,
         errorType: error instanceof Error ? error.constructor.name : 'UnknownError'
       });
@@ -221,7 +221,7 @@ export class PayPalService implements IPayPalService {
         netAmount: parseFloat(capture.amount.value) - fees.reduce((sum: any, fee) => sum + fee.amount, 0)
       };
 
-      this.metrics.incrementCounter('paypal_order_captured', {
+      this._metrics.incrementCounter('paypal_order_captured', {
         orderId,
         amount: result.amount.toString(),
         status: result.status
@@ -244,7 +244,7 @@ export class PayPalService implements IPayPalService {
         processingTime: Date.now() - startTime
       });
 
-      this.metrics.incrementCounter('paypal_order_capture_failed', {
+      this._metrics.incrementCounter('paypal_order_capture_failed', {
         orderId,
         errorType: error instanceof Error ? error.constructor.name : 'UnknownError'
       });
@@ -286,7 +286,7 @@ export class PayPalService implements IPayPalService {
         createdAt: new Date(mockRefund.create_time)
       };
 
-      this.metrics.incrementCounter('paypal_refund_created', {
+      this._metrics.incrementCounter('paypal_refund_created', {
         captureId,
         amount: result.amount.toString()
       });
@@ -347,7 +347,7 @@ export class PayPalService implements IPayPalService {
           });
       }
 
-      this.metrics.incrementCounter('paypal_webhook_processed', {
+      this._metrics.incrementCounter('paypal_webhook_processed', {
         eventType: webhookData.event_type,
         status: 'success'
       });
@@ -358,7 +358,7 @@ export class PayPalService implements IPayPalService {
         error: error instanceof Error ? error.message : 'Unknown error'
       });
 
-      this.metrics.incrementCounter('paypal_webhook_processed', {
+      this._metrics.incrementCounter('paypal_webhook_processed', {
         eventType: webhookData.event_type,
         status: 'failed'
       });

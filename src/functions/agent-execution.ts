@@ -11,10 +11,23 @@ import { Firestore } from 'firebase-admin/firestore';
 import { logger } from '../shared/observability/logger';
 import { metrics } from '../shared/observability/metrics';
 import { 
+  isError, 
+  getErrorMessage, 
+  getErrorContext, 
+  isRetryableError as isErrorRetryable,
+  toApplicationError 
+} from '../shared/error-handling/error-type-guards';
+import { 
+  WorkflowError, 
+  ExternalServiceError, 
+  NetworkError,
+  TimeoutError 
+} from '../shared/error-handling/custom-errors';
+import { 
   TaskType, 
   TaskStatus, 
   AgentTaskRequest,
-  WorkflowDefinition,
+
   WorkflowNodeDefinition,
   WorkflowEdgeDefinition,
   NodeType,
@@ -27,7 +40,7 @@ import {
   StepType 
 } from '../shared/types/orchestration';
 import { LangChainManager } from '../features/ai-assistant/services/langchain-manager';
-import { LangGraphWorkflowManager } from '../features/ai-assistant/services/langgraph-workflow';
+import { LangGraphWorkflowManager, LangGraphWorkflowDefinition } from '../features/ai-assistant/services/langgraph-workflow';
 import { NebiusAIService } from '../features/ai-assistant/services/nebius-ai-service';
 import { CreditService } from '../features/credit-system/services/credit-service';
 
@@ -105,6 +118,7 @@ export interface TaskResultMetadata {
   toolsUsed: string[];
   processingTime: number;
   workflowPath: string[];
+  creditsUsed: number;
 }
 
 /**
@@ -196,7 +210,7 @@ export class AgentExecutionHandler {
     creditService: CreditService
   ) {
     this.realtimeDB = realtimeDB;
-    this.firestore = firestore;
+    this._firestore = firestore;
     this.langChainManager = langChainManager;
     this.langGraphManager = langGraphManager;
     this._nebiusService = nebiusService;
@@ -329,7 +343,7 @@ export class AgentExecutionHandler {
       // Step 1: Create research workflow
       await this.updateProgress(task.id, 10, 'workflow_creation', 'Creating research workflow');
       
-      const workflowDefinition: WorkflowDefinition = {
+      const workflowDefinition: LangGraphWorkflowDefinition = {
         name: 'Research Agent Workflow',
         description: 'Comprehensive research and analysis workflow',
         nodes: [
@@ -456,12 +470,13 @@ export class AgentExecutionHandler {
       return result;
 
     } catch (error) {
+      const errorContext = getErrorContext(error);
       logger.error('Research agent execution failed', {
         taskId: task.id,
-        error: error instanceof Error ? error.message : String(error),
+        ...errorContext,
         correlationId
       });
-      throw error;
+      throw toApplicationError(error, 'RESEARCH_AGENT_FAILED', { taskId: task.id, correlationId });
     }
   }
 
@@ -536,12 +551,13 @@ export class AgentExecutionHandler {
       return result;
 
     } catch (error) {
+      const errorContext = getErrorContext(error);
       logger.error('Code generation agent execution failed', {
         taskId: task.id,
-        error: error instanceof Error ? error.message : String(error),
+        ...errorContext,
         correlationId
       });
-      throw error;
+      throw toApplicationError(error, 'CODE_GENERATION_FAILED', { taskId: task.id, correlationId });
     }
   }
 
@@ -612,12 +628,13 @@ export class AgentExecutionHandler {
       return result;
 
     } catch (error) {
+      const errorContext = getErrorContext(error);
       logger.error('Analysis agent execution failed', {
         taskId: task.id,
-        error: error instanceof Error ? error.message : String(error),
+        ...errorContext,
         correlationId
       });
-      throw error;
+      throw toApplicationError(error, 'ANALYSIS_AGENT_FAILED', { taskId: task.id, correlationId });
     }
   }
 
@@ -688,12 +705,13 @@ export class AgentExecutionHandler {
       return result;
 
     } catch (error) {
+      const errorContext = getErrorContext(error);
       logger.error('Writing agent execution failed', {
         taskId: task.id,
-        error: error instanceof Error ? error.message : String(error),
+        ...errorContext,
         correlationId
       });
-      throw error;
+      throw toApplicationError(error, 'WRITING_AGENT_FAILED', { taskId: task.id, correlationId });
     }
   }
 
@@ -707,7 +725,7 @@ export class AgentExecutionHandler {
       await this.updateProgress(task.id, 10, 'workflow_design', 'Designing custom workflow');
 
       // Create a complex multi-step workflow based on the task requirements
-      const workflowDefinition: WorkflowDefinition = this.createCustomWorkflow(task);
+      const workflowDefinition: LangGraphWorkflowDefinition = this.createCustomWorkflow(task);
 
       await this.updateProgress(task.id, 30, 'workflow_execution', 'Executing multi-step workflow');
 
@@ -748,12 +766,13 @@ export class AgentExecutionHandler {
       return result;
 
     } catch (error) {
+      const errorContext = getErrorContext(error);
       logger.error('Workflow agent execution failed', {
         taskId: task.id,
-        error: error instanceof Error ? error.message : String(error),
+        ...errorContext,
         correlationId
       });
-      throw error;
+      throw toApplicationError(error, 'WORKFLOW_AGENT_FAILED', { taskId: task.id, correlationId });
     }
   }
 
@@ -783,11 +802,12 @@ export class AgentExecutionHandler {
       });
 
     } catch (error) {
+      const errorContext = getErrorContext(error);
       logger.error('Failed to update task progress', {
         taskId,
         progress,
         step,
-        error: error instanceof Error ? error.message : String(error)
+        ...errorContext
       });
     }
   }
@@ -806,7 +826,7 @@ export class AgentExecutionHandler {
       await this.realtimeDB.ref(`orchestration/agent_tasks/${taskId}`).update(updateData);
 
       // Also update in Firestore for persistence
-      await this.firestore.collection('agent_tasks').doc(taskId).update(updateData);
+      await this._firestore.collection('agent_tasks').doc(taskId).update(updateData);
 
       logger.info('Task status updated', {
         taskId,
@@ -815,10 +835,11 @@ export class AgentExecutionHandler {
       });
 
     } catch (error) {
+      const errorContext = getErrorContext(error);
       logger.error('Failed to update task status', {
         taskId,
         status,
-        error: error instanceof Error ? error.message : String(error)
+        ...errorContext
       });
     }
   }
@@ -826,13 +847,14 @@ export class AgentExecutionHandler {
   /**
    * Handle task execution errors
    */
-  private async handleTaskError(taskId: string, task: AgentTask, error: any, correlationId: string): Promise<void> {
+  private async handleTaskError(taskId: string, task: AgentTask, error: unknown, correlationId: string): Promise<void> {
+    const errorContext = getErrorContext(error);
     const errorInfo: AgentTaskError = {
-      code: error.code || 'EXECUTION_ERROR',
-      message: error instanceof Error ? error.message : String(error),
-      retryable: this.isRetryableError(error),
+      code: errorContext.code,
+      message: errorContext.message,
+      retryable: isErrorRetryable(error),
       timestamp: Date.now(),
-      stackTrace: error instanceof Error ? error.stack : undefined
+      stackTrace: errorContext.stack
     };
 
     try {
@@ -902,29 +924,21 @@ export class AgentExecutionHandler {
       }
 
     } catch (updateError) {
+      const updateErrorContext = getErrorContext(updateError);
       logger.error('Failed to handle task error', {
         taskId,
         originalError: errorInfo.message,
-        updateError: updateError instanceof Error ? updateError.message : String(updateError),
+        ...updateErrorContext,
         correlationId
       });
     }
   }
 
   /**
-   * Check if error is retryable
+   * Check if error is retryable (delegated to error type guards)
    */
-  private isRetryableError(error: any): boolean {
-    const retryableErrors = [
-      'NETWORK_ERROR',
-      'TIMEOUT_ERROR',
-      'RATE_LIMIT_ERROR',
-      'TEMPORARY_UNAVAILABLE',
-      'SERVICE_UNAVAILABLE'
-    ];
-
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    return retryableErrors.some(retryableError => errorMessage.includes(retryableError));
+  private isRetryableError(error: unknown): boolean {
+    return isErrorRetryable(error);
   }
 
   /**
@@ -938,7 +952,7 @@ export class AgentExecutionHandler {
   /**
    * Create custom workflow based on task requirements
    */
-  private createCustomWorkflow(task: AgentTask): WorkflowDefinition {
+  private createCustomWorkflow(task: AgentTask): LangGraphWorkflowDefinition {
     return {
       name: 'Custom Multi-Step Workflow',
       description: 'Dynamically created workflow for complex tasks',
@@ -1050,4 +1064,24 @@ export function getAgentExecutionHandler(
   return handlerInstance;
 }
 
-export default AgentExecutionHandler;
+// Export handler function for Firebase Functions
+export async function executeAgentTask(event: DatabaseEvent<DataSnapshot>): Promise<void> {
+  // This would need proper dependency injection in a real implementation
+  // For now, we'll create a placeholder that matches the expected signature
+  const handler = new AgentExecutionHandler(
+    {} as any, // realtimeDB
+    {} as any, // firestore
+    {} as any, // langChainManager
+    {} as any, // langGraphManager
+    {} as any, // nebiusService
+    {} as any  // creditService
+  );
+  
+  return handler.executeAgentTask(event);
+}
+
+export default {
+  executeAgentTask,
+  AgentExecutionHandler,
+  getAgentExecutionHandler
+};

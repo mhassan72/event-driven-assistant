@@ -1,10 +1,13 @@
 /**
- * AI Assistant Types
- * Re-export AI assistant types from feature-specific directory
+ * AI Agent Interfaces
+ * Core interfaces for AI agent functionality, model management, and conversation handling
  */
 
-// Re-export all AI assistant types from the feature directory
-export * from '../../features/ai-assistant/types';
+import { TaskType } from './task-interfaces';
+
+// ============================================================================
+// Core AI Agent Interfaces
+// ============================================================================
 
 /**
  * Base conversation request for AI interactions
@@ -18,47 +21,6 @@ export interface ConversationRequest {
   userId: string;
   estimatedCost?: number;
   metadata?: Record<string, any>;
-}
-
-/**
- * Extended request for long-running agent tasks
- */
-export interface AgentTaskRequest extends ConversationRequest {
-  taskType: TaskType;
-  maxExecutionTime: number;
-  tools: Tool[];
-  workflow?: LangGraphWorkflow;
-  progressCallback?: string; // webhook URL for progress updates
-  priority?: TaskPriority;
-  // Execution state properties (optional for runtime use)
-  taskId?: string;
-  status?: TaskStatus;
-}
-
-/**
- * Task classification result from AI analysis
- */
-export interface TaskClassification {
-  type: TaskType;
-  estimatedDuration: number; // in seconds
-  complexity: TaskComplexity;
-  requiresAgentExecution: boolean;
-  estimatedCreditCost: number;
-  confidence: number; // 0-1
-  reasoning: string;
-}
-
-/**
- * Task routing result from intelligent routing system
- */
-export interface TaskRoutingResult {
-  strategy: RoutingStrategy;
-  executionPath: ExecutionPath;
-  estimatedWaitTime: number;
-  queuePosition?: number;
-  routingReason: string;
-  fallbackOptions: RoutingOption[];
-  metadata: RoutingMetadata;
 }
 
 /**
@@ -76,83 +38,74 @@ export interface ConversationResponse {
 }
 
 /**
- * Agent task initiation result
+ * Conversation context for maintaining state
  */
-export interface AgentTaskInitiation {
-  taskId: string;
-  status: TaskStatus;
-  estimatedCompletion: Date;
-  progressUrl: string;
-  creditsReserved: number;
-  metadata: TaskMetadata;
+export interface ConversationContext {
+  conversationId: string;
+  userId: string;
+  sessionId?: string;
+  messageHistory: ConversationMessage[];
+  systemPrompt?: string;
+  variables?: Record<string, any>;
+  metadata?: Record<string, any>;
 }
 
-// ============================================================================
-// Task Routing Types
-// ============================================================================
-
-export enum RoutingStrategy {
-  SYNCHRONOUS = 'synchronous',
-  ASYNCHRONOUS = 'asynchronous',
-  HYBRID = 'hybrid',
-  QUEUED = 'queued'
+/**
+ * Individual conversation message
+ */
+export interface ConversationMessage {
+  id: string;
+  role: MessageRole;
+  content: string | MessageContent[];
+  timestamp: Date;
+  creditsUsed?: number;
+  model?: string;
+  metadata?: Record<string, any>;
 }
 
-export enum ExecutionPath {
-  QUICK_RESPONSE = 'quick_response',
-  AGENT_FUNCTION = 'agent_function',
-  BATCH_PROCESSING = 'batch_processing',
-  PRIORITY_QUEUE = 'priority_queue'
+export enum MessageRole {
+  SYSTEM = 'system',
+  USER = 'user',
+  ASSISTANT = 'assistant',
+  TOOL = 'tool'
 }
 
-export interface RoutingOption {
-  strategy: RoutingStrategy;
-  executionPath: ExecutionPath;
-  estimatedWaitTime: number;
-  costAdjustment: number;
-  description: string;
+/**
+ * Message content for multimodal messages
+ */
+export interface MessageContent {
+  type: ContentType;
+  text?: string;
+  image_url?: {
+    url: string;
+    detail?: ImageDetail;
+  };
+  tool_call?: ToolCall;
+  tool_result?: ToolResult;
 }
 
-export interface RoutingMetadata {
-  routedAt: Date;
-  routingVersion: string;
-  systemLoad: number;
-  userPriority: number;
-  resourceRequirements: ResourceRequirements;
+export enum ContentType {
+  TEXT = 'text',
+  IMAGE_URL = 'image_url',
+  TOOL_CALL = 'tool_call',
+  TOOL_RESULT = 'tool_result'
 }
 
-export interface ResourceRequirements {
-  estimatedCpu: number;
-  estimatedMemory: number;
-  estimatedDuration: number;
-  requiresGpu: boolean;
-  requiresNetwork: boolean;
-  priority: TaskPriority;
+export enum ImageDetail {
+  LOW = 'low',
+  HIGH = 'high',
+  AUTO = 'auto'
 }
 
-// TaskPriority enum is defined later with string values
-
-export enum TaskStatus {
-  PENDING = 'pending',
-  RUNNING = 'running',
-  COMPLETED = 'completed',
-  FAILED = 'failed',
-  CANCELLED = 'cancelled'
-}
-
+/**
+ * Response metadata
+ */
 export interface ResponseMetadata {
   processingTime: number;
   modelUsed: string;
   tokensUsed: number;
   qualityScore?: number;
   confidence: number;
-}
-
-export interface TaskMetadata {
-  createdAt: Date;
-  estimatedCompletion: Date;
-  priority: TaskPriority;
-  resourceRequirements: ResourceRequirements;
 }
 
 // ============================================================================
@@ -200,34 +153,6 @@ export interface ModelSelection {
   fallbackModels: AIModel[];
   confidence: number; // 0-1
   selectionCriteria: ModelSelectionCriteria;
-}
-
-// ============================================================================
-// Supporting Types and Enums
-// ============================================================================
-
-export enum TaskType {
-  QUICK_CHAT = 'quick_chat',
-  IMAGE_GENERATION = 'image_generation',
-  RESEARCH_TASK = 'research_task',
-  CODE_GENERATION = 'code_generation',
-  DATA_ANALYSIS = 'data_analysis',
-  LONG_FORM_WRITING = 'long_form_writing',
-  MULTI_STEP_WORKFLOW = 'multi_step_workflow',
-  VISION_ANALYSIS = 'vision_analysis'
-}
-
-export enum TaskComplexity {
-  LOW = 'low',
-  MEDIUM = 'medium',
-  HIGH = 'high'
-}
-
-export enum TaskPriority {
-  LOW = 'low',
-  NORMAL = 'normal',
-  HIGH = 'high',
-  URGENT = 'urgent'
 }
 
 export enum ModelCategory {
@@ -340,68 +265,29 @@ export interface GlobalModelSettings {
   maxRetries: number;
 }
 
-// ============================================================================
-// Conversation and Context Types
-// ============================================================================
-
 /**
- * Conversation context for maintaining state
+ * Model preferences for requests
  */
-export interface ConversationContext {
-  conversationId: string;
-  userId: string;
-  sessionId?: string;
-  messageHistory: ConversationMessage[];
-  systemPrompt?: string;
-  variables?: Record<string, any>;
-  metadata?: Record<string, any>;
+export interface ModelPreferences {
+  preferredModels?: string[];
+  excludedModels?: string[];
+  maxCost?: number;
+  maxLatency?: number;
+  minQuality?: number;
+  requiredFeatures?: string[];
 }
 
 /**
- * Individual conversation message
+ * Model requirements for selection
  */
-export interface ConversationMessage {
-  id: string;
-  role: MessageRole;
-  content: string | MessageContent[];
-  timestamp: Date;
-  creditsUsed?: number;
-  model?: string;
-  metadata?: Record<string, any>;
-}
-
-export enum MessageRole {
-  SYSTEM = 'system',
-  USER = 'user',
-  ASSISTANT = 'assistant',
-  TOOL = 'tool'
-}
-
-/**
- * Message content for multimodal messages
- */
-export interface MessageContent {
-  type: ContentType;
-  text?: string;
-  image_url?: {
-    url: string;
-    detail?: ImageDetail;
-  };
-  tool_call?: ToolCall;
-  tool_result?: ToolResult;
-}
-
-export enum ContentType {
-  TEXT = 'text',
-  IMAGE_URL = 'image_url',
-  TOOL_CALL = 'tool_call',
-  TOOL_RESULT = 'tool_result'
-}
-
-export enum ImageDetail {
-  LOW = 'low',
-  HIGH = 'high',
-  AUTO = 'auto'
+export interface ModelRequirements {
+  taskType: TaskType;
+  inputSize: number;
+  expectedOutputSize?: number;
+  maxBudget?: number;
+  maxLatency?: number;
+  requiredFeatures?: string[];
+  qualityThreshold?: number;
 }
 
 // ============================================================================
@@ -499,137 +385,6 @@ export enum MemoryType {
   SUMMARY = 'summary',
   TOKEN_BUFFER = 'token_buffer',
   CONVERSATION_SUMMARY_BUFFER = 'conversation_summary_buffer'
-}
-
-// ============================================================================
-// LangGraph Workflow Types
-// ============================================================================
-
-/**
- * LangGraph workflow definition
- */
-export interface LangGraphWorkflow {
-  id: string;
-  name: string;
-  description: string;
-  nodes: WorkflowNode[];
-  edges: WorkflowEdge[];
-  estimatedCost: number;
-  maxExecutionTime: number;
-  version: string;
-  isActive: boolean;
-}
-
-/**
- * Workflow node definition
- */
-export interface WorkflowNode {
-  id: string;
-  type: NodeType;
-  name: string;
-  description: string;
-  config: NodeConfig;
-  position?: NodePosition;
-}
-
-export enum NodeType {
-  START = 'start',
-  END = 'end',
-  AGENT = 'agent',
-  TOOL = 'tool',
-  CONDITION = 'condition',
-  PARALLEL = 'parallel',
-  HUMAN_INPUT = 'human_input'
-}
-
-/**
- * Node configuration
- */
-export interface NodeConfig {
-  agent?: AgentConfig;
-  tool?: ToolConfig;
-  condition?: ConditionConfig;
-  timeout?: number;
-  retries?: number;
-}
-
-/**
- * Agent configuration for nodes
- */
-export interface AgentConfig {
-  modelId: string;
-  systemPrompt: string;
-  tools: string[];
-  temperature: number;
-  maxTokens: number;
-  name?: string;
-  description?: string;
-  memory?: any;
-}
-
-/**
- * Tool configuration for nodes
- */
-export interface ToolConfig {
-  toolId: string;
-  parameters: Record<string, any>;
-  timeout: number;
-}
-
-/**
- * Condition configuration for decision nodes
- */
-export interface ConditionConfig {
-  expression: string;
-  variables: string[];
-}
-
-/**
- * Workflow edge definition
- */
-export interface WorkflowEdge {
-  id: string;
-  source: string;
-  target: string;
-  condition?: string;
-  label?: string;
-}
-
-/**
- * Node position for visual representation
- */
-export interface NodePosition {
-  x: number;
-  y: number;
-}
-
-// ============================================================================
-// Model Preferences and Requirements
-// ============================================================================
-
-/**
- * Model preferences for requests
- */
-export interface ModelPreferences {
-  preferredModels?: string[];
-  excludedModels?: string[];
-  maxCost?: number;
-  maxLatency?: number;
-  minQuality?: number;
-  requiredFeatures?: string[];
-}
-
-/**
- * Model requirements for selection
- */
-export interface ModelRequirements {
-  taskType: TaskType;
-  inputSize: number;
-  expectedOutputSize?: number;
-  maxBudget?: number;
-  maxLatency?: number;
-  requiredFeatures?: string[];
-  qualityThreshold?: number;
 }
 
 // ============================================================================
@@ -736,3 +491,6 @@ export enum ModelStatus {
   MAINTENANCE = 'maintenance',
   DEPRECATED = 'deprecated'
 }
+
+// Re-export TaskType from task-interfaces to avoid duplication
+export { TaskType } from './task-interfaces';

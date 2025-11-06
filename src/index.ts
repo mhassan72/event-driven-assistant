@@ -53,7 +53,7 @@ export const onPaymentCompleted = onDocumentCreated({
   timeoutSeconds: 120
 }, async (event) => {
   const { default: handler } = await import('./functions/payment-events');
-  return handler.onPaymentCompleted(event);
+  return handler.onPaymentCreated(event);
 });
 
 // Realtime Database orchestration triggers

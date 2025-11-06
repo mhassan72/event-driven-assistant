@@ -4,13 +4,20 @@
     "types": ["jest", "node", "supertest"],
     "noUnusedLocals": false,
     "noImplicitReturns": false,
+    "noUnusedParameters": false,
     "baseUrl": "../src",
     "paths": {
       "@/*": ["*"],
       "@features/*": ["features/*"],
       "@shared/*": ["shared/*"],
       "@api/*": ["api/*"]
-    }
+    },
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
   },
   "include": [
     "../src/**/*",

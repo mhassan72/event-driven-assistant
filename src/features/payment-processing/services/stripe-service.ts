@@ -143,7 +143,7 @@ export class StripeService implements IStripeService {
     // this._stripe = new Stripe(stripeSecretKey, { apiVersion: '2023-10-16' });
     this._webhookSecret = webhookSecret;
     this.logger = logger;
-    this.metrics = metrics;
+    this._metrics = metrics;
   }
 
   async createPaymentIntent(request: TraditionalPaymentRequest): Promise<StripePaymentIntent> {
@@ -196,7 +196,7 @@ export class StripeService implements IStripeService {
         createdAt: new Date(mockPaymentIntent.created * 1000)
       };
 
-      this.metrics.incrementCounter('stripe_payment_intent_created', {
+      this._metrics.incrementCounter('stripe_payment_intent_created', {
         userId: request.userId,
         amount: pricingCalculation.finalPrice.toString()
       });
@@ -216,7 +216,7 @@ export class StripeService implements IStripeService {
         processingTime: Date.now() - startTime
       });
 
-      this.metrics.incrementCounter('stripe_payment_intent_creation_failed', {
+      this._metrics.incrementCounter('stripe_payment_intent_creation_failed', {
         userId: request.userId,
         errorType: error instanceof Error ? error.constructor.name : 'UnknownError'
       });
@@ -288,7 +288,7 @@ export class StripeService implements IStripeService {
         netAmount: (mockConfirmedIntent.amount / 100) - fees.reduce((sum: any, fee) => sum + fee.amount, 0)
       };
 
-      this.metrics.incrementCounter('stripe_payment_confirmed', {
+      this._metrics.incrementCounter('stripe_payment_confirmed', {
         userId: result.userId,
         amount: result.amount.toString(),
         status: result.status
@@ -311,7 +311,7 @@ export class StripeService implements IStripeService {
         processingTime: Date.now() - startTime
       });
 
-      this.metrics.incrementCounter('stripe_payment_confirmation_failed', {
+      this._metrics.incrementCounter('stripe_payment_confirmation_failed', {
         paymentIntentId,
         errorType: error instanceof Error ? error.constructor.name : 'UnknownError'
       });
@@ -357,7 +357,7 @@ export class StripeService implements IStripeService {
         createdAt: new Date(mockRefund.created * 1000)
       };
 
-      this.metrics.incrementCounter('stripe_refund_created', {
+      this._metrics.incrementCounter('stripe_refund_created', {
         paymentId,
         amount: result.amount.toString()
       });
@@ -428,7 +428,7 @@ export class StripeService implements IStripeService {
           });
       }
 
-      this.metrics.incrementCounter('stripe_webhook_processed', {
+      this._metrics.incrementCounter('stripe_webhook_processed', {
         type: webhook.type,
         status: 'success'
       });
@@ -440,7 +440,7 @@ export class StripeService implements IStripeService {
         error: error instanceof Error ? error.message : 'Unknown error'
       });
 
-      this.metrics.incrementCounter('stripe_webhook_processed', {
+      this._metrics.incrementCounter('stripe_webhook_processed', {
         type: webhook.type,
         status: 'failed'
       });

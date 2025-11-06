@@ -275,7 +275,7 @@ export interface SagaAction {
   type: string;
   payload?: any;
   handler: string;
-  parameters?: Record<string, any>;
+  parameters: Record<string, any>;
 }
 
 /**

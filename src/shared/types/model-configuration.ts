@@ -495,13 +495,13 @@ export enum OptimizationMetric {
  * Optimization target
  */
 export interface OptimizationTarget {
-  type: TargetType;
+  type: OptimizationTargetType;
   value?: number;
   percentile?: number;
   benchmark?: string;
 }
 
-export enum TargetType {
+export enum OptimizationTargetType {
   ABSOLUTE_VALUE = 'absolute_value',
   PERCENTILE = 'percentile',
   RELATIVE_TO_BENCHMARK = 'relative_to_benchmark',

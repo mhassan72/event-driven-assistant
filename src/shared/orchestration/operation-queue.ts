@@ -127,7 +127,7 @@ export class OperationQueue {
   private _firestore: Firestore;
   private eventBus: IEventBus;
   private logger: IStructuredLogger;
-  private _metrics: IMetricsCollector;
+  private metrics: IMetricsCollector;
   
   // Internal state
   private queues: Map<OperationPriority, PriorityQueue> = new Map();
@@ -138,7 +138,7 @@ export class OperationQueue {
   
   constructor(dependencies: OperationQueueDependencies) {
     this.realtimeDB = dependencies.realtimeDB;
-    this.firestore = dependencies.firestore;
+    this._firestore = dependencies.firestore;
     this.eventBus = dependencies.eventBus;
     this.logger = dependencies.logger;
     this.metrics = dependencies.metrics;
@@ -238,7 +238,7 @@ export class OperationQueue {
       }
       
       // Check persistence
-      const doc = await this.firestore.collection('operations').doc(operationId).get();
+      const doc = await this._firestore.collection('operations').doc(operationId).get();
       if (doc.exists) {
         const data = doc.data()!;
         return {
@@ -642,7 +642,7 @@ export class OperationQueue {
       this.logger.info('Recovering pending operations');
       
       // Query for operations that were processing when system went down
-      const pendingSnapshot = await this.firestore
+      const pendingSnapshot = await this._firestore
         .collection('operations')
         .where('status', 'in', [OperationStatus.PROCESSING, OperationStatus.RETRY_SCHEDULED])
         .get();
@@ -679,7 +679,7 @@ export class OperationQueue {
   }
   
   private async persistOperation(operation: QueuedOperation): Promise<void> {
-    await this.firestore.collection('operations').doc(operation.id).set({
+    await this._firestore.collection('operations').doc(operation.id).set({
       ...operation,
       createdAt: operation.createdAt.toISOString(),
       scheduledAt: operation.scheduledAt.toISOString(),

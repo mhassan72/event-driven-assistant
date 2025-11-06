@@ -1,11 +1,10 @@
 /**
  * Credit System Types
- * Core interfaces for credit management, transactions, and blockchain ledger
+ * Re-export credit system types from feature-specific directory
  */
 
-// ============================================================================
-// Credit Balance and Management
-// ============================================================================
+// Re-export all credit system types from the feature directory
+export * from '../../features/credit-system/types';
 
 /**
  * User's credit balance with comprehensive tracking

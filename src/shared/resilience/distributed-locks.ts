@@ -4,7 +4,7 @@
  */
 
 import { Database } from 'firebase-admin/database';
-import { Firestore } from 'firebase-admin/firestore';
+import { Firestore, Transaction } from 'firebase-admin/firestore';
 import { IStructuredLogger } from '../observability/logger';
 import { IMetricsCollector } from '../observability/metrics';
 
@@ -113,9 +113,9 @@ export class DistributedLockManager {
     };
     
     this.realtimeDB = dependencies.realtimeDB;
-    this.firestore = dependencies.firestore;
+    this._firestore = dependencies.firestore;
     this.logger = dependencies.logger;
-    this.metrics = dependencies.metrics;
+    this._metrics = dependencies.metrics;
     
     this.initializeLockManager();
   }
@@ -182,12 +182,12 @@ export class DistributedLockManager {
         });
         
         if (this.config.enableMetrics) {
-          this.metrics.counter('distributed_locks.acquired', 1, {
+          this._metrics.counter('distributed_locks.acquired', 1, {
             resource,
             owner
           });
           
-          this.metrics.histogram('distributed_locks.acquisition_time', result.waitTime, {
+          this._metrics.histogram('distributed_locks.acquisition_time', result.waitTime, {
             resource,
             success: 'true'
           });
@@ -202,7 +202,7 @@ export class DistributedLockManager {
         });
         
         if (this.config.enableMetrics) {
-          this.metrics.counter('distributed_locks.acquisition_failed', 1, {
+          this._metrics.counter('distributed_locks.acquisition_failed', 1, {
             resource,
             owner,
             reason: result.error || 'unknown'
@@ -224,7 +224,7 @@ export class DistributedLockManager {
       });
       
       if (this.config.enableMetrics) {
-        this.metrics.counter('distributed_locks.acquisition_errors', 1, {
+        this._metrics.counter('distributed_locks.acquisition_errors', 1, {
           resource,
           owner
         });
@@ -411,7 +411,7 @@ export class DistributedLockManager {
       });
       
       if (this.config.enableMetrics) {
-        this.metrics.counter('distributed_locks.released', 1, {
+        this._metrics.counter('distributed_locks.released', 1, {
           resource: lock.resource,
           owner: lock.owner
         });
@@ -473,7 +473,7 @@ export class DistributedLockManager {
         });
         
         if (this.config.enableMetrics) {
-          this.metrics.counter('distributed_locks.renewed', 1, {
+          this._metrics.counter('distributed_locks.renewed', 1, {
             resource: lock.resource,
             owner: lock.owner
           });
@@ -634,7 +634,7 @@ export class DistributedLockManager {
         });
         
         if (this.config.enableMetrics) {
-          this.metrics.counter('distributed_locks.expired_cleaned', expiredLocks.length);
+          this._metrics.counter('distributed_locks.expired_cleaned', expiredLocks.length);
         }
       }
       
@@ -780,9 +780,9 @@ export class OptimisticConcurrencyManager {
     logger: IStructuredLogger;
     metrics: IMetricsCollector;
   }) {
-    this.firestore = dependencies.firestore;
+    this._firestore = dependencies.firestore;
     this.logger = dependencies.logger;
-    this.metrics = dependencies.metrics;
+    this._metrics = dependencies.metrics;
   }
   
   /**
@@ -793,7 +793,7 @@ export class OptimisticConcurrencyManager {
     documentId: string
   ): Promise<{ data: T | null; version: OptimisticLockVersion | null }> {
     try {
-      const doc = await this.firestore.collection(collection).doc(documentId).get();
+      const doc = await this._firestore.collection(collection).doc(documentId).get();
       
       if (!doc.exists) {
         return { data: null, version: null };
@@ -831,9 +831,9 @@ export class OptimisticConcurrencyManager {
     updatedBy: string
   ): Promise<OptimisticUpdateResult<T>> {
     try {
-      const docRef = this.firestore.collection(collection).doc(documentId);
+      const docRef = this._firestore.collection(collection).doc(documentId);
       
-      const result = await this.firestore.runTransaction(async (transaction) => {
+      const result = await this._firestore.runTransaction(async (transaction: Transaction) => {
         const doc = await transaction.get(docRef);
         
         if (!doc.exists) {
@@ -857,7 +857,7 @@ export class OptimisticConcurrencyManager {
             updatedBy
           });
           
-          this.metrics.counter('optimistic_concurrency.conflicts', 1, {
+          this._metrics.counter('optimistic_concurrency.conflicts', 1, {
             collection,
             updated_by: updatedBy
           });
@@ -905,7 +905,7 @@ export class OptimisticConcurrencyManager {
           updatedBy
         });
         
-        this.metrics.counter('optimistic_concurrency.updates_success', 1, {
+        this._metrics.counter('optimistic_concurrency.updates_success', 1, {
           collection,
           updated_by: updatedBy
         });
@@ -921,7 +921,7 @@ export class OptimisticConcurrencyManager {
         updatedBy
       });
       
-      this.metrics.counter('optimistic_concurrency.updates_error', 1, {
+      this._metrics.counter('optimistic_concurrency.updates_error', 1, {
         collection,
         updated_by: updatedBy
       });

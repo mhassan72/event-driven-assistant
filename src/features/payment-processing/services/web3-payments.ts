@@ -133,7 +133,7 @@ export class Web3PaymentService implements IWeb3PaymentService {
     metrics: IMetricsCollector
   ) {
     this.logger = logger;
-    this.metrics = metrics;
+    this._metrics = metrics;
   }
 
   async connectWallet(walletAddress: string, walletType: WalletType, signature: string): Promise<WalletConnectionResult> {
@@ -180,7 +180,7 @@ export class Web3PaymentService implements IWeb3PaymentService {
         balance
       };
 
-      this.metrics.incrementCounter('web3_wallet_connected', {
+      this._metrics.incrementCounter('web3_wallet_connected', {
         walletType,
         blockchain: validation.blockchain
       });
@@ -202,7 +202,7 @@ export class Web3PaymentService implements IWeb3PaymentService {
         processingTime: Date.now() - startTime
       });
 
-      this.metrics.incrementCounter('web3_wallet_connection_failed', {
+      this._metrics.incrementCounter('web3_wallet_connection_failed', {
         walletType,
         errorType: error instanceof Error ? error.constructor.name : 'UnknownError'
       });
@@ -317,7 +317,7 @@ export class Web3PaymentService implements IWeb3PaymentService {
       // Cache session
       this.sessionCache.set(session.id, session);
 
-      this.metrics.incrementCounter('web3_payment_session_created', {
+      this._metrics.incrementCounter('web3_payment_session_created', {
         currency: request.currency,
         blockchain: request.blockchain,
         userId: request.userId
@@ -341,7 +341,7 @@ export class Web3PaymentService implements IWeb3PaymentService {
         processingTime: Date.now() - startTime
       });
 
-      this.metrics.incrementCounter('web3_payment_session_creation_failed', {
+      this._metrics.incrementCounter('web3_payment_session_creation_failed', {
         currency: request.currency,
         errorType: error instanceof Error ? error.constructor.name : 'UnknownError'
       });
@@ -505,7 +505,7 @@ export class Web3PaymentService implements IWeb3PaymentService {
         exchangeRate: session.exchangeRate
       };
 
-      this.metrics.incrementCounter('web3_payment_processed', {
+      this._metrics.incrementCounter('web3_payment_processed', {
         currency: request.currency,
         blockchain: request.blockchain,
         amount: request.amount.toString()
@@ -529,7 +529,7 @@ export class Web3PaymentService implements IWeb3PaymentService {
         processingTime: Date.now() - startTime
       });
 
-      this.metrics.incrementCounter('web3_payment_processing_failed', {
+      this._metrics.incrementCounter('web3_payment_processing_failed', {
         currency: request.currency,
         errorType: error instanceof Error ? error.constructor.name : 'UnknownError'
       });

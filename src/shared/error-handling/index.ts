@@ -63,13 +63,19 @@ export {
   handleWithErrorRecovery
 } from './comprehensive-error-handler';
 
+// Error type guards and utilities
+export * from './error-type-guards';
+
+// Custom error classes
+export * from './custom-errors';
+
 // Re-export existing error types for backward compatibility
 export {
   AppError,
-  ValidationError,
+  ValidationError as MiddlewareValidationError,
   UnauthorizedError,
   ForbiddenError,
-  NotFoundError,
+  NotFoundError as MiddlewareNotFoundError,
   ConflictError,
   InternalServerError,
   errorHandler,

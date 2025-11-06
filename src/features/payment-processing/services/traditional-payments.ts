@@ -103,10 +103,10 @@ export class TraditionalPaymentService implements ITraditionalPaymentService {
     logger: IStructuredLogger,
     metrics: IMetricsCollector
   ) {
-    this._stripeService = stripeService;
+    this.stripeService = stripeService;
     this.paypalService = paypalService;
     this.logger = logger;
-    this.metrics = metrics;
+    this._metrics = metrics;
   }
 
   async initiatePayment(request: TraditionalPaymentRequest): Promise<PaymentInitiationResult> {
@@ -139,7 +139,7 @@ export class TraditionalPaymentService implements ITraditionalPaymentService {
           throw new Error(`Unsupported payment method: ${request.paymentMethod}`);
       }
 
-      this.metrics.incrementCounter('traditional_payment_initiated', {
+      this._metrics.incrementCounter('traditional_payment_initiated', {
         userId: request.userId,
         paymentMethod: request.paymentMethod,
         provider: result.provider,
@@ -163,7 +163,7 @@ export class TraditionalPaymentService implements ITraditionalPaymentService {
         processingTime: Date.now() - startTime
       });
 
-      this.metrics.incrementCounter('traditional_payment_initiation_failed', {
+      this._metrics.incrementCounter('traditional_payment_initiation_failed', {
         userId: request.userId,
         paymentMethod: request.paymentMethod,
         errorType: error instanceof Error ? error.constructor.name : 'UnknownError'
@@ -174,7 +174,7 @@ export class TraditionalPaymentService implements ITraditionalPaymentService {
   }
 
   private async initiateStripePayment(request: TraditionalPaymentRequest): Promise<PaymentInitiationResult> {
-    const paymentIntent = await this._stripeService.createPaymentIntent(request);
+    const paymentIntent = await this.stripeService.createPaymentIntent(request);
     
     return {
       paymentId: paymentIntent.id,
@@ -223,7 +223,7 @@ export class TraditionalPaymentService implements ITraditionalPaymentService {
           if (!confirmationData.paymentMethodId) {
             throw new Error('Payment method ID required for Stripe confirmation');
           }
-          result = await this._stripeService.confirmPaymentIntent(paymentId, confirmationData.paymentMethodId);
+          result = await this.stripeService.confirmPaymentIntent(paymentId, confirmationData.paymentMethodId);
           break;
           
         case 'paypal':
@@ -234,7 +234,7 @@ export class TraditionalPaymentService implements ITraditionalPaymentService {
           throw new Error(`Unsupported payment provider: ${confirmationData.provider}`);
       }
 
-      this.metrics.incrementCounter('traditional_payment_confirmed', {
+      this._metrics.incrementCounter('traditional_payment_confirmed', {
         paymentId,
         provider: confirmationData.provider,
         status: result.status,
@@ -260,7 +260,7 @@ export class TraditionalPaymentService implements ITraditionalPaymentService {
         processingTime: Date.now() - startTime
       });
 
-      this.metrics.incrementCounter('traditional_payment_confirmation_failed', {
+      this._metrics.incrementCounter('traditional_payment_confirmation_failed', {
         paymentId,
         provider: confirmationData.provider,
         errorType: error instanceof Error ? error.constructor.name : 'UnknownError'
@@ -288,7 +288,7 @@ export class TraditionalPaymentService implements ITraditionalPaymentService {
 
       switch (provider) {
         case 'stripe':
-          const stripeRefund = await this._stripeService.createRefund(paymentId, amount, reason);
+          const stripeRefund = await this.stripeService.createRefund(paymentId, amount, reason);
           refundId = stripeRefund.id;
           status = stripeRefund.status;
           break;
@@ -312,7 +312,7 @@ export class TraditionalPaymentService implements ITraditionalPaymentService {
         processedAt: new Date()
       };
 
-      this.metrics.incrementCounter('traditional_payment_refunded', {
+      this._metrics.incrementCounter('traditional_payment_refunded', {
         paymentId,
         provider,
         amount: (amount || 0).toString()
@@ -346,18 +346,18 @@ export class TraditionalPaymentService implements ITraditionalPaymentService {
 
   async getCreditPackages(): Promise<CreditPackage[]> {
     // Use Stripe service for credit packages (could be configurable)
-    return this._stripeService.getCreditPackages();
+    return this.stripeService.getCreditPackages();
   }
 
   async calculatePricing(creditAmount: number): Promise<PricingCalculation> {
     // Use Stripe service for pricing calculation (could be configurable)
-    return this._stripeService.calculatePricing(creditAmount);
+    return this.stripeService.calculatePricing(creditAmount);
   }
 
   async createCustomer(userId: string, email: string, name: string): Promise<CustomerResult> {
     try {
       // Create customer in primary provider (Stripe)
-      const stripeCustomer = await this._stripeService.createCustomer(userId, email, name);
+      const stripeCustomer = await this.stripeService.createCustomer(userId, email, name);
       
       return {
         customerId: stripeCustomer.id,

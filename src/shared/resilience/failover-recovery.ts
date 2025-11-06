@@ -4,7 +4,7 @@
  */
 
 import { Database } from 'firebase-admin/database';
-import { Firestore } from 'firebase-admin/firestore';
+import { Firestore, QueryDocumentSnapshot } from 'firebase-admin/firestore';
 import { IStructuredLogger } from '../observability/logger';
 import { IMetricsCollector } from '../observability/metrics';
 
@@ -148,9 +148,9 @@ export class FailoverRecoveryManager {
     metrics: IMetricsCollector;
   }) {
     this.realtimeDB = dependencies.realtimeDB;
-    this.firestore = dependencies.firestore;
+    this._firestore = dependencies.firestore;
     this.logger = dependencies.logger;
-    this.metrics = dependencies.metrics;
+    this._metrics = dependencies.metrics;
     
     this.initializeFailoverManager();
   }
@@ -200,7 +200,7 @@ export class FailoverRecoveryManager {
       await this.updateActiveService(config);
       
       // Persist to Firestore
-      await this.firestore.collection('service_registry').doc(config.name).set({
+      await this._firestore.collection('service_registry').doc(config.name).set({
         ...config,
         registeredAt: new Date().toISOString(),
         isActive: registryEntry.isActive
@@ -209,7 +209,7 @@ export class FailoverRecoveryManager {
       // Start health monitoring
       this.startServiceHealthCheck(config.name);
       
-      this.metrics.counter('failover_manager.services_registered', 1, {
+      this._metrics.counter('failover_manager.services_registered', 1, {
         service_type: config.type,
         service_name: config.name
       });
@@ -249,9 +249,9 @@ export class FailoverRecoveryManager {
       this.services.delete(serviceName);
       
       // Remove from Firestore
-      await this.firestore.collection('service_registry').doc(serviceName).delete();
+      await this._firestore.collection('service_registry').doc(serviceName).delete();
       
-      this.metrics.counter('failover_manager.services_unregistered', 1, {
+      this._metrics.counter('failover_manager.services_unregistered', 1, {
         service_name: serviceName
       });
       
@@ -401,7 +401,7 @@ export class FailoverRecoveryManager {
   }> {
     try {
       // Simple Firestore connectivity check
-      const testDoc = await this.firestore.collection('_health_check').doc('test').get();
+      const testDoc = await this._firestore.collection('_health_check').doc('test').get();
       
       return {
         status: ServiceHealthStatus.HEALTHY,
@@ -489,7 +489,7 @@ export class FailoverRecoveryManager {
         failureCount: service.failureCount
       });
       
-      this.metrics.counter('failover_manager.health_status_changes', 1, {
+      this._metrics.counter('failover_manager.health_status_changes', 1, {
         service_name: serviceName,
         from_status: previousStatus,
         to_status: healthResult.status
@@ -502,11 +502,11 @@ export class FailoverRecoveryManager {
     }
     
     // Update metrics
-    this.metrics.gauge('failover_manager.service_health', this.getHealthStatusValue(healthResult.status), {
+    this._metrics.gauge('failover_manager.service_health', this.getHealthStatusValue(healthResult.status), {
       service_name: serviceName
     });
     
-    this.metrics.histogram('failover_manager.health_check_response_time', healthResult.responseTime, {
+    this._metrics.histogram('failover_manager.health_check_response_time', healthResult.responseTime, {
       service_name: serviceName,
       status: healthResult.status
     });
@@ -556,7 +556,7 @@ export class FailoverRecoveryManager {
           serviceType: fromService.config.type
         });
         
-        this.metrics.counter('failover_manager.failover_no_backup', 1, {
+        this._metrics.counter('failover_manager.failover_no_backup', 1, {
           service_name: fromServiceName,
           service_type: fromService.config.type
         });
@@ -614,7 +614,7 @@ export class FailoverRecoveryManager {
       this.failoverEvents.push(failoverEvent);
       
       // Persist event
-      await this.firestore.collection('failover_events').doc(failoverId).set({
+      await this._firestore.collection('failover_events').doc(failoverId).set({
         ...failoverEvent,
         timestamp: failoverEvent.timestamp.toISOString()
       });
@@ -627,13 +627,13 @@ export class FailoverRecoveryManager {
           duration: failoverDuration
         });
         
-        this.metrics.counter('failover_manager.failovers_success', 1, {
+        this._metrics.counter('failover_manager.failovers_success', 1, {
           from_service: fromServiceName,
           to_service: backupService.config.name,
           strategy: fromService.config.failoverStrategy
         });
         
-        this.metrics.histogram('failover_manager.failover_duration', failoverDuration, {
+        this._metrics.histogram('failover_manager.failover_duration', failoverDuration, {
           strategy: fromService.config.failoverStrategy,
           success: 'true'
         });
@@ -649,7 +649,7 @@ export class FailoverRecoveryManager {
           duration: failoverDuration
         });
         
-        this.metrics.counter('failover_manager.failovers_failed', 1, {
+        this._metrics.counter('failover_manager.failovers_failed', 1, {
           from_service: fromServiceName,
           to_service: backupService.config.name,
           strategy: fromService.config.failoverStrategy
@@ -761,7 +761,7 @@ export class FailoverRecoveryManager {
       // Create manual intervention request
       const requestId = `manual_failover_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       
-      await this.firestore.collection('manual_failover_requests').doc(requestId).set({
+      await this._firestore.collection('manual_failover_requests').doc(requestId).set({
         fromService: fromService.config.name,
         toService: toService.config.name,
         reason,
@@ -921,7 +921,7 @@ export class FailoverRecoveryManager {
       this.recoveryEvents.push(recoveryEvent);
       
       // Persist event
-      await this.firestore.collection('recovery_events').doc(recoveryId).set({
+      await this._firestore.collection('recovery_events').doc(recoveryId).set({
         ...recoveryEvent,
         timestamp: recoveryEvent.timestamp.toISOString()
       });
@@ -940,7 +940,7 @@ export class FailoverRecoveryManager {
           this.recoveryCheckTimers.delete(serviceName);
         }
         
-        this.metrics.counter('failover_manager.recoveries_success', 1, {
+        this._metrics.counter('failover_manager.recoveries_success', 1, {
           service_name: serviceName,
           strategy: service.config.recoveryStrategy
         });
@@ -952,7 +952,7 @@ export class FailoverRecoveryManager {
           duration: recoveryDuration
         });
         
-        this.metrics.counter('failover_manager.recoveries_failed', 1, {
+        this._metrics.counter('failover_manager.recoveries_failed', 1, {
           service_name: serviceName,
           strategy: service.config.recoveryStrategy
         });
@@ -1024,7 +1024,7 @@ export class FailoverRecoveryManager {
       // Create recovery confirmation request
       const requestId = `recovery_confirmation_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       
-      await this.firestore.collection('recovery_confirmations').doc(requestId).set({
+      await this._firestore.collection('recovery_confirmations').doc(requestId).set({
         serviceName: service.config.name,
         serviceType: service.config.type,
         requestedAt: new Date().toISOString(),
@@ -1062,7 +1062,7 @@ export class FailoverRecoveryManager {
       // Create manual recovery request
       const requestId = `manual_recovery_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       
-      await this.firestore.collection('manual_recovery_requests').doc(requestId).set({
+      await this._firestore.collection('manual_recovery_requests').doc(requestId).set({
         serviceName: service.config.name,
         serviceType: service.config.type,
         requestedAt: new Date().toISOString(),
@@ -1096,9 +1096,9 @@ export class FailoverRecoveryManager {
    */
   private async loadServiceConfigurations(): Promise<void> {
     try {
-      const snapshot = await this.firestore.collection('service_registry').get();
+      const snapshot = await this._firestore.collection('service_registry').get();
       
-      snapshot.forEach(doc => {
+      snapshot.forEach((doc: QueryDocumentSnapshot) => {
         const config = doc.data() as ServiceConfig;
         
         const registryEntry: ServiceRegistryEntry = {

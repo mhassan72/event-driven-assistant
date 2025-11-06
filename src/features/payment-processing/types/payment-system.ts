@@ -1,10 +1,11 @@
 /**
- * Payment System Types
- * Re-export payment system types from feature-specific directory
+ * Payment System Core Types
+ * Core interfaces for payment processing, Web3 payments, and financial transactions
  */
 
-// Re-export all payment system types from the feature directory
-export * from '../../features/payment-processing/types/payment-system';
+// ============================================================================
+// Payment Request and Response Types
+// ============================================================================
 
 /**
  * Base payment request interface

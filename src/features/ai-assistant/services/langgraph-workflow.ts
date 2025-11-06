@@ -20,14 +20,14 @@ import { IMetricsCollector } from '@/shared/observability/metrics';
  */
 export interface ILangGraphWorkflowManager {
   // Workflow Management
-  createWorkflow(definition: WorkflowDefinition): Promise<LangGraphWorkflow>;
+  createWorkflow(definition: LangGraphWorkflowDefinition): Promise<LangGraphWorkflow>;
   getWorkflow(workflowId: string): Promise<LangGraphWorkflow>;
   updateWorkflow(workflowId: string, updates: Partial<LangGraphWorkflow>): Promise<void>;
   deleteWorkflow(workflowId: string): Promise<void>;
   
   // Workflow Execution
   executeWorkflow(workflowId: string, input: WorkflowInput): Promise<WorkflowExecution>;
-  executeWorkflowDefinition(definition: WorkflowDefinition, input: WorkflowInput): Promise<WorkflowExecution>;
+  executeWorkflowDefinition(definition: LangGraphWorkflowDefinition, input: WorkflowInput): Promise<WorkflowExecution>;
   
   // Workflow Building
   validateWorkflow(workflow: LangGraphWorkflow): Promise<WorkflowValidation>;
@@ -41,7 +41,7 @@ export interface ILangGraphWorkflowManager {
 /**
  * Supporting interfaces
  */
-export interface WorkflowDefinition {
+export interface LangGraphWorkflowDefinition {
   name: string;
   description: string;
   nodes: WorkflowNodeDefinition[];
@@ -252,7 +252,7 @@ export class LangGraphWorkflowManager implements ILangGraphWorkflowManager {
   // Workflow Management
   // ============================================================================
 
-  async createWorkflow(definition: WorkflowDefinition): Promise<LangGraphWorkflow> {
+  async createWorkflow(definition: LangGraphWorkflowDefinition): Promise<LangGraphWorkflow> {
     try {
       const workflowId = this.generateId();
       
@@ -375,7 +375,7 @@ export class LangGraphWorkflowManager implements ILangGraphWorkflowManager {
     }
   }
 
-  async executeWorkflowDefinition(definition: WorkflowDefinition, input: WorkflowInput): Promise<WorkflowExecution> {
+  async executeWorkflowDefinition(definition: LangGraphWorkflowDefinition, input: WorkflowInput): Promise<WorkflowExecution> {
     try {
       // Create temporary workflow
       const workflow = await this.createWorkflow(definition);
@@ -905,7 +905,7 @@ export class LangGraphWorkflowManager implements ILangGraphWorkflowManager {
     }));
   }
 
-  private async estimateWorkflowCost(definition: WorkflowDefinition): Promise<number> {
+  private async estimateWorkflowCost(definition: LangGraphWorkflowDefinition): Promise<number> {
     let totalCost = 0;
 
     for (const node of definition.nodes) {

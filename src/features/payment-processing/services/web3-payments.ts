@@ -647,13 +647,6 @@ export class Web3PaymentService implements IWeb3PaymentService {
 
   async generatePaymentQRCode(session: CryptoPaymentSession): Promise<string> {
     // Mock QR code generation - would use actual QR code library
-    const paymentData = {
-      address: session.paymentAddress,
-      amount: session.cryptoAmount,
-      currency: session.currency,
-      sessionId: session.id
-    };
-    
     return `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==`;
   }
 

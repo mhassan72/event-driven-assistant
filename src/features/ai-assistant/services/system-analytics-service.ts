@@ -13,6 +13,7 @@ import {
 } from '../../../shared/types';
 import { IStructuredLogger } from '../../../shared/observability/logger';
 import { IMetricsCollector } from '../../../shared/observability/metrics';
+import { BaseAnalyticsService } from '../../../shared/services/base-analytics-service';
 import * as admin from 'firebase-admin';
 
 /**
@@ -1035,19 +1036,13 @@ export interface HealthRecommendation {
 /**
  * System Analytics Service Implementation
  */
-export class SystemAnalyticsService implements ISystemAnalyticsService {
-  private firestore: admin.firestore.Firestore;
-  private logger: IStructuredLogger;
-  private _metrics: IMetricsCollector;
-
+export class SystemAnalyticsService extends BaseAnalyticsService implements ISystemAnalyticsService {
   constructor(
     firestore: admin.firestore.Firestore,
     logger: IStructuredLogger,
     metrics: IMetricsCollector
   ) {
-    this.firestore = firestore;
-    this.logger = logger;
-    this._metrics = metrics;
+    super(firestore, logger);
   }
 
   // ============================================================================
@@ -1055,33 +1050,24 @@ export class SystemAnalyticsService implements ISystemAnalyticsService {
   // ============================================================================
 
   async getCreditUsageAnalytics(timeRange?: TimeRange): Promise<CreditUsageAnalytics> {
-    try {
-      const defaultTimeRange: TimeRange = {
-        startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
-        endDate: new Date(),
-        granularity: TimeGranularity.DAY
-      };
-      
-      const range = timeRange || defaultTimeRange;
+    return this.executeAnalyticsMethod('getCreditUsageAnalytics', async () => {
+      const range = this.getEffectiveTimeRange(timeRange);
       
       // Query credit transactions for the time range
-      const transactionsQuery = this.firestore
-        .collection('credit_transactions')
-        .where('timestamp', '>=', range.startDate)
-        .where('timestamp', '<=', range.endDate)
-        .orderBy('timestamp', 'desc');
+      const transactions = await this.queryCollectionByTimeRange('credit_transactions', range);
       
-      const transactionsSnapshot = await transactionsQuery.get();
-      const transactions = transactionsSnapshot.docs.map((doc: any) => doc.data());
+      // Calculate analytics using base class methods
+      const totalCreditsUsed = this.aggregateNumericField(
+        transactions, 
+        'amount', 
+        t => t.type === 'credit_deduction'
+      );
       
-      // Calculate analytics
-      const totalCreditsUsed = transactions
-        .filter(t => t.type === 'credit_deduction')
-        .reduce((sum: any, t) => sum + t.amount, 0);
-      
-      const totalCreditsAdded = transactions
-        .filter(t => t.type === 'credit_addition')
-        .reduce((sum: any, t) => sum + t.amount, 0);
+      const totalCreditsAdded = this.aggregateNumericField(
+        transactions, 
+        'amount', 
+        t => t.type === 'credit_addition'
+      );
       
 
       
@@ -1105,37 +1091,20 @@ export class SystemAnalyticsService implements ISystemAnalyticsService {
       };
       
       return analytics;
-      
-    } catch (error) {
-      this.logger.error('Failed to get credit usage analytics', { 
-        error: error instanceof Error ? error.message : 'Unknown error' 
-      });
-      throw error;
-    }
+    });
   }
 
   async getFinancialReporting(timeRange?: TimeRange): Promise<FinancialReport> {
-    try {
-      const defaultTimeRange: TimeRange = {
-        startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-        endDate: new Date(),
-        granularity: TimeGranularity.DAY
-      };
+    return this.executeAnalyticsMethod('getFinancialReporting', async () => {
+      const range = this.getEffectiveTimeRange(timeRange);
       
-      const range = timeRange || defaultTimeRange;
+      // Get payment data using base class method
+      const payments = await this.queryCollectionByTimeRange('payments', range, [
+        { field: 'status', operator: '==', value: 'completed' }
+      ]);
       
-      // Get payment data
-      const paymentsQuery = this.firestore
-        .collection('payments')
-        .where('timestamp', '>=', range.startDate)
-        .where('timestamp', '<=', range.endDate)
-        .where('status', '==', 'completed');
-      
-      const paymentsSnapshot = await paymentsQuery.get();
-      const payments = paymentsSnapshot.docs.map((doc: any) => doc.data());
-      
-      const totalRevenue = payments.reduce((sum: any, p) => sum + p.amount, 0);
-      const userCount = new Set(payments.map(p => p.userId)).size;
+      const totalRevenue = this.aggregateNumericField(payments, 'amount');
+      const userCount = this.countUniqueValues(payments, 'userId');
       
       const report: FinancialReport = {
         timeRange: range,
@@ -1155,13 +1124,7 @@ export class SystemAnalyticsService implements ISystemAnalyticsService {
       };
       
       return report;
-      
-    } catch (error) {
-      this.logger.error('Failed to get financial reporting', { 
-        error: error instanceof Error ? error.message : 'Unknown error' 
-      });
-      throw error;
-    }
+    });
   }
 
   // ============================================================================
@@ -1169,14 +1132,8 @@ export class SystemAnalyticsService implements ISystemAnalyticsService {
   // ============================================================================
 
   async getUserEngagementMetrics(timeRange?: TimeRange): Promise<UserEngagementMetrics> {
-    try {
-      const defaultTimeRange: TimeRange = {
-        startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-        endDate: new Date(),
-        granularity: TimeGranularity.DAY
-      };
-      
-      const range = timeRange || defaultTimeRange;
+    return this.executeAnalyticsMethod('getUserEngagementMetrics', async () => {
+      const range = this.getEffectiveTimeRange(timeRange);
       
       // Get user activity data
       const usersSnapshot = await this.firestore.collection('users').get();
@@ -1215,13 +1172,7 @@ export class SystemAnalyticsService implements ISystemAnalyticsService {
       };
       
       return metrics;
-      
-    } catch (error) {
-      this.logger.error('Failed to get user engagement metrics', { 
-        error: error instanceof Error ? error.message : 'Unknown error' 
-      });
-      throw error;
-    }
+    });
   }
 
   async getUserSegmentAnalysis(timeRange?: TimeRange): Promise<UserSegmentAnalysis> {
@@ -1245,13 +1196,7 @@ export class SystemAnalyticsService implements ISystemAnalyticsService {
       };
       
       return analysis;
-      
-    } catch (error) {
-      this.logger.error('Failed to get user segment analysis', { 
-        error: error instanceof Error ? error.message : 'Unknown error' 
-      });
-      throw error;
-    }
+    });
   }
 
   // ============================================================================
@@ -1259,7 +1204,7 @@ export class SystemAnalyticsService implements ISystemAnalyticsService {
   // ============================================================================
 
   async getSystemPerformanceReport(timeRange?: TimeRange): Promise<SystemPerformanceReport> {
-    try {
+    return this.executeAnalyticsMethod('getSystemPerformanceReport', async () => {
       const defaultTimeRange: TimeRange = {
         startDate: new Date(Date.now() - 24 * 60 * 60 * 1000), // 24 hours ago
         endDate: new Date(),
@@ -1278,13 +1223,7 @@ export class SystemAnalyticsService implements ISystemAnalyticsService {
       };
       
       return report;
-      
-    } catch (error) {
-      this.logger.error('Failed to get system performance report', { 
-        error: error instanceof Error ? error.message : 'Unknown error' 
-      });
-      throw error;
-    }
+    });
   }
 
   async getSystemReliabilityMetrics(timeRange?: TimeRange): Promise<SystemReliabilityMetrics> {
@@ -1306,13 +1245,7 @@ export class SystemAnalyticsService implements ISystemAnalyticsService {
       };
       
       return metrics;
-      
-    } catch (error) {
-      this.logger.error('Failed to get system reliability metrics', { 
-        error: error instanceof Error ? error.message : 'Unknown error' 
-      });
-      throw error;
-    }
+    });
   }
 
   // ============================================================================
@@ -1339,13 +1272,7 @@ export class SystemAnalyticsService implements ISystemAnalyticsService {
       };
       
       return report;
-      
-    } catch (error) {
-      this.logger.error('Failed to get business intelligence report', { 
-        error: error instanceof Error ? error.message : 'Unknown error' 
-      });
-      throw error;
-    }
+    });
   }
 
   async getKPIDashboard(): Promise<KPIDashboard> {
@@ -1360,13 +1287,7 @@ export class SystemAnalyticsService implements ISystemAnalyticsService {
       };
       
       return dashboard;
-      
-    } catch (error) {
-      this.logger.error('Failed to get KPI dashboard', { 
-        error: error instanceof Error ? error.message : 'Unknown error' 
-      });
-      throw error;
-    }
+    });
   }
 
   // ============================================================================
@@ -1389,13 +1310,7 @@ export class SystemAnalyticsService implements ISystemAnalyticsService {
       };
       
       return metrics;
-      
-    } catch (error) {
-      this.logger.error('Failed to get real-time metrics', { 
-        error: error instanceof Error ? error.message : 'Unknown error' 
-      });
-      throw error;
-    }
+    });
   }
 
   async getSystemHealthStatus(): Promise<SystemHealthStatus> {
@@ -1412,13 +1327,7 @@ export class SystemAnalyticsService implements ISystemAnalyticsService {
       };
       
       return status;
-      
-    } catch (error) {
-      this.logger.error('Failed to get system health status', { 
-        error: error instanceof Error ? error.message : 'Unknown error' 
-      });
-      throw error;
-    }
+    });
   }
 
   // ============================================================================

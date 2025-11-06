@@ -5,8 +5,7 @@
 
 import { onDocumentCreated, onDocumentUpdated } from 'firebase-functions/v2/firestore';
 import { onValueCreated, onValueUpdated } from 'firebase-functions/v2/database';
-import { IStructuredLogger } from '../../../shared/observability/logger';
-import { IMetricsCollector } from '../../../shared/observability/metrics';
+
 
 /**
  * Handle new payment requests created in Firestore

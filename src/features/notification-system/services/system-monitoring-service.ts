@@ -184,10 +184,10 @@ export enum AlertStatus {
 }
 
 export class SystemMonitoringService implements ISystemMonitoringService {
-  private _firestore: Firestore;
+  private firestore: Firestore;
   private realtimeDb: Database;
   private logger: IStructuredLogger;
-  private _metrics: IMetricsCollector;
+  private metrics: IMetricsCollector;
   private notificationService: NotificationService;
   private alertCooldowns: Map<string, Date> = new Map();
 

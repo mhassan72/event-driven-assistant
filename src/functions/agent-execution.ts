@@ -11,33 +11,19 @@ import { Firestore } from 'firebase-admin/firestore';
 import { logger } from '../shared/observability/logger';
 import { metrics } from '../shared/observability/metrics';
 import { 
-  isError, 
-  getErrorMessage, 
   getErrorContext, 
   isRetryableError as isErrorRetryable,
   toApplicationError 
 } from '../shared/error-handling/error-type-guards';
 import { 
-  WorkflowError, 
-  ExternalServiceError, 
-  NetworkError,
-  TimeoutError 
-} from '../shared/error-handling/custom-errors';
-import { 
   TaskType, 
   TaskStatus, 
-  AgentTaskRequest,
-
-  WorkflowNodeDefinition,
-  WorkflowEdgeDefinition,
   NodeType,
   AgentConfig,
   TaskPriority
 } from '../shared/types/ai-assistant';
 import { 
-  WorkflowType,
-  ExecutionStatus,
-  StepType 
+  ExecutionStatus
 } from '../shared/types/orchestration';
 import { LangChainManager } from '../features/ai-assistant/services/langchain-manager';
 import { LangGraphWorkflowManager, LangGraphWorkflowDefinition } from '../features/ai-assistant/services/langgraph-workflow';
@@ -198,7 +184,7 @@ export class AgentExecutionHandler {
   private _firestore: Firestore;
   private langChainManager: LangChainManager;
   private langGraphManager: LangGraphWorkflowManager;
-  private _nebiusService: NebiusAIService;
+
   private _creditService: CreditService;
 
   constructor(
@@ -213,7 +199,7 @@ export class AgentExecutionHandler {
     this._firestore = firestore;
     this.langChainManager = langChainManager;
     this.langGraphManager = langGraphManager;
-    this._nebiusService = nebiusService;
+
     this._creditService = creditService;
   }
 
@@ -309,7 +295,6 @@ export class AgentExecutionHandler {
    * Execute agent task based on type
    */
   private async executeAgentByType(task: AgentTask, correlationId: string): Promise<AgentTaskResult> {
-    const startTime = Date.now();
 
     switch (task.type) {
       case TaskType.RESEARCH_TASK:
@@ -937,9 +922,7 @@ export class AgentExecutionHandler {
   /**
    * Check if error is retryable (delegated to error type guards)
    */
-  private isRetryableError(error: unknown): boolean {
-    return isErrorRetryable(error);
-  }
+
 
   /**
    * Calculate tokens used from workflow execution

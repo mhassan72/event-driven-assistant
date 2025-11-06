@@ -424,7 +424,7 @@ export class GracefulDegradationManager {
       const newDegradedFeatures = new Map(this.currentState.degradedFeatures);
       
       // Execute each action
-      for (const { rule, action } of actionsToExecute) {
+      for (const { action } of actionsToExecute) {
         await this.executeDegradationAction(action, newDisabledFeatures, newDegradedFeatures);
         
         // Update degradation level based on action severity

@@ -7,6 +7,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { getDatabase } from 'firebase-admin/database';
 import { logger } from '../../../shared/observability/logger';
 import { IMetricsCollector } from '../../../shared/observability/metrics';
+import { BaseService } from '../../../shared/services/base-service';
 import { 
   ICreditService,
   CreditBalance,
@@ -41,17 +42,17 @@ export interface CreditServiceConfig {
 /**
  * Credit service implementation
  */
-export class CreditService implements ICreditService {
+export class CreditService extends BaseService implements ICreditService {
   private firestore: any;
   private database: any;
-  protected metrics: IMetricsCollector;
   private config: CreditServiceConfig;
 
   constructor(metrics: IMetricsCollector, config?: Partial<CreditServiceConfig>, firestore?: any, database?: any) {
+    super(logger, metrics);
+    
     // Initialize Firebase services - use provided instances or get from Firebase Admin
     this.firestore = firestore !== undefined ? firestore : getFirestore();
     this.database = database !== undefined ? database : getDatabase();
-    this.metrics = metrics;
     this.config = {
       welcomeBonusAmount: 1000,
       reservationExpiryMinutes: 30,

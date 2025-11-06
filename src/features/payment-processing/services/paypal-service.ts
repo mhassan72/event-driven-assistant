@@ -48,8 +48,7 @@ export interface PayPalRefund {
 }
 
 export class PayPalService implements IPayPalService {
-  private _clientId: string;
-  private _clientSecret: string;
+
   private environment: 'sandbox' | 'production';
   private logger: IStructuredLogger;
   private _metrics: IMetricsCollector;
@@ -61,8 +60,7 @@ export class PayPalService implements IPayPalService {
     logger: IStructuredLogger,
     metrics: IMetricsCollector
   ) {
-    this._clientId = clientId;
-    this._clientSecret = clientSecret;
+
     this.environment = environment;
     this.logger = logger;
     this._metrics = metrics;

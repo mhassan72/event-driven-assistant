@@ -80,7 +80,6 @@ export interface OptimisticUpdateResult<T> {
  */
 export class DistributedLockManager {
   private realtimeDB: Database;
-  private _firestore: Firestore;
   private logger: IStructuredLogger;
   private _metrics: IMetricsCollector;
   private config: LockConfig;
@@ -88,7 +87,6 @@ export class DistributedLockManager {
   // Internal state
   private activeLocks: Map<string, LockInfo> = new Map();
   private renewalTimers: Map<string, NodeJS.Timeout> = new Map();
-  private _lockQueues: Map<string, string[]> = new Map();
   
   constructor(
     config: Partial<LockConfig> = {},
@@ -113,7 +111,6 @@ export class DistributedLockManager {
     };
     
     this.realtimeDB = dependencies.realtimeDB;
-    this._firestore = dependencies.firestore;
     this.logger = dependencies.logger;
     this._metrics = dependencies.metrics;
     
@@ -308,7 +305,6 @@ export class DistributedLockManager {
     owner: string,
     metadata: Record<string, any>
   ): Promise<LockInfo | null> {
-    const lockRef = this.realtimeDB.ref(`locks/${resource}/${lockId}`);
     const resourceRef = this.realtimeDB.ref(`locks/${resource}`);
     
     try {

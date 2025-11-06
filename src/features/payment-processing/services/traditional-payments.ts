@@ -6,13 +6,10 @@
 import { 
   TraditionalPaymentRequest, 
   PaymentResult, 
-  PaymentMethod,
-  PaymentStatus,
-  PaymentError,
-  PaymentErrorType
+  PaymentMethod
 } from '../../../shared/types/payment-system';
-import { IStripeService, StripePaymentIntent, CreditPackage, PricingCalculation } from './stripe-service';
-import { IPayPalService, PayPalOrder } from './paypal-service';
+import { IStripeService, CreditPackage, PricingCalculation } from './stripe-service';
+import { IPayPalService } from './paypal-service';
 import { IStructuredLogger } from '../../../shared/observability/logger';
 import { IMetricsCollector } from '../../../shared/observability/metrics';
 

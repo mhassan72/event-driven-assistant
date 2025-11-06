@@ -401,7 +401,7 @@ export class FailoverRecoveryManager {
   }> {
     try {
       // Simple Firestore connectivity check
-      const testDoc = await this._firestore.collection('_health_check').doc('test').get();
+      await this._firestore.collection('_health_check').doc('test').get();
       
       return {
         status: ServiceHealthStatus.HEALTHY,

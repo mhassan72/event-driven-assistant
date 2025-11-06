@@ -6,14 +6,12 @@
 import { 
   PaymentRequest,
   TraditionalPaymentRequest,
-  Web3PaymentRequest,
   PaymentResult,
   PaymentStatus,
   PaymentMethod,
-  PaymentError,
-  PaymentErrorType
+  PaymentError
 } from '../../../shared/types/payment-system';
-import { ITraditionalPaymentService, PaymentInitiationResult, PaymentConfirmationData } from './traditional-payments';
+import { ITraditionalPaymentService, PaymentInitiationResult } from './traditional-payments';
 import { IPaymentValidator, ValidationResult } from './payment-validator';
 import { IPaymentWebhookHandler } from './payment-webhook-handler';
 import { IStructuredLogger } from '../../../shared/observability/logger';
@@ -204,7 +202,7 @@ export class PaymentOrchestrator implements IPaymentOrchestrator {
   private paymentValidator: IPaymentValidator;
   private _webhookHandler: IPaymentWebhookHandler;
   private logger: IStructuredLogger;
-  private _metrics: IMetricsCollector;
+  private metrics: IMetricsCollector;
   private activeSagas: Map<string, PaymentSaga> = new Map();
 
   constructor(

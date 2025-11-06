@@ -40,17 +40,10 @@ export interface IAdminModelService {
 }
 
 export class AdminModelService implements IAdminModelService {
-  private _firestore: any;
   private logger: IStructuredLogger;
-  private _metrics: IMetricsCollector;
-  private _modelManagementService: any;
 
   constructor(firestore: any, logger: IStructuredLogger, metrics: IMetricsCollector, modelManagementService?: any) {
-    this._firestore = firestore;
-    this._firestore = firestore;
     this.logger = logger;
-    this._metrics = metrics;
-    this._modelManagementService = modelManagementService;
   }
 
   async listModels(): Promise<any[]> {

@@ -7,8 +7,6 @@ import {
   TraditionalPaymentRequest, 
   PaymentResult, 
   PaymentStatus, 
-  PaymentError, 
-  PaymentErrorType,
   PaymentFee,
   FeeType,
   PaymentWebhook,
@@ -128,8 +126,7 @@ export interface PricingCalculation {
 }
 
 export class StripeService implements IStripeService {
-  private _stripe: any; // Will be initialized with actual Stripe SDK
-  private _webhookSecret: string;
+
   private logger: IStructuredLogger;
   private _metrics: IMetricsCollector;
 
@@ -141,7 +138,6 @@ export class StripeService implements IStripeService {
   ) {
     // Initialize Stripe SDK when available
     // this._stripe = new Stripe(stripeSecretKey, { apiVersion: '2023-10-16' });
-    this._webhookSecret = webhookSecret;
     this.logger = logger;
     this._metrics = metrics;
   }

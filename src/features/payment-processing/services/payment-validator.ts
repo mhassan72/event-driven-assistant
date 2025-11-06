@@ -88,8 +88,8 @@ export interface PaymentRestriction {
 
 export class PaymentValidator implements IPaymentValidator {
   private logger: IStructuredLogger;
-  private _metrics: IMetricsCollector;
-  private _fraudThreshold: number = 75; // Fraud score threshold (0-100)
+  private metrics: IMetricsCollector;
+  private fraudThreshold: number = 75; // Fraud score threshold (0-100)
   private maxDailyAmount: number = 10000; // Maximum daily amount in USD
 
   constructor(

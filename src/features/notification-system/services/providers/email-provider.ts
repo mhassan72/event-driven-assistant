@@ -9,10 +9,10 @@ import { IMetricsCollector } from '../../../../shared/observability/metrics';
 
 export class EmailProvider implements IEmailProvider {
   private logger: IStructuredLogger;
-  private metrics: IMetricsCollector;
-  private apiKey: string;
-  private fromEmail: string;
-  private fromName: string;
+  private _metrics: IMetricsCollector;
+  private _apiKey: string;
+  private _fromEmail: string;
+  private _fromName: string;
 
   constructor(
     logger: IStructuredLogger,
@@ -25,9 +25,9 @@ export class EmailProvider implements IEmailProvider {
   ) {
     this.logger = logger;
     this.metrics = metrics;
-    this.apiKey = config.apiKey;
-    this.fromEmail = config.fromEmail;
-    this.fromName = config.fromName;
+    this._apiKey = config.apiKey;
+    this._fromEmail = config.fromEmail;
+    this._fromName = config.fromName;
   }
 
   async sendEmail(to: string, subject: string, body: string, htmlBody?: string): Promise<EmailResult> {
@@ -50,7 +50,7 @@ export class EmailProvider implements IEmailProvider {
       // Simulate network delay
       await new Promise(resolve => setTimeout(resolve, 100 + Math.random() * 200));
 
-      this.metrics.increment('email.sent', {
+      this.metrics.increment('email.sent', 1, {
         success: 'true'
       });
 
@@ -66,13 +66,14 @@ export class EmailProvider implements IEmailProvider {
       };
 
     } catch (error) {
-      this.logger.error('Failed to send email', error, {
+      this.logger.error('Failed to send email', {
+        error: error instanceof Error ? error.message : 'Unknown error',
         to,
         subject,
         duration: Date.now() - startTime
       });
 
-      this.metrics.increment('email.failed', {
+      this.metrics.increment('email.failed', 1, {
         error: error instanceof Error ? error.message : 'unknown'
       });
 
@@ -96,10 +97,10 @@ import sgMail from '@sendgrid/mail';
 export class SendGridEmailProvider implements IEmailProvider {
   constructor(
     private logger: IStructuredLogger,
-    private metrics: IMetricsCollector,
+    private _metrics: IMetricsCollector,
     apiKey: string,
-    private fromEmail: string,
-    private fromName: string
+    private _fromEmail: string,
+    private _fromName: string
   ) {
     sgMail.setApiKey(apiKey);
   }
@@ -109,8 +110,8 @@ export class SendGridEmailProvider implements IEmailProvider {
       const msg = {
         to,
         from: {
-          email: this.fromEmail,
-          name: this.fromName
+          email: this._fromEmail,
+          name: this._fromName
         },
         subject,
         text: body,
@@ -125,7 +126,7 @@ export class SendGridEmailProvider implements IEmailProvider {
       };
 
     } catch (error) {
-      this.logger.error('SendGrid email failed', error, { to, subject });
+      this.logger.error('SendGrid email failed', { error: error instanceof Error ? error.message : 'Unknown error',  to, subject });
       
       return {
         messageId: 'failed',

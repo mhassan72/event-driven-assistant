@@ -617,7 +617,7 @@ export class ModelCostCalculator implements IModelCostCalculator {
       
       // Calculate feature costs
       const featureCosts = this.calculateFeatureCosts(request.features || [], model);
-      const totalFeatureCost = featureCosts.reduce((sum, fc) => sum + fc.cost, 0);
+      const totalFeatureCost = featureCosts.reduce((sum: any, fc) => sum + fc.cost, 0);
       
       // Apply priority adjustment
       const priorityAdjustment = this.calculatePriorityAdjustment(
@@ -1230,7 +1230,7 @@ export class ModelCostCalculator implements IModelCostCalculator {
       // 2. Usage timing optimization
       const peakUsageCosts = currentUsage.peakUsageTimes
         .filter(peak => peak.cost > currentUsage.totalCost * 0.1)
-        .reduce((sum, peak) => sum + peak.cost, 0);
+        .reduce((sum: any, peak) => sum + peak.cost, 0);
         
       if (peakUsageCosts > 0) {
         suggestions.push({
@@ -1250,7 +1250,7 @@ export class ModelCostCalculator implements IModelCostCalculator {
       // 3. Quality adjustment suggestions
       const highQualityUsage = currentUsage.taskDistribution
         .filter(task => task.averageCost > 50) // High-cost tasks
-        .reduce((sum, task) => sum + task.totalCost, 0);
+        .reduce((sum: any, task) => sum + task.totalCost, 0);
         
       if (highQualityUsage > currentUsage.totalCost * 0.3) {
         suggestions.push({
@@ -1760,7 +1760,7 @@ export class ModelCostCalculator implements IModelCostCalculator {
 
   private async calculateModelROI(model: AIModel, usage: UsageProjection): Promise<ModelROI> {
     // Calculate ROI based on model costs and benefits
-    const totalCost = usage.projectedUsage.reduce((sum, proj) => sum + proj.estimatedCost, 0);
+    const totalCost = usage.projectedUsage.reduce((sum: any, proj) => sum + proj.estimatedCost, 0);
     const totalBenefit = totalCost * 1.2; // Placeholder: 20% benefit over cost
     const roi = (totalBenefit - totalCost) / totalCost;
     

@@ -69,7 +69,7 @@ modelsRouter.get('/', asyncHandler(async (req: AuthenticatedRequest, res: any) =
         modelsByCategory,
         totalCount: models.length,
         categories: Object.keys(modelsByCategory),
-        providers: [...new Set(models.map((m: any) => m.provider))]
+        providers: Array.from(new Set(models.map((m: any) => m.provider)))
       }
     });
   } catch (error) {
@@ -438,7 +438,7 @@ modelsRouter.get('/recommendations', asyncHandler(async (req: AuthenticatedReque
     }
 
     const modelsSnapshot = await modelsQuery.get();
-    const models = modelsSnapshot.docs.map(doc => doc.data());
+    const models = modelsSnapshot.docs.map((doc: any) => doc.data());
 
     // Simple recommendation algorithm
     const recommendations = models

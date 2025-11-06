@@ -124,7 +124,7 @@ export interface NetworkStatus {
 
 export class Web3PaymentService implements IWeb3PaymentService {
   private logger: IStructuredLogger;
-  private metrics: IMetricsCollector;
+  private _metrics: IMetricsCollector;
   private exchangeRateCache: Map<string, ExchangeRateResult> = new Map();
   private sessionCache: Map<string, CryptoPaymentSession> = new Map();
 
@@ -443,7 +443,7 @@ export class Web3PaymentService implements IWeb3PaymentService {
       }
     ];
 
-    const totalFees = fees.reduce((sum, fee) => sum + fee.amount, 0);
+    const totalFees = fees.reduce((sum: any, fee) => sum + fee.amount, 0);
     const totalCryptoAmount = cryptoAmount + totalFees;
 
     return {

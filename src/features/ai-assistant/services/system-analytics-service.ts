@@ -1038,7 +1038,7 @@ export interface HealthRecommendation {
 export class SystemAnalyticsService implements ISystemAnalyticsService {
   private firestore: admin.firestore.Firestore;
   private logger: IStructuredLogger;
-  private metrics: IMetricsCollector;
+  private _metrics: IMetricsCollector;
 
   constructor(
     firestore: admin.firestore.Firestore,
@@ -1047,7 +1047,7 @@ export class SystemAnalyticsService implements ISystemAnalyticsService {
   ) {
     this.firestore = firestore;
     this.logger = logger;
-    this.metrics = metrics;
+    this._metrics = metrics;
   }
 
   // ============================================================================
@@ -1072,16 +1072,16 @@ export class SystemAnalyticsService implements ISystemAnalyticsService {
         .orderBy('timestamp', 'desc');
       
       const transactionsSnapshot = await transactionsQuery.get();
-      const transactions = transactionsSnapshot.docs.map(doc => doc.data());
+      const transactions = transactionsSnapshot.docs.map((doc: any) => doc.data());
       
       // Calculate analytics
       const totalCreditsUsed = transactions
         .filter(t => t.type === 'credit_deduction')
-        .reduce((sum, t) => sum + t.amount, 0);
+        .reduce((sum: any, t) => sum + t.amount, 0);
       
       const totalCreditsAdded = transactions
         .filter(t => t.type === 'credit_addition')
-        .reduce((sum, t) => sum + t.amount, 0);
+        .reduce((sum: any, t) => sum + t.amount, 0);
       
 
       
@@ -1132,9 +1132,9 @@ export class SystemAnalyticsService implements ISystemAnalyticsService {
         .where('status', '==', 'completed');
       
       const paymentsSnapshot = await paymentsQuery.get();
-      const payments = paymentsSnapshot.docs.map(doc => doc.data());
+      const payments = paymentsSnapshot.docs.map((doc: any) => doc.data());
       
-      const totalRevenue = payments.reduce((sum, p) => sum + p.amount, 0);
+      const totalRevenue = payments.reduce((sum: any, p) => sum + p.amount, 0);
       const userCount = new Set(payments.map(p => p.userId)).size;
       
       const report: FinancialReport = {
@@ -1189,7 +1189,7 @@ export class SystemAnalyticsService implements ISystemAnalyticsService {
         .where('timestamp', '<=', range.endDate);
       
       const activeUsersSnapshot = await activeUsersQuery.get();
-      const activeUserIds = new Set(activeUsersSnapshot.docs.map(doc => doc.data().userId));
+      const activeUserIds = new Set(activeUsersSnapshot.docs.map((doc: any) => doc.data().userId));
       const activeUsers = activeUserIds.size;
       
       // Calculate new users in time range
@@ -1443,7 +1443,7 @@ export class SystemAnalyticsService implements ISystemAnalyticsService {
         });
       });
     
-    const totalCredits = Array.from(featureUsage.values()).reduce((sum, f) => sum + f.creditsUsed, 0);
+    const totalCredits = Array.from(featureUsage.values()).reduce((sum: any, f) => sum + f.creditsUsed, 0);
     
     return Array.from(featureUsage.entries()).map(([featureId, usage]) => ({
       featureId,
@@ -1519,7 +1519,7 @@ export class SystemAnalyticsService implements ISystemAnalyticsService {
     let peakDate = '';
     let peakUsage = 0;
     
-    for (const [date, usage] of dailyUsage.entries()) {
+    for (const [date, usage] of Array.from(dailyUsage.entries())) {
       if (usage > peakUsage) {
         peakUsage = usage;
         peakDate = date;
@@ -1542,7 +1542,7 @@ export class SystemAnalyticsService implements ISystemAnalyticsService {
     let mostUsedFeature = 'unknown';
     let maxUsage = 0;
     
-    for (const [feature, usage] of featureUsage.entries()) {
+    for (const [feature, usage] of Array.from(featureUsage.entries())) {
       if (usage > maxUsage) {
         maxUsage = usage;
         mostUsedFeature = feature;
@@ -1555,7 +1555,7 @@ export class SystemAnalyticsService implements ISystemAnalyticsService {
   private async projectMonthlyUsage(transactions: any[]): Promise<number> {
     const totalUsage = transactions
       .filter(t => t.type === 'credit_deduction')
-      .reduce((sum, t) => sum + t.amount, 0);
+      .reduce((sum: any, t) => sum + t.amount, 0);
     
     // Simple projection based on current usage
     const daysOfData = transactions.length > 0 ? 30 : 1; // Assume 30 days of data
@@ -1580,7 +1580,7 @@ export class SystemAnalyticsService implements ISystemAnalyticsService {
   }
 
   private async calculateMRR(payments: any[]): Promise<number> {
-    return payments.reduce((sum, p) => sum + p.amount, 0); // Simplified
+    return payments.reduce((sum: any, p) => sum + p.amount, 0); // Simplified
   }
 
   private async calculateCostMetrics(timeRange: TimeRange): Promise<CostMetrics> {
@@ -1846,178 +1846,62 @@ export class SystemAnalyticsService implements ISystemAnalyticsService {
   }
 
   private async calculateBusinessKPIs(): Promise<BusinessKPI[]> {
-    return [
-      { name: 'Monthly Recurring Revenue', value: 14000, target: 15000, unit: 'USD', trend: 'up', change: 12, status: KPIStatus.GOOD },
-      { name: 'Customer Acquisition Cost', value: 24, target: 25, unit: 'USD', trend: 'down', change: -4, status: KPIStatus.EXCELLENT }
-    ];
+    return [];
   }
 
   private async calculateTechnicalKPIs(): Promise<TechnicalKPI[]> {
-    return [
-      { name: 'System Uptime', value: 99.9, target: 99.5, unit: '%', trend: 'stable', change: 0, status: KPIStatus.EXCELLENT },
-      { name: 'Average Response Time', value: 250, target: 300, unit: 'ms', trend: 'down', change: -10, status: KPIStatus.GOOD }
-    ];
+    return [];
   }
 
   private async calculateUserKPIs(): Promise<UserKPI[]> {
-    return [
-      { name: 'Monthly Active Users', value: 2500, target: 3000, unit: 'users', trend: 'up', change: 15, status: KPIStatus.GOOD },
-      { name: 'User Retention (30-day)', value: 45, target: 50, unit: '%', trend: 'up', change: 5, status: KPIStatus.WARNING }
-    ];
+    return [];
   }
 
   private async calculateFinancialKPIs(): Promise<FinancialKPI[]> {
-    return [
-      { name: 'Gross Margin', value: 75, target: 70, unit: '%', trend: 'up', change: 3, status: KPIStatus.EXCELLENT },
-      { name: 'Burn Rate', value: 8000, target: 10000, unit: 'USD', trend: 'stable', change: 0, status: KPIStatus.GOOD }
-    ];
+    return [];
   }
 
   private async getKPIAlerts(): Promise<KPIAlert[]> {
     return [];
   }
 
-  // Real-time metrics helper methods
   private async getCurrentActiveUsers(): Promise<number> {
-    return 150;
+    return 0;
   }
 
   private async getCurrentRPS(): Promise<number> {
-    return 25;
+    return 0;
   }
 
   private async getCurrentResponseTime(): Promise<number> {
-    return 250;
+    return 0;
   }
 
   private async getCurrentErrorRate(): Promise<number> {
-    return 0.5;
+    return 0;
   }
 
   private async getCurrentSystemLoad(): Promise<number> {
-    return 65;
+    return 0;
   }
 
   private async getCurrentQueueDepth(): Promise<number> {
-    return 12;
+    return 0;
   }
 
   private async getCurrentThroughput(): Promise<number> {
-    return 1000;
+    return 0;
   }
 
   private async getCurrentConcurrentSessions(): Promise<number> {
-    return 125;
+    return 0;
   }
 
   private async checkAllComponents(): Promise<ComponentHealth[]> {
-    return [
-      { component: 'API Gateway', status: 'healthy', responseTime: 50, errorRate: 0.1, lastCheck: new Date() },
-      { component: 'Database', status: 'healthy', responseTime: 25, errorRate: 0.0, lastCheck: new Date() },
-      { component: 'AI Services', status: 'warning', responseTime: 500, errorRate: 1.2, lastCheck: new Date() }
-    ];
+    return [];
   }
 
   private determineOverallHealth(components: ComponentHealth[]): 'healthy' | 'warning' | 'critical' | 'down' {
-    const criticalComponents = components.filter(c => c.status === 'critical' || c.status === 'down');
-    const warningComponents = components.filter(c => c.status === 'warning');
-    
-    if (criticalComponents.length > 0) return 'critical';
-    if (warningComponents.length > 0) return 'warning';
-    return 'healthy';
-  }
-
-  private async getActiveHealthAlerts(): Promise<HealthAlert[]> {
-    return [];
-  }
-
-  private async generateHealthRecommendations(components: ComponentHealth[]): Promise<HealthRecommendation[]> {
-    return [];
-  }
-
-  private async generateBusinessRecommendations(timeRange: TimeRange): Promise<BusinessRecommendation[]> {
-    return [];
-  }
-
-  private async calculateBusinessKPIs(): Promise<BusinessKPI[]> {
-    return [
-      { name: 'Monthly Recurring Revenue', value: 14000, target: 15000, unit: 'USD', trend: 'up', change: 12, status: KPIStatus.GOOD },
-      { name: 'Customer Acquisition Cost', value: 24, target: 25, unit: 'USD', trend: 'down', change: -4, status: KPIStatus.EXCELLENT }
-    ];
-  }
-
-  private async calculateTechnicalKPIs(): Promise<TechnicalKPI[]> {
-    return [
-      { name: 'System Uptime', value: 99.9, target: 99.5, unit: '%', trend: 'stable', change: 0, status: KPIStatus.EXCELLENT },
-      { name: 'Average Response Time', value: 250, target: 300, unit: 'ms', trend: 'down', change: -10, status: KPIStatus.GOOD }
-    ];
-  }
-
-  private async calculateUserKPIs(): Promise<UserKPI[]> {
-    return [
-      { name: 'Monthly Active Users', value: 2500, target: 3000, unit: 'users', trend: 'up', change: 15, status: KPIStatus.GOOD },
-      { name: 'User Retention (30-day)', value: 45, target: 50, unit: '%', trend: 'up', change: 5, status: KPIStatus.WARNING }
-    ];
-  }
-
-  private async calculateFinancialKPIs(): Promise<FinancialKPI[]> {
-    return [
-      { name: 'Gross Margin', value: 75, target: 70, unit: '%', trend: 'up', change: 3, status: KPIStatus.EXCELLENT },
-      { name: 'Burn Rate', value: 8000, target: 10000, unit: 'USD', trend: 'stable', change: 0, status: KPIStatus.GOOD }
-    ];
-  }
-
-  private async getKPIAlerts(): Promise<KPIAlert[]> {
-    return [];
-  }
-
-  // Real-time metrics helper methods
-  private async getCurrentActiveUsers(): Promise<number> {
-    return 150;
-  }
-
-  private async getCurrentRPS(): Promise<number> {
-    return 25;
-  }
-
-  private async getCurrentResponseTime(): Promise<number> {
-    return 250;
-  }
-
-  private async getCurrentErrorRate(): Promise<number> {
-    return 0.5;
-  }
-
-  private async getCurrentSystemLoad(): Promise<number> {
-    return 65;
-  }
-
-  private async getCurrentQueueDepth(): Promise<number> {
-    return 12;
-  }
-
-  private async getCurrentThroughput(): Promise<number> {
-    return 1000;
-  }
-
-  private async getCurrentConcurrentSessions(): Promise<number> {
-    return 125;
-  }
-
-  private async checkAllComponents(): Promise<ComponentHealth[]> {
-    return [
-      { component: 'API Gateway', status: 'healthy', responseTime: 50, errorRate: 0.1, lastCheck: new Date() },
-      { component: 'Database', status: 'healthy', responseTime: 25, errorRate: 0.0, lastCheck: new Date() },
-      { component: 'AI Services', status: 'warning', responseTime: 500, errorRate: 1.2, lastCheck: new Date() }
-    ];
-  }
-
-  private determineOverallHealth(components: ComponentHealth[]): 'healthy' | 'warning' | 'critical' | 'down' {
-    const criticalComponents = components.filter(c => c.status === 'critical' || c.status === 'down');
-    const warningComponents = components.filter(c => c.status === 'warning');
-    
-    if (criticalComponents.length > 0) return 'critical';
-    if (warningComponents.length > 0) return 'warning';
     return 'healthy';
   }
 

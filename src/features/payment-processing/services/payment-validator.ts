@@ -88,8 +88,8 @@ export interface PaymentRestriction {
 
 export class PaymentValidator implements IPaymentValidator {
   private logger: IStructuredLogger;
-  private metrics: IMetricsCollector;
-  private fraudThreshold: number = 75; // Fraud score threshold (0-100)
+  private _metrics: IMetricsCollector;
+  private _fraudThreshold: number = 75; // Fraud score threshold (0-100)
   private maxDailyAmount: number = 10000; // Maximum daily amount in USD
 
   constructor(
@@ -363,7 +363,7 @@ export class PaymentValidator implements IPaymentValidator {
       });
 
       // Calculate overall risk score
-      const overallScore = riskFactors.reduce((sum, factor) => 
+      const overallScore = riskFactors.reduce((sum: any, factor) => 
         sum + (factor.score * factor.weight), 0
       );
 

@@ -125,9 +125,9 @@ export interface ServiceRegistryEntry {
  */
 export class FailoverRecoveryManager {
   private realtimeDB: Database;
-  private firestore: Firestore;
+  private _firestore: Firestore;
   private logger: IStructuredLogger;
-  private metrics: IMetricsCollector;
+  private _metrics: IMetricsCollector;
   
   // Service registry
   private services: Map<string, ServiceRegistryEntry> = new Map();
@@ -217,7 +217,7 @@ export class FailoverRecoveryManager {
     } catch (error) {
       this.logger.error('Failed to register service', {
         serviceName: config.name,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
       
       throw error;
@@ -258,7 +258,7 @@ export class FailoverRecoveryManager {
     } catch (error) {
       this.logger.error('Failed to unregister service', {
         serviceName,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   }
@@ -298,7 +298,7 @@ export class FailoverRecoveryManager {
         responseTime: Date.now() - startTime,
         timestamp: new Date(),
         details: {},
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       };
       
       // Update service status
@@ -356,7 +356,7 @@ export class FailoverRecoveryManager {
         return {
           status: ServiceHealthStatus.UNHEALTHY,
           details: {
-            error: error.message
+            error: error instanceof Error ? error.message : 'Unknown error'
           }
         };
       }
@@ -416,7 +416,7 @@ export class FailoverRecoveryManager {
         status: ServiceHealthStatus.UNHEALTHY,
         details: {
           connected: false,
-          error: error.message
+          error: error instanceof Error ? error.message : 'Unknown error'
         }
       };
     }
@@ -661,7 +661,7 @@ export class FailoverRecoveryManager {
     } catch (error) {
       this.logger.error('Failover execution failed', {
         fromServiceName,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
       
       return false;
@@ -697,7 +697,7 @@ export class FailoverRecoveryManager {
       
     } catch (error) {
       this.logger.error('Immediate failover failed', {
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
       
       return false;
@@ -720,7 +720,7 @@ export class FailoverRecoveryManager {
       
     } catch (error) {
       this.logger.error('Graceful failover failed', {
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
       
       return false;
@@ -742,7 +742,7 @@ export class FailoverRecoveryManager {
       
     } catch (error) {
       this.logger.error('Circuit breaker failover failed', {
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
       
       return false;
@@ -786,7 +786,7 @@ export class FailoverRecoveryManager {
       
     } catch (error) {
       this.logger.error('Manual failover request failed', {
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
       
       return false;
@@ -864,7 +864,7 @@ export class FailoverRecoveryManager {
     } catch (error) {
       this.logger.error('Recovery check failed', {
         serviceName,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   }
@@ -963,7 +963,7 @@ export class FailoverRecoveryManager {
     } catch (error) {
       this.logger.error('Service recovery failed', {
         serviceName,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
       
       return false;
@@ -1009,7 +1009,7 @@ export class FailoverRecoveryManager {
       
     } catch (error) {
       this.logger.error('Automatic recovery failed', {
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
       
       return false;
@@ -1047,7 +1047,7 @@ export class FailoverRecoveryManager {
       
     } catch (error) {
       this.logger.error('Semi-automatic recovery request failed', {
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
       
       return false;
@@ -1084,7 +1084,7 @@ export class FailoverRecoveryManager {
       
     } catch (error) {
       this.logger.error('Manual recovery request failed', {
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
       
       return false;
@@ -1123,7 +1123,7 @@ export class FailoverRecoveryManager {
       
     } catch (error) {
       this.logger.error('Failed to load service configurations', {
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   }
@@ -1186,7 +1186,7 @@ export class FailoverRecoveryManager {
       } catch (error) {
         this.logger.error('Health check failed', {
           serviceName,
-          error: error.message
+          error: error instanceof Error ? error.message : 'Unknown error'
         });
       }
     }, service.config.healthCheckInterval);
@@ -1197,7 +1197,7 @@ export class FailoverRecoveryManager {
     this.performHealthCheck(serviceName).catch(error => {
       this.logger.error('Initial health check failed', {
         serviceName,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     });
   }

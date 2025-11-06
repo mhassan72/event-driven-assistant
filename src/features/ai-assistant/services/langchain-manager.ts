@@ -457,7 +457,7 @@ export class LangChainManager implements ILangChainManager {
         description: 'Temporary agent for one-time execution',
         modelId: config.modelId,
         systemPrompt: 'You are a helpful AI assistant.',
-        tools: config.tools?.map(t => t.id) || [],
+        tools: config.tools?.map((t: any) => t.id) || [],
         temperature: config.temperature,
         maxTokens: config.maxTokens
       };
@@ -587,7 +587,7 @@ export class LangChainManager implements ILangChainManager {
       constraints: context?.constraints || {
         maxTokens: agent.config.maxTokens,
         maxExecutionTime: 300000, // 5 minutes
-        allowedTools: agent.tools.map(t => t.id),
+        allowedTools: agent.tools.map((t: any) => t.id),
         budgetLimit: 1000 // credits
       }
     };
@@ -622,7 +622,7 @@ export class LangChainManager implements ILangChainManager {
       steps.push(responseStep);
 
       // Calculate totals
-      totalTokensUsed = steps.reduce((sum, step) => sum + (step.input?.tokens || 0) + (step.output?.tokens || 0), 0);
+      totalTokensUsed = steps.reduce((sum: any, step) => sum + (step.input?.tokens || 0) + (step.output?.tokens || 0), 0);
       totalCost = this.calculateExecutionCost(agent, totalTokensUsed, toolsUsed);
 
       const result: AgentExecutionResult = {

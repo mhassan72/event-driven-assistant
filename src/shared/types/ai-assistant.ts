@@ -31,6 +31,9 @@ export interface AgentTaskRequest extends ConversationRequest {
   workflow?: LangGraphWorkflow;
   progressCallback?: string; // webhook URL for progress updates
   priority?: TaskPriority;
+  // Execution state properties (optional for runtime use)
+  taskId?: string;
+  status?: TaskStatus;
 }
 
 /**
@@ -560,6 +563,9 @@ export interface AgentConfig {
   tools: string[];
   temperature: number;
   maxTokens: number;
+  name?: string;
+  description?: string;
+  memory?: any;
 }
 
 /**

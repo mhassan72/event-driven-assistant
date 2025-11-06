@@ -43,7 +43,7 @@ const sendNotificationSchema = z.object({
   type: z.nativeEnum(NotificationType),
   title: z.string().min(1).max(200),
   message: z.string().min(1).max(1000),
-  data: z.record(z.any()).optional(),
+  data: z.record(z.string(), z.any()).optional(),
   channels: z.array(z.nativeEnum(NotificationChannel)).optional(),
   priority: z.nativeEnum(NotificationPriority).optional(),
   scheduledAt: z.string().datetime().optional(),
@@ -78,7 +78,7 @@ const updatePreferencesSchema = z.object({
       minPriority: z.nativeEnum(NotificationPriority),
       url: z.string().url().optional(),
       secret: z.string().optional(),
-      headers: z.record(z.string()).optional()
+      headers: z.record(z.string(), z.string()).optional()
     }).optional()
   }).optional(),
   quietHours: z.object({
@@ -219,7 +219,7 @@ notificationsRouter.post('/send',
       const service = getNotificationService();
       const notification = await service.sendNotification(notificationRequest);
 
-      res.json({
+      return res.json({
         success: true,
         data: { notification }
       });
@@ -231,7 +231,7 @@ notificationsRouter.post('/send',
         body: req.body
       });
 
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         error: 'Failed to send notification'
       });
@@ -260,7 +260,7 @@ notificationsRouter.patch('/:notificationId/read',
         });
       }
 
-      res.json({
+      return res.json({
         success: true,
         data: { marked: true }
       });
@@ -272,7 +272,7 @@ notificationsRouter.patch('/:notificationId/read',
         notificationId: req.params.notificationId
       });
 
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         error: 'Failed to mark notification as read'
       });
@@ -333,7 +333,7 @@ notificationsRouter.delete('/:notificationId',
         });
       }
 
-      res.json({
+      return res.json({
         success: true,
         data: { deleted: true }
       });
@@ -345,7 +345,7 @@ notificationsRouter.delete('/:notificationId',
         notificationId: req.params.notificationId
       });
 
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         error: 'Failed to delete notification'
       });

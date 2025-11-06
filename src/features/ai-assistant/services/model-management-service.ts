@@ -424,7 +424,7 @@ export class ModelManagementService implements IModelManagementService {
       const systemHealth: SystemHealthScore = {
         overall: Math.round((healthyModels / models.length) * 100),
         availability: Math.round(((models.length - unavailableModels) / models.length) * 100),
-        performance: Math.round(modelStatuses.reduce((sum, status) => 
+        performance: Math.round(modelStatuses.reduce((sum: any, status) => 
           sum + (status.responseTime < 2000 ? 100 : Math.max(0, 100 - (status.responseTime - 2000) / 100)), 0
         ) / modelStatuses.length),
         reliability: Math.round((healthyModels / models.length) * 100)

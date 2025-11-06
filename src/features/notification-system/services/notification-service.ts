@@ -25,11 +25,11 @@ import { Firestore } from 'firebase-admin/firestore';
 import { Database } from 'firebase-admin/database';
 
 export class NotificationService implements INotificationService {
-  private firestore: Firestore;
+  private _firestore: Firestore;
   private realtimeDb: Database;
   private logger: IStructuredLogger;
-  private metrics: IMetricsCollector;
-  private templateService: INotificationTemplateService;
+  private _metrics: IMetricsCollector;
+  private _templateService: INotificationTemplateService;
   private deliveryService: INotificationDeliveryService;
 
   constructor(
@@ -44,7 +44,7 @@ export class NotificationService implements INotificationService {
     this.realtimeDb = realtimeDb;
     this.logger = logger;
     this.metrics = metrics;
-    this.templateService = templateService;
+    this._templateService = templateService;
     this.deliveryService = deliveryService;
   }
 
@@ -91,7 +91,7 @@ export class NotificationService implements INotificationService {
       await this.updateRealtimeNotification(notification);
 
       // Record metrics
-      this.metrics.increment('notifications.sent', {
+      this.metrics.increment('notifications.sent', 1, {
         type: request.type,
         priority: request.priority || NotificationPriority.NORMAL
       });
@@ -106,13 +106,13 @@ export class NotificationService implements INotificationService {
       return notification;
 
     } catch (error) {
-      this.logger.error('Failed to send notification', error, {
+      this.logger.error('Failed to send notification', { error: error instanceof Error ? error.message : 'Unknown error', 
         userId: request.userId,
         type: request.type,
         duration: Date.now() - startTime
       });
 
-      this.metrics.increment('notifications.failed', {
+      this.metrics.increment('notifications.failed', 1, {
         type: request.type,
         error: error instanceof Error ? error.message : 'unknown'
       });
@@ -146,14 +146,14 @@ export class NotificationService implements INotificationService {
         processed: false
       });
 
-      this.metrics.increment('notifications.scheduled', {
+      this.metrics.increment('notifications.scheduled', 1, {
         type: request.type
       });
 
       return notification;
 
     } catch (error) {
-      this.logger.error('Failed to schedule notification', error, {
+      this.logger.error('Failed to schedule notification', { error: error instanceof Error ? error.message : 'Unknown error', 
         userId: request.userId,
         type: request.type,
         scheduledAt: scheduledAt.toISOString()
@@ -196,7 +196,7 @@ export class NotificationService implements INotificationService {
       return true;
 
     } catch (error) {
-      this.logger.error('Failed to cancel notification', error, { notificationId });
+      this.logger.error('Failed to cancel notification', { error: error instanceof Error ? error.message : 'Unknown error',  notificationId });
       return false;
     }
   }
@@ -209,7 +209,7 @@ export class NotificationService implements INotificationService {
       const batch = requests.slice(i, i + batchSize);
       const batchPromises = batch.map(request => 
         this.sendNotification(request).catch(error => {
-          this.logger.error('Bulk notification failed', error, { 
+          this.logger.error('Bulk notification failed', { error: error instanceof Error ? error.message : 'Unknown error',  
             userId: request.userId, 
             type: request.type 
           });
@@ -221,7 +221,7 @@ export class NotificationService implements INotificationService {
       results.push(...batchResults.filter(result => result !== null) as Notification[]);
     }
 
-    this.metrics.increment('notifications.bulk_sent', {
+    this.metrics.increment('notifications.bulk_sent', 1, {
       total: requests.length,
       successful: results.length
     });
@@ -262,10 +262,10 @@ export class NotificationService implements INotificationService {
       }
 
       const snapshot = await query.get();
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Notification));
+      return snapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() } as Notification));
 
     } catch (error) {
-      this.logger.error('Failed to get user notifications', error, { userId, options });
+      this.logger.error('Failed to get user notifications', { error: error instanceof Error ? error.message : 'Unknown error',  userId, options });
       throw error;
     }
   }
@@ -298,14 +298,14 @@ export class NotificationService implements INotificationService {
         readAt: new Date().toISOString()
       });
 
-      this.metrics.increment('notifications.read', {
+      this.metrics.increment('notifications.read', 1, {
         type: notificationData.type
       });
 
       return true;
 
     } catch (error) {
-      this.logger.error('Failed to mark notification as read', error, { notificationId, userId });
+      this.logger.error('Failed to mark notification as read', { error: error instanceof Error ? error.message : 'Unknown error',  notificationId, userId });
       return false;
     }
   }
@@ -339,14 +339,14 @@ export class NotificationService implements INotificationService {
         await this.realtimeDb.ref().update(updates);
       }
 
-      this.metrics.increment('notifications.mark_all_read', {
+      this.metrics.increment('notifications.mark_all_read', 1, {
         count: snapshot.size
       });
 
       return snapshot.size;
 
     } catch (error) {
-      this.logger.error('Failed to mark all notifications as read', error, { userId });
+      this.logger.error('Failed to mark all notifications as read', { error: error instanceof Error ? error.message : 'Unknown error',  userId });
       throw error;
     }
   }
@@ -378,7 +378,7 @@ export class NotificationService implements INotificationService {
       return true;
 
     } catch (error) {
-      this.logger.error('Failed to delete notification', error, { notificationId, userId });
+      this.logger.error('Failed to delete notification', { error: error instanceof Error ? error.message : 'Unknown error',  notificationId, userId });
       return false;
     }
   }
@@ -396,7 +396,7 @@ export class NotificationService implements INotificationService {
       return this.getDefaultPreferences(userId);
 
     } catch (error) {
-      this.logger.error('Failed to get notification preferences', error, { userId });
+      this.logger.error('Failed to get notification preferences', { error: error instanceof Error ? error.message : 'Unknown error',  userId });
       return this.getDefaultPreferences(userId);
     }
   }
@@ -421,7 +421,7 @@ export class NotificationService implements INotificationService {
       return updatedPreferences;
 
     } catch (error) {
-      this.logger.error('Failed to update notification preferences', error, { userId });
+      this.logger.error('Failed to update notification preferences', { error: error instanceof Error ? error.message : 'Unknown error',  userId });
       throw error;
     }
   }
@@ -441,7 +441,7 @@ export class NotificationService implements INotificationService {
       }
 
       const snapshot = await query.get();
-      const notifications = snapshot.docs.map(doc => doc.data() as Notification);
+      const notifications = snapshot.docs.map((doc: any) => doc.data() as Notification);
 
       // Calculate metrics
       const metrics = {
@@ -469,7 +469,7 @@ export class NotificationService implements INotificationService {
       };
 
     } catch (error) {
-      this.logger.error('Failed to get notification analytics', error, { options });
+      this.logger.error('Failed to get notification analytics', { error: error instanceof Error ? error.message : 'Unknown error',  options });
       throw error;
     }
   }

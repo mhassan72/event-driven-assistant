@@ -80,15 +80,15 @@ export interface OptimisticUpdateResult<T> {
  */
 export class DistributedLockManager {
   private realtimeDB: Database;
-  private firestore: Firestore;
+  private _firestore: Firestore;
   private logger: IStructuredLogger;
-  private metrics: IMetricsCollector;
+  private _metrics: IMetricsCollector;
   private config: LockConfig;
   
   // Internal state
   private activeLocks: Map<string, LockInfo> = new Map();
   private renewalTimers: Map<string, NodeJS.Timeout> = new Map();
-  private lockQueues: Map<string, string[]> = new Map();
+  private _lockQueues: Map<string, string[]> = new Map();
   
   constructor(
     config: Partial<LockConfig> = {},
@@ -134,7 +134,7 @@ export class DistributedLockManager {
     // Start periodic cleanup
     setInterval(() => {
       this.cleanupExpiredLocks().catch(error => {
-        this.logger.error('Lock cleanup failed', { error: error.message });
+        this.logger.error('Lock cleanup failed', { error: error instanceof Error ? error.message : 'Unknown error' });
       });
     }, 60000); // Every minute
   }
@@ -219,7 +219,7 @@ export class DistributedLockManager {
         lockId,
         resource,
         owner,
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         waitTime
       });
       
@@ -232,7 +232,7 @@ export class DistributedLockManager {
       
       return {
         success: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         waitTime
       };
     }
@@ -373,7 +373,7 @@ export class DistributedLockManager {
       this.logger.error('Atomic lock acquisition failed', {
         lockId,
         resource,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
       
       return null;
@@ -422,7 +422,7 @@ export class DistributedLockManager {
     } catch (error) {
       this.logger.error('Lock release failed', {
         lockId,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
       
       return false;
@@ -487,7 +487,7 @@ export class DistributedLockManager {
     } catch (error) {
       this.logger.error('Lock renewal failed', {
         lockId,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
       
       return false;
@@ -640,7 +640,7 @@ export class DistributedLockManager {
       
     } catch (error) {
       this.logger.error('Lock cleanup failed', {
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   }
@@ -771,9 +771,9 @@ export class DistributedLockManager {
  * Optimistic Concurrency Control Manager
  */
 export class OptimisticConcurrencyManager {
-  private firestore: Firestore;
+  private _firestore: Firestore;
   private logger: IStructuredLogger;
-  private metrics: IMetricsCollector;
+  private _metrics: IMetricsCollector;
   
   constructor(dependencies: {
     firestore: Firestore;
@@ -813,7 +813,7 @@ export class OptimisticConcurrencyManager {
       this.logger.error('Optimistic read failed', {
         collection,
         documentId,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
       
       throw error;
@@ -917,7 +917,7 @@ export class OptimisticConcurrencyManager {
       this.logger.error('Optimistic update failed', {
         collection,
         documentId,
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         updatedBy
       });
       

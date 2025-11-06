@@ -63,7 +63,7 @@ export enum NotificationType {
 export enum NotificationChannel {
   EMAIL = 'email',
   PUSH = 'push',
-  IN_APP = 'in_app',
+  IN_APP = 'inApp',
   SMS = 'sms',
   WEBHOOK = 'webhook'
 }

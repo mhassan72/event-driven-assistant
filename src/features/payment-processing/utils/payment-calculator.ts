@@ -153,7 +153,7 @@ export class PaymentCalculator {
   } {
     const pricing = this.calculateCreditPrice(creditAmount);
     const fees = this.calculateProcessingFees(pricing.discountedPrice, provider, isInternational);
-    const totalFees = fees.reduce((sum, fee) => sum + fee.amount, 0);
+    const totalFees = fees.reduce((sum: any, fee) => sum + fee.amount, 0);
     const finalAmount = pricing.discountedPrice + totalFees;
 
     return {

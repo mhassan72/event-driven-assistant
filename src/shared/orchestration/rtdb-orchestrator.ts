@@ -40,7 +40,7 @@ import { TransactionType, CreditTransaction } from '../types/credit-system';
 export class RTDBOrchestrator extends BaseOrchestrator {
   private sagaInstances: Map<string, SagaInstance> = new Map();
   private taskClassifier: ITaskClassifier;
-  private creditService: ICreditService;
+  private _creditService: ICreditService;
   
   constructor(
     dependencies: OrchestratorDependencies,
@@ -49,7 +49,7 @@ export class RTDBOrchestrator extends BaseOrchestrator {
   ) {
     super(dependencies);
     this.taskClassifier = taskClassifier;
-    this.creditService = creditService;
+    this._creditService = creditService;
     
     this.initializeAIOrchestrator();
   }
@@ -98,7 +98,7 @@ export class RTDBOrchestrator extends BaseOrchestrator {
     } catch (error) {
       this.logger.error('AI conversation orchestration failed', {
         userId: request.userId,
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         correlationId
       });
       
@@ -218,7 +218,7 @@ export class RTDBOrchestrator extends BaseOrchestrator {
     } catch (error) {
       this.logger.error('Credit deduction orchestration failed', {
         userId: request.userId,
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         correlationId
       });
       
@@ -289,7 +289,7 @@ export class RTDBOrchestrator extends BaseOrchestrator {
     } catch (error) {
       this.logger.error('AI task routing failed', {
         taskType: classification.type,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
       
       throw error;
@@ -345,7 +345,7 @@ export class RTDBOrchestrator extends BaseOrchestrator {
     } catch (error) {
       this.logger.error('Failed to start saga', {
         sagaId,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
       
       throw error;
@@ -377,7 +377,7 @@ export class RTDBOrchestrator extends BaseOrchestrator {
         } catch (error) {
           errors.push({
             stepId: step.id,
-            error: error.message,
+            error: error instanceof Error ? error.message : 'Unknown error',
             timestamp: new Date()
           });
         }
@@ -407,7 +407,7 @@ export class RTDBOrchestrator extends BaseOrchestrator {
     } catch (error) {
       this.logger.error('Saga compensation failed', {
         sagaId,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
       
       throw error;
@@ -460,7 +460,7 @@ export class RTDBOrchestrator extends BaseOrchestrator {
   protected async handleFailure(workflowId: string, error: Error): Promise<FailureResult> {
     this.logger.error('Handling workflow failure', {
       workflowId,
-      error: error.message
+      error: error instanceof Error ? error.message : 'Unknown error'
     });
     
     // Determine if compensation is required
@@ -527,7 +527,7 @@ export class RTDBOrchestrator extends BaseOrchestrator {
       this.logger.error('Workflow step execution failed', {
         workflowId: execution.id,
         stepId: step.id,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
       
       return {
@@ -535,7 +535,7 @@ export class RTDBOrchestrator extends BaseOrchestrator {
         status: ExecutionStatus.FAILURE,
         error: {
           code: 'STEP_EXECUTION_FAILED',
-          message: error.message,
+          message: error instanceof Error ? error.message : 'Unknown error',
           cause: error,
           retryable: this.isRetryableError(error)
         },
@@ -591,7 +591,7 @@ export class RTDBOrchestrator extends BaseOrchestrator {
         }
       }
     } catch (error) {
-      this.logger.error('Failed to recover active sagas', { error: error.message });
+      this.logger.error('Failed to recover active sagas', { error: error instanceof Error ? error.message : 'Unknown error' });
     }
   }
   
@@ -689,7 +689,7 @@ export class RTDBOrchestrator extends BaseOrchestrator {
     } catch (error) {
       this.logger.error('Failed to handle AI conversation request', {
         requestId,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   }
@@ -710,7 +710,7 @@ export class RTDBOrchestrator extends BaseOrchestrator {
     } catch (error) {
       this.logger.error('Failed to handle credit operation request', {
         operationId,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   }
@@ -753,7 +753,7 @@ export class RTDBOrchestrator extends BaseOrchestrator {
   private async startCompensationWorkflow(workflowId: string, error: Error): Promise<void> {
     this.logger.info('Starting compensation workflow', {
       originalWorkflowId: workflowId,
-      error: error.message
+      error: error instanceof Error ? error.message : 'Unknown error'
     });
     
     // This would implement the compensation workflow logic

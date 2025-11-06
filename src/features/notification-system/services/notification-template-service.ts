@@ -77,7 +77,7 @@ export class NotificationTemplateService implements INotificationTemplateService
       return template;
 
     } catch (error) {
-      this.logger.error('Failed to get notification template', error, { type, channel, language });
+      this.logger.error('Failed to get notification template', { error: error instanceof Error ? error.message : 'Unknown error',  type, channel, language });
       
       // Return default template as fallback
       const defaultTemplate = this.getDefaultTemplate(type, channel, language);
@@ -102,7 +102,7 @@ export class NotificationTemplateService implements INotificationTemplateService
       return rendered;
 
     } catch (error) {
-      this.logger.error('Failed to render notification template', error, { 
+      this.logger.error('Failed to render notification template', { error: error instanceof Error ? error.message : 'Unknown error',  
         templateId: template.id, 
         variables 
       });
@@ -131,7 +131,7 @@ export class NotificationTemplateService implements INotificationTemplateService
       return template;
 
     } catch (error) {
-      this.logger.error('Failed to create notification template', error, { templateData });
+      this.logger.error('Failed to create notification template', { error: error instanceof Error ? error.message : 'Unknown error',  templateData });
       throw error;
     }
   }
@@ -165,7 +165,7 @@ export class NotificationTemplateService implements INotificationTemplateService
       return updatedTemplate;
 
     } catch (error) {
-      this.logger.error('Failed to update notification template', error, { templateId, updates });
+      this.logger.error('Failed to update notification template', { error: error instanceof Error ? error.message : 'Unknown error',  templateId, updates });
       throw error;
     }
   }
@@ -189,7 +189,7 @@ export class NotificationTemplateService implements INotificationTemplateService
       return true;
 
     } catch (error) {
-      this.logger.error('Failed to delete notification template', error, { templateId });
+      this.logger.error('Failed to delete notification template', { error: error instanceof Error ? error.message : 'Unknown error',  templateId });
       return false;
     }
   }

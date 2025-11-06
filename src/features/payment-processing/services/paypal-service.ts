@@ -48,11 +48,11 @@ export interface PayPalRefund {
 }
 
 export class PayPalService implements IPayPalService {
-  private clientId: string;
-  private clientSecret: string;
+  private _clientId: string;
+  private _clientSecret: string;
   private environment: 'sandbox' | 'production';
   private logger: IStructuredLogger;
-  private metrics: IMetricsCollector;
+  private _metrics: IMetricsCollector;
 
   constructor(
     clientId: string,
@@ -61,8 +61,8 @@ export class PayPalService implements IPayPalService {
     logger: IStructuredLogger,
     metrics: IMetricsCollector
   ) {
-    this.clientId = clientId;
-    this.clientSecret = clientSecret;
+    this._clientId = clientId;
+    this._clientSecret = clientSecret;
     this.environment = environment;
     this.logger = logger;
     this.metrics = metrics;
@@ -218,7 +218,7 @@ export class PayPalService implements IPayPalService {
         processingDuration: Date.now() - startTime,
         providerLatency: 800, // Mock latency
         fees,
-        netAmount: parseFloat(capture.amount.value) - fees.reduce((sum, fee) => sum + fee.amount, 0)
+        netAmount: parseFloat(capture.amount.value) - fees.reduce((sum: any, fee) => sum + fee.amount, 0)
       };
 
       this.metrics.incrementCounter('paypal_order_captured', {

@@ -202,9 +202,9 @@ export enum DiscrepancyType {
 export class PaymentOrchestrator implements IPaymentOrchestrator {
   private traditionalPaymentService: ITraditionalPaymentService;
   private paymentValidator: IPaymentValidator;
-  private webhookHandler: IPaymentWebhookHandler;
+  private _webhookHandler: IPaymentWebhookHandler;
   private logger: IStructuredLogger;
-  private metrics: IMetricsCollector;
+  private _metrics: IMetricsCollector;
   private activeSagas: Map<string, PaymentSaga> = new Map();
 
   constructor(
@@ -216,7 +216,7 @@ export class PaymentOrchestrator implements IPaymentOrchestrator {
   ) {
     this.traditionalPaymentService = traditionalPaymentService;
     this.paymentValidator = paymentValidator;
-    this.webhookHandler = webhookHandler;
+    this._webhookHandler = webhookHandler;
     this.logger = logger;
     this.metrics = metrics;
   }

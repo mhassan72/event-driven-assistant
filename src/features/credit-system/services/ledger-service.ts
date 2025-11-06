@@ -500,7 +500,7 @@ export class LedgerService implements ILedgerService {
         .orderBy('blockIndex', 'asc')
         .get();
 
-      const entries = entriesQuery.docs.map(doc => doc.data() as LedgerEntry);
+      const entries = entriesQuery.docs.map((doc: any) => doc.data() as LedgerEntry);
       const errors: ChainValidationError[] = [];
       let validatedTransactions = 0;
 
@@ -752,7 +752,7 @@ export class LedgerService implements ILedgerService {
       }
 
       const entriesSnapshot = await entriesQuery.get();
-      const entries = entriesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as (LedgerEntry & { id: string })[];
+      const entries = entriesSnapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() })) as (LedgerEntry & { id: string })[];
 
       let repairedCount = 0;
       const newHashChain: string[] = [];
@@ -845,7 +845,7 @@ export class LedgerService implements ILedgerService {
         .where('timestamp', '<=', timeRange.endDate)
         .get();
 
-      const transactions = transactionsQuery.docs.map(doc => doc.data() as CreditTransaction);
+      const transactions = transactionsQuery.docs.map((doc: any) => doc.data() as CreditTransaction);
       
       // Get corresponding ledger entries
       const auditTransactions: AuditTransaction[] = [];
@@ -896,7 +896,7 @@ export class LedgerService implements ILedgerService {
         generatedAt: new Date(),
         generatedBy: 'system',
         totalTransactions: transactions.length,
-        totalCreditsProcessed: transactions.reduce((sum, t) => sum + Math.abs(t.amount), 0),
+        totalCreditsProcessed: transactions.reduce((sum: any, t) => sum + Math.abs(t.amount), 0),
         integrityScore,
         transactions: auditTransactions,
         anomalies,
@@ -952,7 +952,7 @@ export class LedgerService implements ILedgerService {
         }
       }
 
-      const overallScore = ruleResults.reduce((sum, r) => sum + r.score, 0) / ruleResults.length;
+      const overallScore = ruleResults.reduce((sum: any, r) => sum + r.score, 0) / ruleResults.length;
       const overall = this.scoreToComplianceLevel(overallScore);
 
       return {
@@ -983,7 +983,7 @@ export class LedgerService implements ILedgerService {
         .orderBy('timestamp', 'desc')
         .get();
 
-      return eventsQuery.docs.map(doc => doc.data() as TransactionEvent);
+      return eventsQuery.docs.map((doc: any) => doc.data() as TransactionEvent);
 
     } catch (error) {
       logger.error('Failed to get transaction events', {
@@ -1133,7 +1133,7 @@ export class LedgerService implements ILedgerService {
         .orderBy('blockIndex', 'asc')
         .get();
 
-      const entries = entriesQuery.docs.map(doc => doc.data());
+      const entries = entriesQuery.docs.map((doc: any) => doc.data());
 
       // Store backup
       await this.firestore.collection('chain_backups').doc(backupId).set({
@@ -1155,8 +1155,8 @@ export class LedgerService implements ILedgerService {
     const anomalies: AuditAnomaly[] = [];
 
     // Detect unusual amounts
-    const amounts = transactions.map(t => Math.abs(t.amount));
-    const avgAmount = amounts.reduce((sum, a) => sum + a, 0) / amounts.length;
+    const amounts = transactions.map((t: any) => Math.abs(t.amount));
+    const avgAmount = amounts.reduce((sum: any, a) => sum + a, 0) / amounts.length;
     const threshold = avgAmount * 3; // 3x average
 
     transactions.forEach(transaction => {
@@ -1180,7 +1180,7 @@ export class LedgerService implements ILedgerService {
       transactionsByHour.set(hour, (transactionsByHour.get(hour) || 0) + 1);
     });
 
-    const avgPerHour = Array.from(transactionsByHour.values()).reduce((sum, count) => sum + count, 0) / transactionsByHour.size;
+    const avgPerHour = Array.from(transactionsByHour.values()).reduce((sum: any, count) => sum + count, 0) / transactionsByHour.size;
     const spikeThreshold = avgPerHour * 5; // 5x average
 
     transactionsByHour.forEach((count, hour) => {
@@ -1191,7 +1191,7 @@ export class LedgerService implements ILedgerService {
           type: AnomalyType.FREQUENCY_SPIKE,
           severity: AnomalySeverity.HIGH,
           description: `Unusual transaction frequency: ${count} transactions in hour ${hour} (threshold: ${spikeThreshold})`,
-          transactionIds: hourTransactions.map(t => t.id),
+          transactionIds: hourTransactions.map((t: any) => t.id),
           detectedAt: new Date(),
           resolved: false
         });

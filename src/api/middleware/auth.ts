@@ -800,7 +800,7 @@ export class FirebaseAuthMiddleware implements IFirebaseAuthMiddleware {
    */
   private cleanupRateLimitStore(): void {
     const now = Date.now();
-    for (const [key, entry] of this.rateLimitStore.entries()) {
+    for (const [key, entry] of Array.from(this.rateLimitStore.entries())) {
       if (entry.resetTime <= now) {
         this.rateLimitStore.delete(key);
       }

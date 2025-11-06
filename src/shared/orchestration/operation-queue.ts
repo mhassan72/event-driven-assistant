@@ -124,10 +124,10 @@ export enum OperationStatus {
  */
 export class OperationQueue {
   private realtimeDB: Database;
-  private firestore: Firestore;
+  private _firestore: Firestore;
   private eventBus: IEventBus;
   private logger: IStructuredLogger;
-  private metrics: IMetricsCollector;
+  private _metrics: IMetricsCollector;
   
   // Internal state
   private queues: Map<OperationPriority, PriorityQueue> = new Map();
@@ -780,7 +780,7 @@ export class OperationQueue {
 // ============================================================================
 
 class PriorityQueue {
-  private _priority: OperationPriority; // Stored for potential future use
+  _priority: OperationPriority; // Stored for potential future use
   private operations: QueuedOperation[] = [];
   
   constructor(priority: OperationPriority) {

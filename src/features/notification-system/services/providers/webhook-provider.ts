@@ -6,7 +6,7 @@
 import { IWebhookProvider, WebhookResult, DeliveryStatus } from '../../types';
 import { IStructuredLogger } from '../../../../shared/observability/logger';
 import { IMetricsCollector } from '../../../../shared/observability/metrics';
-import crypto from 'crypto';
+import * as crypto from 'crypto';
 
 export class WebhookProvider implements IWebhookProvider {
   private logger: IStructuredLogger;
@@ -42,7 +42,7 @@ export class WebhookProvider implements IWebhookProvider {
 
         const result = await this.makeWebhookRequest(url, payload, headers);
 
-        this.metrics.increment('webhook.sent', {
+        this.metrics.increment('webhook.sent', 1, {
           success: 'true',
           attempt: attempt.toString(),
           responseCode: result.responseCode?.toString() || 'unknown'
@@ -60,7 +60,8 @@ export class WebhookProvider implements IWebhookProvider {
       } catch (error) {
         lastError = error instanceof Error ? error : new Error('Unknown error');
         
-        this.logger.warn('Webhook attempt failed', lastError, {
+        this.logger.warn('Webhook attempt failed', {
+          error: lastError instanceof Error ? lastError.message : 'Unknown error',
           url: this.maskUrl(url),
           attempt,
           duration: Date.now() - startTime
@@ -80,13 +81,14 @@ export class WebhookProvider implements IWebhookProvider {
     }
 
     // All attempts failed
-    this.logger.error('Webhook delivery failed after all attempts', lastError, {
+    this.logger.error('Webhook delivery failed after all attempts', {
+      error: lastError instanceof Error ? lastError.message : 'Unknown error',
       url: this.maskUrl(url),
       attempts: this.maxRetries,
       totalDuration: Date.now() - startTime
     });
 
-    this.metrics.increment('webhook.failed', {
+    this.metrics.increment('webhook.failed', 1, {
       error: lastError?.message || 'unknown',
       attempts: this.maxRetries.toString()
     });

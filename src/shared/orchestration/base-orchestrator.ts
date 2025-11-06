@@ -667,7 +667,7 @@ export abstract class BaseOrchestrator implements IRTDBOrchestrator {
     // Initialize metric collectors
     this.metrics.gauge('orchestrator.active_workflows', () => this.activeWorkflows.size);
     this.metrics.gauge('orchestrator.event_handlers', () => {
-      return Array.from(this.eventHandlers.values()).reduce((sum, handlers) => sum + handlers.length, 0);
+      return Array.from(this.eventHandlers.values()).reduce((sum: any, handlers) => sum + handlers.length, 0);
     });
   }
   

@@ -39,7 +39,7 @@ export class PushProvider implements IPushProvider {
         android: {
           notification: {
             channelId: 'default',
-            priority: 'high' as messaging.AndroidNotificationPriority
+            priority: 'high' as any
           }
         },
         apns: {
@@ -58,7 +58,7 @@ export class PushProvider implements IPushProvider {
 
       const messageId = await this.messaging.send(message);
 
-      this.metrics.increment('push.sent', {
+      this.metrics.increment('push.sent', 1, {
         success: 'true'
       });
 
@@ -73,13 +73,14 @@ export class PushProvider implements IPushProvider {
       };
 
     } catch (error) {
-      this.logger.error('Failed to send push notification', error, {
+      this.logger.error('Failed to send push notification', {
+        error: error instanceof Error ? error.message : 'Unknown error',
         token: token.substring(0, 20) + '...',
         title,
         duration: Date.now() - startTime
       });
 
-      this.metrics.increment('push.failed', {
+      this.metrics.increment('push.failed', 1, {
         error: error instanceof Error ? error.message : 'unknown'
       });
 
@@ -118,7 +119,7 @@ export class PushProvider implements IPushProvider {
         android: {
           notification: {
             channelId: 'default',
-            priority: 'high' as messaging.AndroidNotificationPriority
+            priority: 'high' as any
           }
         },
         apns: {
@@ -160,16 +161,17 @@ export class PushProvider implements IPushProvider {
         }
       }
 
-      this.metrics.increment('push.multicast', {
-        total: tokens.length,
-        successful: response.successCount,
-        failed: response.failureCount
+      this.metrics.increment('push.multicast', 1, {
+        total: tokens.length.toString(),
+        successful: response.successCount.toString(),
+        failed: response.failureCount.toString()
       });
 
       return results;
 
     } catch (error) {
-      this.logger.error('Failed to send multicast push notification', error, {
+      this.logger.error('Failed to send multicast push notification', {
+        error: error instanceof Error ? error.message : 'Unknown error',
         tokenCount: tokens.length,
         title
       });

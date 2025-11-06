@@ -44,7 +44,7 @@ export interface CreditServiceConfig {
 export class CreditService implements ICreditService {
   private firestore: any;
   private database: any;
-  private metrics: IMetricsCollector;
+  protected metrics: IMetricsCollector;
   private config: CreditServiceConfig;
 
   constructor(metrics: IMetricsCollector, config?: Partial<CreditServiceConfig>, firestore?: any, database?: any) {
@@ -529,7 +529,7 @@ export class CreditService implements ICreditService {
       }
 
       const snapshot = await query.get();
-      return snapshot.docs.map(doc => doc.data() as CreditTransaction);
+      return snapshot.docs.map((doc: any) => doc.data() as CreditTransaction);
 
     } catch (error) {
       logger.error('Failed to get transaction history', {

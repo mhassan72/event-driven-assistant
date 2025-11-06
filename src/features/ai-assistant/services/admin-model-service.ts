@@ -3,7 +3,7 @@
  * Handles administrative operations for AI models
  */
 
-import { StructuredLogger } from '../../../shared/observability/logger';
+import { IStructuredLogger } from '../../../shared/observability/logger';
 import { IMetricsCollector } from '../../../shared/observability/metrics';
 
 export interface IAdminModelService {
@@ -40,16 +40,17 @@ export interface IAdminModelService {
 }
 
 export class AdminModelService implements IAdminModelService {
-  private firestore: any;
-  private logger: StructuredLogger;
-  private metrics: IMetricsCollector;
-  private modelManagementService: any;
+  private _firestore: any;
+  private logger: IStructuredLogger;
+  private _metrics: IMetricsCollector;
+  private _modelManagementService: any;
 
-  constructor(firestore: any, logger: StructuredLogger, metrics: IMetricsCollector, modelManagementService?: any) {
-    this.firestore = firestore;
+  constructor(firestore: any, logger: IStructuredLogger, metrics: IMetricsCollector, modelManagementService?: any) {
+    this._firestore = firestore;
+    this._firestore = firestore;
     this.logger = logger;
-    this.metrics = metrics;
-    this.modelManagementService = modelManagementService;
+    this._metrics = metrics;
+    this._modelManagementService = modelManagementService;
   }
 
   async listModels(): Promise<any[]> {

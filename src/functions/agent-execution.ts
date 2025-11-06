@@ -181,11 +181,11 @@ export interface ExecutionStep {
  */
 export class AgentExecutionHandler {
   private realtimeDB: Database;
-  private firestore: Firestore;
+  private _firestore: Firestore;
   private langChainManager: LangChainManager;
   private langGraphManager: LangGraphWorkflowManager;
-  private nebiusService: NebiusAIService;
-  private creditService: CreditService;
+  private _nebiusService: NebiusAIService;
+  private _creditService: CreditService;
 
   constructor(
     realtimeDB: Database,
@@ -199,8 +199,8 @@ export class AgentExecutionHandler {
     this.firestore = firestore;
     this.langChainManager = langChainManager;
     this.langGraphManager = langGraphManager;
-    this.nebiusService = nebiusService;
-    this.creditService = creditService;
+    this._nebiusService = nebiusService;
+    this._creditService = creditService;
   }
 
   /**
@@ -260,7 +260,7 @@ export class AgentExecutionHandler {
 
       // Deduct actual credits used
       if (result.metadata.creditsUsed > 0) {
-        await this.creditService.deductCredits(
+        await this._creditService.deductCredits(
           taskData.userId,
           result.metadata.creditsUsed,
           `Agent task: ${taskData.type}`,
@@ -516,7 +516,7 @@ export class AgentExecutionHandler {
           modelUsed: agentConfig.modelId,
           tokensUsed: executionResult.tokensUsed.total,
           executionSteps: [],
-          toolsUsed: executionResult.toolsUsed.map(t => t.toolName),
+          toolsUsed: executionResult.toolsUsed.map((t: any) => t.toolName),
           processingTime: Date.now() - startTime,
           workflowPath: ['code_analysis', 'code_generation', 'code_review'],
           creditsUsed: executionResult.cost
@@ -592,7 +592,7 @@ export class AgentExecutionHandler {
           modelUsed: agentConfig.modelId,
           tokensUsed: executionResult.tokensUsed.total,
           executionSteps: [],
-          toolsUsed: executionResult.toolsUsed.map(t => t.toolName),
+          toolsUsed: executionResult.toolsUsed.map((t: any) => t.toolName),
           processingTime: Date.now() - startTime,
           workflowPath: ['data_preparation', 'analysis_execution', 'insights_generation'],
           creditsUsed: executionResult.cost
@@ -668,7 +668,7 @@ export class AgentExecutionHandler {
           modelUsed: agentConfig.modelId,
           tokensUsed: executionResult.tokensUsed.total,
           executionSteps: [],
-          toolsUsed: executionResult.toolsUsed.map(t => t.toolName),
+          toolsUsed: executionResult.toolsUsed.map((t: any) => t.toolName),
           processingTime: Date.now() - startTime,
           workflowPath: ['content_planning', 'content_creation', 'content_editing'],
           creditsUsed: executionResult.cost

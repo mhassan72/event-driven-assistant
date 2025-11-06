@@ -70,6 +70,9 @@ export const auth = firebaseInitialized ? getAuth() : null;
 export const firestore = firebaseInitialized ? getFirestore() : null;
 export const realtimeDb = firebaseInitialized ? getDatabase() : null;
 
+// Export initialization status for other modules to check
+export const isFirebaseInitialized = firebaseInitialized;
+
 // Create Express application
 const app = express();
 

@@ -184,10 +184,10 @@ export enum AlertStatus {
 }
 
 export class SystemMonitoringService implements ISystemMonitoringService {
-  private firestore: Firestore;
+  private _firestore: Firestore;
   private realtimeDb: Database;
   private logger: IStructuredLogger;
-  private metrics: IMetricsCollector;
+  private _metrics: IMetricsCollector;
   private notificationService: NotificationService;
   private alertCooldowns: Map<string, Date> = new Map();
 
@@ -275,7 +275,7 @@ export class SystemMonitoringService implements ISystemMonitoringService {
       return threshold;
 
     } catch (error) {
-      this.logger.error('Failed to create alert threshold', error, { thresholdData });
+      this.logger.error('Failed to create alert threshold', { error: error instanceof Error ? error.message : 'Unknown error',  thresholdData });
       throw error;
     }
   }
@@ -303,7 +303,7 @@ export class SystemMonitoringService implements ISystemMonitoringService {
       return updatedThreshold;
 
     } catch (error) {
-      this.logger.error('Failed to update alert threshold', error, { thresholdId, updates });
+      this.logger.error('Failed to update alert threshold', { error: error instanceof Error ? error.message : 'Unknown error',  thresholdId, updates });
       throw error;
     }
   }
@@ -323,7 +323,7 @@ export class SystemMonitoringService implements ISystemMonitoringService {
       return true;
 
     } catch (error) {
-      this.logger.error('Failed to delete alert threshold', error, { thresholdId });
+      this.logger.error('Failed to delete alert threshold', { error: error instanceof Error ? error.message : 'Unknown error',  thresholdId });
       return false;
     }
   }
@@ -331,7 +331,7 @@ export class SystemMonitoringService implements ISystemMonitoringService {
   async getAlertThresholds(): Promise<AlertThreshold[]> {
     try {
       const snapshot = await this.firestore.collection('alert_thresholds').get();
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as AlertThreshold));
+      return snapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() } as AlertThreshold));
 
     } catch (error) {
       this.logger.error('Failed to get alert thresholds', error);
@@ -398,7 +398,7 @@ export class SystemMonitoringService implements ISystemMonitoringService {
       return true;
 
     } catch (error) {
-      this.logger.error('Failed to acknowledge alert', error, { alertId, userId });
+      this.logger.error('Failed to acknowledge alert', { error: error instanceof Error ? error.message : 'Unknown error',  alertId, userId });
       return false;
     }
   }
@@ -420,7 +420,7 @@ export class SystemMonitoringService implements ISystemMonitoringService {
       return true;
 
     } catch (error) {
-      this.logger.error('Failed to resolve alert', error, { alertId, userId });
+      this.logger.error('Failed to resolve alert', { error: error instanceof Error ? error.message : 'Unknown error',  alertId, userId });
       return false;
     }
   }
@@ -432,7 +432,7 @@ export class SystemMonitoringService implements ISystemMonitoringService {
         .orderBy('triggeredAt', 'desc')
         .get();
 
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as SystemAlert));
+      return snapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() } as SystemAlert));
 
     } catch (error) {
       this.logger.error('Failed to get active alerts', error);

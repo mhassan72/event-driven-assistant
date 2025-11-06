@@ -3,18 +3,19 @@
  * Central export point for all AI assistant services
  */
 
-export * from './admin-model-service';
-export * from './model-management-service';
-export * from './system-analytics-service';
-export * from './task-classifier';
-export * from './task-router';
-export * from './ai-assistant-service';
-export * from './quick-response-handler';
-export * from './conversation-manager';
-export * from './nebius-ai-service';
-export * from './langchain-manager';
-export * from './langgraph-workflow';
-export * from './agent-workflow-manager';
+// Core services
+export { AdminModelService, IAdminModelService } from './admin-model-service';
+export { ModelManagementService, IModelManagementService } from './model-management-service';
+export { SystemAnalyticsService, ISystemAnalyticsService } from './system-analytics-service';
+export { TaskClassifier, ITaskClassifier } from './task-classifier';
+export { TaskRouter, ITaskRouter } from './task-router';
+export { AIAssistantService, IAIAssistantService, ServiceConversationResponse, ServiceAgentTaskInitiation } from './ai-assistant-service';
+export { QuickResponseHandler, IQuickResponseHandler } from './quick-response-handler';
+export { ConversationManager, IConversationManager } from './conversation-manager';
+export { NebiusAIService, INebiusAIService } from './nebius-ai-service';
+export { LangChainManager, ILangChainManager } from './langchain-manager';
+export { LangGraphWorkflowManager, ILangGraphWorkflowManager } from './langgraph-workflow';
+export { AgentWorkflowManager, IAgentWorkflowManager } from './agent-workflow-manager';
 
 // User Preference Manager - export with aliases to avoid conflicts
 export {

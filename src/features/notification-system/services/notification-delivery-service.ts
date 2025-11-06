@@ -114,11 +114,11 @@ export class NotificationDeliveryService implements INotificationDeliveryService
       await this.updateRealtimeDeliveryStatus(notification.userId, notification.id, finalStatus);
 
       // Record metrics
-      this.metrics.increment('notification_delivery.completed', {
+      this.metrics.increment('notification_delivery.completed', 1, {
         type: notification.type,
         status: finalStatus,
-        channelCount: notification.channels.length,
-        successfulChannels: results.filter(r => r.status === DeliveryStatus.SENT).length
+        channelCount: notification.channels.length.toString(),
+        successfulChannels: results.filter(r => r.status === DeliveryStatus.SENT).length.toString()
       });
 
       this.logger.info('Notification delivery completed', {
@@ -129,14 +129,15 @@ export class NotificationDeliveryService implements INotificationDeliveryService
       });
 
     } catch (error) {
-      this.logger.error('Notification delivery failed', error, {
+      this.logger.error('Notification delivery failed', {
+        error: error instanceof Error ? error.message : 'Unknown error',
         notificationId: notification.id,
         duration: Date.now() - startTime
       });
 
       await this.updateNotificationStatus(notification.id, NotificationStatus.FAILED);
       
-      this.metrics.increment('notification_delivery.failed', {
+      this.metrics.increment('notification_delivery.failed', 1, {
         type: notification.type,
         error: error instanceof Error ? error.message : 'unknown'
       });
@@ -178,15 +179,19 @@ export class NotificationDeliveryService implements INotificationDeliveryService
         updatedAt: new Date()
       });
 
-      this.metrics.increment('notification_delivery.retried', {
+      this.metrics.increment('notification_delivery.retried', 1, {
         channel,
-        success: result.status === DeliveryStatus.SENT
+        success: (result.status === DeliveryStatus.SENT).toString()
       });
 
       return result.status === DeliveryStatus.SENT;
 
     } catch (error) {
-      this.logger.error('Failed to retry notification delivery', error, { notificationId, channel });
+      this.logger.error('Failed to retry notification delivery', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        notificationId,
+        channel
+      });
       return false;
     }
   }
@@ -229,7 +234,8 @@ export class NotificationDeliveryService implements INotificationDeliveryService
       }
 
     } catch (error) {
-      this.logger.error('Channel delivery failed', error, {
+      this.logger.error('Channel delivery failed', {
+        error: error instanceof Error ? error.message : 'Unknown error',
         notificationId: notification.id,
         channel,
         duration: Date.now() - startTime
@@ -440,7 +446,10 @@ export class NotificationDeliveryService implements INotificationDeliveryService
       };
 
     } catch (error) {
-      this.logger.error('Failed to get user contact info', error, { userId });
+      this.logger.error('Failed to get user contact info', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        userId
+      });
       throw error;
     }
   }

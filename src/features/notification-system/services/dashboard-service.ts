@@ -135,18 +135,18 @@ export interface TimeRange {
 }
 
 export class DashboardService implements IDashboardService {
-  private firestore: Firestore;
+  private _firestore: Firestore;
   private logger: IStructuredLogger;
-  private metrics: IMetricsCollector;
+  private _metrics: IMetricsCollector;
 
   constructor(
     firestore: Firestore,
     logger: IStructuredLogger,
     metrics: IMetricsCollector
   ) {
-    this.firestore = firestore;
+    this._firestore = firestore;
     this.logger = logger;
-    this.metrics = metrics;
+    this._metrics = metrics;
   }
 
   async getDashboardMetrics(timeRange?: TimeRange): Promise<DashboardMetrics> {

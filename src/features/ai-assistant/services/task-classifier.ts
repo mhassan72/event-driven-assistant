@@ -545,7 +545,7 @@ export class TaskClassifier implements ITaskClassifier {
 
   private calculateLanguageComplexity(message: string): number {
     const words = message.split(/\s+/);
-    const avgWordLength = words.reduce((sum, word) => sum + word.length, 0) / words.length;
+    const avgWordLength = words.reduce((sum: any, word) => sum + word.length, 0) / words.length;
     const sentences = message.split(/[.!?]+/).filter(s => s.trim().length > 0);
     const avgSentenceLength = words.length / sentences.length;
 

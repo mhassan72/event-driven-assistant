@@ -8,8 +8,8 @@ import {
   AgentTaskRequest,
   TaskClassification,
   TaskRoutingResult,
-  ConversationResponse,
-  AgentTaskInitiation,
+
+
   ModelSelection,
   AIModel,
   ModelRequirements,
@@ -28,8 +28,8 @@ import { IMetricsCollector } from '@/shared/observability/metrics';
  */
 export interface IAIAssistantService {
   // Main Processing Methods
-  processConversation(request: ConversationRequest): Promise<ConversationResponse>;
-  initiateAgentTask(request: AgentTaskRequest): Promise<AgentTaskInitiation>;
+  processConversation(request: ConversationRequest): Promise<ServiceConversationResponse>;
+  initiateAgentTask(request: AgentTaskRequest): Promise<ServiceAgentTaskInitiation>;
   
   // Task Analysis
   analyzeTask(request: ConversationRequest): Promise<TaskAnalysisResult>;
@@ -106,7 +106,7 @@ export interface ResourceAllocation {
   gpuRequired: boolean;
 }
 
-export interface ConversationResponse {
+export interface ServiceConversationResponse {
   id: string;
   conversationId: string;
   response: string;
@@ -125,7 +125,7 @@ export interface ResponseMetadata {
   timestamp: Date;
 }
 
-export interface AgentTaskInitiation {
+export interface ServiceAgentTaskInitiation {
   taskId: string;
   status: TaskStatus;
   estimatedCompletion: Date;
@@ -208,7 +208,7 @@ export class AIAssistantService implements IAIAssistantService {
   // Main Processing Methods
   // ============================================================================
 
-  async processConversation(request: ConversationRequest): Promise<ConversationResponse> {
+  async processConversation(request: ConversationRequest): Promise<ServiceConversationResponse> {
     const startTime = Date.now();
     
     try {
@@ -278,7 +278,7 @@ export class AIAssistantService implements IAIAssistantService {
       // Step 7: Record metrics
       this.recordProcessingMetrics(analysis, processingTime, actualCost);
 
-      const conversationResponse: ConversationResponse = {
+      const conversationResponse: ServiceConversationResponse = {
         id: this.generateId(),
         conversationId: request.conversationId,
         response: response.content,
@@ -316,7 +316,7 @@ export class AIAssistantService implements IAIAssistantService {
     }
   }
 
-  async initiateAgentTask(request: AgentTaskRequest): Promise<AgentTaskInitiation> {
+  async initiateAgentTask(request: AgentTaskRequest): Promise<ServiceAgentTaskInitiation> {
     try {
       this.logger.info('Initiating agent task', {
         conversationId: request.conversationId,
@@ -350,7 +350,7 @@ export class AIAssistantService implements IAIAssistantService {
       const taskId = this.generateId();
       const estimatedCompletion = new Date(Date.now() + routing.estimatedWaitTime * 1000);
 
-      const initiation: AgentTaskInitiation = {
+      const initiation: ServiceAgentTaskInitiation = {
         taskId,
         status: TaskStatus.QUEUED,
         estimatedCompletion,

@@ -323,7 +323,7 @@ export class ComprehensiveErrorHandler {
       } catch (dlqError) {
         this.logger.error('Failed to send operation to DLQ', {
           operationId: context.operationId,
-          dlqError: dlqError.message
+          dlqError: dlqError instanceof Error ? dlqError.message : 'Unknown error'
         });
       }
     }
@@ -522,7 +522,7 @@ export class ComprehensiveErrorHandler {
       
     } catch (alertError) {
       this.logger.error('Failed to send critical error alert', {
-        alertError: alertError.message,
+        alertError: alertError instanceof Error ? alertError.message : 'Unknown error',
         originalError: error.message
       });
     }

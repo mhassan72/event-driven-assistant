@@ -73,9 +73,13 @@ function getMonitoringService(): ISystemMonitoringService {
 
 function getDashboardService(): IDashboardService {
   if (!dashboardService) {
-    const firestore = admin.firestore();
-    const logger = Logger.getInstance();
-    const metrics = Metrics.getInstance();
+    const { firestore } = require('../../app');
+    const { logger } = require('../../shared/observability/logger');
+    const { metrics } = require('../../shared/observability/metrics');
+    
+    if (!firestore) {
+      throw new Error('Firestore not initialized');
+    }
     
     dashboardService = new DashboardService(firestore, logger, metrics);
   }
@@ -130,7 +134,9 @@ systemMonitoringRouter.get('/metrics',
       });
 
     } catch (error) {
-      Logger.getInstance().error('Failed to get system metrics', error, {
+      const { logger } = require('../../shared/observability/logger');
+      logger.error('Failed to get system metrics', {
+        error: error instanceof Error ? error.message : 'Unknown error',
         adminId: req.user?.uid
       });
 
@@ -165,7 +171,9 @@ systemMonitoringRouter.get('/dashboard',
       });
 
     } catch (error) {
-      Logger.getInstance().error('Failed to get dashboard metrics', error, {
+      const { logger } = require('../../shared/observability/logger');
+      logger.error('Failed to get dashboard metrics', {
+        error: error instanceof Error ? error.message : 'Unknown error',
         adminId: req.user?.uid,
         query: req.query
       });
@@ -193,7 +201,9 @@ systemMonitoringRouter.get('/alerts',
       });
 
     } catch (error) {
-      Logger.getInstance().error('Failed to get active alerts', error, {
+      const { logger } = require('../../shared/observability/logger');
+      logger.error('Failed to get active alerts', {
+        error: error instanceof Error ? error.message : 'Unknown error',
         adminId: req.user?.uid
       });
 
@@ -224,7 +234,7 @@ systemMonitoringRouter.patch('/alerts/:alertId/acknowledge',
         });
       }
 
-      res.json({
+      return res.json({
         success: true,
         data: { acknowledged: true }
       });
@@ -236,7 +246,7 @@ systemMonitoringRouter.patch('/alerts/:alertId/acknowledge',
         alertId: req.params.alertId
       });
 
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         error: 'Failed to acknowledge alert'
       });
@@ -263,7 +273,7 @@ systemMonitoringRouter.patch('/alerts/:alertId/resolve',
         });
       }
 
-      res.json({
+      return res.json({
         success: true,
         data: { resolved: true }
       });
@@ -275,7 +285,7 @@ systemMonitoringRouter.patch('/alerts/:alertId/resolve',
         alertId: req.params.alertId
       });
 
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         error: 'Failed to resolve alert'
       });
@@ -298,7 +308,9 @@ systemMonitoringRouter.get('/thresholds',
       });
 
     } catch (error) {
-      Logger.getInstance().error('Failed to get alert thresholds', error, {
+      const { logger } = require('../../shared/observability/logger');
+      logger.error('Failed to get alert thresholds', {
+        error: error instanceof Error ? error.message : 'Unknown error',
         adminId: req.user?.uid
       });
 
@@ -328,7 +340,9 @@ systemMonitoringRouter.post('/thresholds',
       });
 
     } catch (error) {
-      Logger.getInstance().error('Failed to create alert threshold', error, {
+      const { logger } = require('../../shared/observability/logger');
+      logger.error('Failed to create alert threshold', {
+        error: error instanceof Error ? error.message : 'Unknown error',
         adminId: req.user?.uid,
         body: req.body
       });
@@ -360,7 +374,9 @@ systemMonitoringRouter.put('/thresholds/:thresholdId',
       });
 
     } catch (error) {
-      Logger.getInstance().error('Failed to update alert threshold', error, {
+      const { logger } = require('../../shared/observability/logger');
+      logger.error('Failed to update alert threshold', {
+        error: error instanceof Error ? error.message : 'Unknown error',
         adminId: req.user?.uid,
         thresholdId: req.params.thresholdId,
         updates: req.body
@@ -392,7 +408,7 @@ systemMonitoringRouter.delete('/thresholds/:thresholdId',
         });
       }
 
-      res.json({
+      return res.json({
         success: true,
         data: { deleted: true }
       });
@@ -404,7 +420,7 @@ systemMonitoringRouter.delete('/thresholds/:thresholdId',
         thresholdId: req.params.thresholdId
       });
 
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         error: 'Failed to delete alert threshold'
       });
@@ -427,7 +443,9 @@ systemMonitoringRouter.post('/fraud-detection',
       });
 
     } catch (error) {
-      Logger.getInstance().error('Failed to run fraud detection', error, {
+      const { logger } = require('../../shared/observability/logger');
+      logger.error('Failed to run fraud detection', {
+        error: error instanceof Error ? error.message : 'Unknown error',
         adminId: req.user?.uid
       });
 
@@ -454,7 +472,9 @@ systemMonitoringRouter.post('/model-performance',
       });
 
     } catch (error) {
-      Logger.getInstance().error('Failed to monitor model performance', error, {
+      const { logger } = require('../../shared/observability/logger');
+      logger.error('Failed to monitor model performance', {
+        error: error instanceof Error ? error.message : 'Unknown error',
         adminId: req.user?.uid
       });
 

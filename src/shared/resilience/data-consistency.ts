@@ -285,7 +285,7 @@ export class DataConsistencyManager {
     } catch (error) {
       this.logger.error('Failed to register consistency rule', {
         ruleName: rule.name,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
       
       throw error;
@@ -344,7 +344,7 @@ export class DataConsistencyManager {
       // Process violations
       const processedViolations: ConsistencyViolation[] = [];
       
-      for (const violationData of violations) {
+      for (const violationData of (violations as any[])) {
         const violation = await this.createConsistencyViolation(
           rule,
           violationData,
@@ -401,7 +401,7 @@ export class DataConsistencyManager {
       this.logger.error('Consistency check failed', {
         checkId,
         ruleId,
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         duration
       });
       
@@ -417,7 +417,7 @@ export class DataConsistencyManager {
         violations: [],
         documentsChecked: 0,
         collectionsChecked: 0,
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         metadata: {}
       };
       
@@ -562,7 +562,7 @@ export class DataConsistencyManager {
         startedAt: new Date(startTime),
         completedAt: new Date(),
         success: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         changes: [],
         metadata: {}
       };
@@ -575,7 +575,7 @@ export class DataConsistencyManager {
       this.logger.error('Automatic repair failed', {
         attemptId,
         violationId: violation.id,
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         duration: Date.now() - startTime
       });
       
@@ -647,7 +647,7 @@ export class DataConsistencyManager {
       this.logger.error('Manual repair failed', {
         violationId,
         repairedBy,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
       
       return false;
@@ -678,7 +678,7 @@ export class DataConsistencyManager {
       
     } catch (error) {
       this.logger.error('Failed to load consistency rules', {
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   }
@@ -688,7 +688,7 @@ export class DataConsistencyManager {
    */
   private registerBuiltInValidationFunctions(): void {
     // Referential integrity check
-    this.validationFunctions.set('checkReferentialIntegrity', async (rule, firestore, realtimeDB) => {
+    this.validationFunctions.set('checkReferentialIntegrity', async (rule: any, firestore: any, realtimeDB: any) => {
       const violations = [];
       
       // Example: Check if user references in transactions exist
@@ -716,7 +716,7 @@ export class DataConsistencyManager {
     });
     
     // Data synchronization check
-    this.validationFunctions.set('checkDataSynchronization', async (rule, firestore, realtimeDB) => {
+    this.validationFunctions.set('checkDataSynchronization', async (rule: any, firestore: any, realtimeDB: any) => {
       const violations = [];
       
       // Example: Check if credit balances match between Firestore and Realtime DB
@@ -745,7 +745,7 @@ export class DataConsistencyManager {
     });
     
     // Checksum validation
-    this.validationFunctions.set('checkChecksumValidation', async (rule, firestore, realtimeDB) => {
+    this.validationFunctions.set('checkChecksumValidation', async (rule: any, firestore: any, realtimeDB: any) => {
       const violations = [];
       
       // Example: Validate blockchain ledger checksums
@@ -775,7 +775,7 @@ export class DataConsistencyManager {
     });
     
     // Register corresponding repair functions
-    this.repairFunctions.set('repairReferentialIntegrity', async (violation, rule, firestore, realtimeDB) => {
+    this.repairFunctions.set('repairReferentialIntegrity', async (violation, rule, firestore: any, realtimeDB: any) => {
       const changes = [];
       
       // Example repair: Remove transactions with invalid user references
@@ -793,7 +793,7 @@ export class DataConsistencyManager {
       return changes;
     });
     
-    this.repairFunctions.set('repairDataSynchronization', async (violation, rule, firestore, realtimeDB) => {
+    this.repairFunctions.set('repairDataSynchronization', async (violation, rule, firestore: any, realtimeDB: any) => {
       const changes = [];
       
       // Example repair: Sync RTDB balance with Firestore
@@ -875,7 +875,7 @@ export class DataConsistencyManager {
       } catch (error) {
         this.logger.error('Scheduled consistency check failed', {
           ruleId,
-          error: error.message
+          error: error instanceof Error ? error.message : 'Unknown error'
         });
       }
     }, intervalMs);
@@ -946,7 +946,7 @@ export class DataConsistencyManager {
     } catch (error) {
       this.logger.error('Failed to get violation', {
         violationId,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
       
       return null;
@@ -980,7 +980,7 @@ export class DataConsistencyManager {
     } catch (error) {
       this.logger.error('Failed to get violations by rule', {
         ruleId,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
       
       return [];
@@ -1013,7 +1013,7 @@ export class DataConsistencyManager {
       
     } catch (error) {
       this.logger.error('Failed to cleanup old violations', {
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   }

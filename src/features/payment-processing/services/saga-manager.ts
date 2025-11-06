@@ -138,7 +138,7 @@ export class SagaManager implements ISagaManager {
   private stepHandlers: Map<string, StepHandler> = new Map();
   private compensationHandlers: Map<string, CompensationHandler> = new Map();
   private logger: IStructuredLogger;
-  private metrics: IMetricsCollector;
+  private _metrics: IMetricsCollector;
 
   constructor(
     logger: IStructuredLogger,
@@ -499,7 +499,7 @@ export class SagaManager implements ISagaManager {
     );
     
     const averageExecutionTime = completedSagasWithTime.length > 0
-      ? completedSagasWithTime.reduce((sum, s) => 
+      ? completedSagasWithTime.reduce((sum: any, s) => 
           sum + (s.updatedAt!.getTime() - s.createdAt.getTime()), 0
         ) / completedSagasWithTime.length
       : 0;

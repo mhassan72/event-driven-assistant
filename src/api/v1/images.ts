@@ -249,7 +249,7 @@ imagesRouter.get('/', asyncHandler(async (req: AuthenticatedRequest, res: any) =
     }
 
     const snapshot = await query.get();
-    const images = snapshot.docs.map(doc => {
+    const images = snapshot.docs.map((doc: any) => {
       const data = doc.data();
       return {
         id: doc.id,

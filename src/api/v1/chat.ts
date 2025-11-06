@@ -278,7 +278,7 @@ chatRouter.get('/conversations', asyncHandler(async (req: AuthenticatedRequest, 
     }
 
     const snapshot = await query.get();
-    const conversations = snapshot.docs.map(doc => {
+    const conversations = snapshot.docs.map((doc: any) => {
       const data = doc.data();
       return {
         id: doc.id,

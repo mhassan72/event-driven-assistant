@@ -128,10 +128,10 @@ export interface PricingCalculation {
 }
 
 export class StripeService implements IStripeService {
-  private stripe: any; // Will be initialized with actual Stripe SDK
-  private webhookSecret: string;
+  private _stripe: any; // Will be initialized with actual Stripe SDK
+  private _webhookSecret: string;
   private logger: IStructuredLogger;
-  private metrics: IMetricsCollector;
+  private _metrics: IMetricsCollector;
 
   constructor(
     stripeSecretKey: string,
@@ -140,8 +140,8 @@ export class StripeService implements IStripeService {
     metrics: IMetricsCollector
   ) {
     // Initialize Stripe SDK when available
-    // this.stripe = new Stripe(stripeSecretKey, { apiVersion: '2023-10-16' });
-    this.webhookSecret = webhookSecret;
+    // this._stripe = new Stripe(stripeSecretKey, { apiVersion: '2023-10-16' });
+    this._webhookSecret = webhookSecret;
     this.logger = logger;
     this.metrics = metrics;
   }
@@ -285,7 +285,7 @@ export class StripeService implements IStripeService {
         processingDuration: Date.now() - startTime,
         providerLatency: 1200, // Mock latency
         fees,
-        netAmount: (mockConfirmedIntent.amount / 100) - fees.reduce((sum, fee) => sum + fee.amount, 0)
+        netAmount: (mockConfirmedIntent.amount / 100) - fees.reduce((sum: any, fee) => sum + fee.amount, 0)
       };
 
       this.metrics.incrementCounter('stripe_payment_confirmed', {
@@ -390,7 +390,7 @@ export class StripeService implements IStripeService {
   validateWebhook(payload: string, signature: string): boolean {
     try {
       // Mock webhook validation - will use actual Stripe webhook validation
-      // const event = this.stripe.webhooks.constructEvent(payload, signature, this.webhookSecret);
+      // const event = this._stripe.webhooks.constructEvent(payload, signature, this._webhookSecret);
       return true;
     } catch (error) {
       this.logger.error('Webhook validation failed', {

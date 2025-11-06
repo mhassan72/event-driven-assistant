@@ -309,7 +309,7 @@ export class BalanceSyncService implements IBalanceSyncService {
     try {
       // Get all users with balances
       const balancesQuery = await this.firestore.collection('credit_balances').get();
-      const userIds = balancesQuery.docs.map(doc => doc.id);
+      const userIds = balancesQuery.docs.map((doc: any) => doc.id);
 
       const results: SyncResult[] = [];
       const batchSize = 10; // Process in batches to avoid overwhelming the system

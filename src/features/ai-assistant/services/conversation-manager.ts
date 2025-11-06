@@ -770,7 +770,7 @@ export class ConversationManager implements IConversationManager {
       return score;
     });
 
-    const averageSentiment = sentiments.reduce((sum, s) => sum + s, 0) / sentiments.length;
+    const averageSentiment = sentiments.reduce((sum: any, s) => sum + s, 0) / sentiments.length;
     
     return {
       overall: Math.round(averageSentiment) as SentimentScore,

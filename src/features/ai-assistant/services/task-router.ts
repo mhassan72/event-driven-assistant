@@ -7,7 +7,8 @@ import {
   ConversationRequest,
   TaskClassification,
   TaskType,
-  TaskComplexity
+  TaskComplexity,
+  TaskPriority
 } from '@/shared/types';
 import { IStructuredLogger } from '@/shared/observability/logger';
 import { IMetricsCollector } from '@/shared/observability/metrics';
@@ -130,12 +131,7 @@ export interface ResourceRequirements {
   priority: TaskPriority;
 }
 
-export enum TaskPriority {
-  LOW = 1,
-  NORMAL = 2,
-  HIGH = 3,
-  URGENT = 4
-}
+
 
 /**
  * Task Router Implementation
@@ -556,8 +552,8 @@ export class TaskRouter implements ITaskRouter {
 
   private getUserPriority(userId: string): number {
     // In a real implementation, this would check user tier/subscription
-    // For now, return default priority
-    return TaskPriority.NORMAL;
+    // For now, return default priority (2 = NORMAL)
+    return 2;
   }
 
   private calculateResourceRequirements(classification: TaskClassification): ResourceRequirements {

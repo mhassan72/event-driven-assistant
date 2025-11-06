@@ -9,9 +9,9 @@ import { IMetricsCollector } from '../../../../shared/observability/metrics';
 
 export class SMSProvider implements ISMSProvider {
   private logger: IStructuredLogger;
-  private metrics: IMetricsCollector;
-  private apiKey: string;
-  private fromNumber: string;
+  private _metrics: IMetricsCollector;
+  private _apiKey: string;
+  private _fromNumber: string;
 
   constructor(
     logger: IStructuredLogger,
@@ -23,8 +23,8 @@ export class SMSProvider implements ISMSProvider {
   ) {
     this.logger = logger;
     this.metrics = metrics;
-    this.apiKey = config.apiKey;
-    this.fromNumber = config.fromNumber;
+    this._apiKey = config.apiKey;
+    this._fromNumber = config.fromNumber;
   }
 
   async sendSMS(to: string, message: string): Promise<SMSResult> {
@@ -63,7 +63,7 @@ export class SMSProvider implements ISMSProvider {
       // Simulate network delay
       await new Promise(resolve => setTimeout(resolve, 200 + Math.random() * 300));
 
-      this.metrics.increment('sms.sent', {
+      this.metrics.increment('sms.sent', 1, {
         success: 'true',
         messageLength: message.length.toString()
       });
@@ -80,13 +80,14 @@ export class SMSProvider implements ISMSProvider {
       };
 
     } catch (error) {
-      this.logger.error('Failed to send SMS', error, {
+      this.logger.error('Failed to send SMS', {
+        error: error instanceof Error ? error.message : 'Unknown error',
         to: this.maskPhoneNumber(to),
         messageLength: message.length,
         duration: Date.now() - startTime
       });
 
-      this.metrics.increment('sms.failed', {
+      this.metrics.increment('sms.failed', 1, {
         error: error instanceof Error ? error.message : 'unknown'
       });
 
@@ -128,10 +129,10 @@ export class TwilioSMSProvider implements ISMSProvider {
   
   constructor(
     private logger: IStructuredLogger,
-    private metrics: IMetricsCollector,
+    private _metrics: IMetricsCollector,
     accountSid: string,
     authToken: string,
-    private fromNumber: string
+    private _fromNumber: string
   ) {
     this.client = twilio(accountSid, authToken);
   }
@@ -140,7 +141,7 @@ export class TwilioSMSProvider implements ISMSProvider {
     try {
       const result = await this.client.messages.create({
         body: message,
-        from: this.fromNumber,
+        from: this._fromNumber,
         to: to
       });
 
@@ -150,7 +151,7 @@ export class TwilioSMSProvider implements ISMSProvider {
       };
 
     } catch (error) {
-      this.logger.error('Twilio SMS failed', error, { to: this.maskPhoneNumber(to) });
+      this.logger.error('Twilio SMS failed', { error: error instanceof Error ? error.message : 'Unknown error',  to: this.maskPhoneNumber(to) });
       
       return {
         messageId: 'failed',

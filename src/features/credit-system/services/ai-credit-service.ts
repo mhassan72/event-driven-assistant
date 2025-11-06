@@ -149,7 +149,6 @@ export interface IAICreditService extends ICreditService {
  * AI-specific credit service implementation
  */
 export class AICreditService extends CreditService implements IAICreditService {
-  private firestore: any;
   private ledgerService: ILedgerService;
   private balanceSyncService: IBalanceSyncService;
   private welcomeBonusConfig: WelcomeBonusConfig;
@@ -507,16 +506,16 @@ export class AICreditService extends CreditService implements IAICreditService {
         .where('timestamp', '<=', timeRange.endDate)
         .get();
 
-      const transactions = aiTransactions.docs.map(doc => doc.data());
+      const transactions = aiTransactions.docs.map((doc: any) => doc.data());
 
       // Calculate AI-specific metrics
       const totalAIInteractions = transactions.length;
-      const totalCreditsUsed = transactions.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+      const totalCreditsUsed = transactions.reduce((sum: number, t: any) => sum + Math.abs(t.amount), 0);
       const averageCreditsPerInteraction = totalAIInteractions > 0 ? totalCreditsUsed / totalAIInteractions : 0;
 
       // Task type breakdown
       const taskTypeMap = new Map<TaskType, { count: number; credits: number }>();
-      transactions.forEach(t => {
+      transactions.forEach((t: any) => {
         const taskType = t.metadata?.taskType as TaskType || TaskType.QUICK_CHAT;
         const current = taskTypeMap.get(taskType) || { count: 0, credits: 0 };
         taskTypeMap.set(taskType, {
@@ -535,7 +534,7 @@ export class AICreditService extends CreditService implements IAICreditService {
 
       // Model efficiency metrics
       const modelMap = new Map<string, { count: number; credits: number; tokens: number }>();
-      transactions.forEach(t => {
+      transactions.forEach((t: any) => {
         const model = t.metadata?.aiModel || 'unknown';
         const tokens = (t.metadata?.inputTokens || 0) + (t.metadata?.outputTokens || 0);
         const current = modelMap.get(model) || { count: 0, credits: 0, tokens: 0 };
@@ -557,7 +556,7 @@ export class AICreditService extends CreditService implements IAICreditService {
       }));
 
       // Conversation metrics
-      const conversationIds = new Set(transactions.map(t => t.metadata?.conversationId).filter(Boolean));
+      const conversationIds = new Set(transactions.map((t: any) => t.metadata?.conversationId).filter(Boolean));
       const conversationMetrics: ConversationMetrics = {
         totalConversations: conversationIds.size,
         averageMessagesPerConversation: conversationIds.size > 0 ? totalAIInteractions / conversationIds.size : 0,
@@ -799,7 +798,7 @@ export class AICreditService extends CreditService implements IAICreditService {
         return 999; // No recent usage, return high number
       }
 
-      const totalUsed = recentTransactions.docs.reduce((sum, doc) => 
+      const totalUsed = recentTransactions.docs.reduce((sum: any, doc: any) => 
         sum + Math.abs(doc.data().amount), 0
       );
       
@@ -863,14 +862,52 @@ export class AICreditService extends CreditService implements IAICreditService {
     return '500+';
   }
 
-  private categorizeError(error: unknown): string {
-    if (error instanceof Error) {
-      if (error.message.includes('insufficient')) return 'insufficient_credits';
-      if (error.message.includes('not found')) return 'not_found';
-      if (error.message.includes('validation')) return 'validation_error';
-      if (error.message.includes('timeout')) return 'timeout';
-      if (error.message.includes('eligibility')) return 'eligibility_error';
+
+
+  /**
+   * Track model usage for analytics and billing
+   */
+  async trackModelUsage(userId: string, modelId: string, creditsUsed: number, tokensUsed: number): Promise<void> {
+    try {
+      const usageDoc = {
+        userId,
+        modelId,
+        creditsUsed,
+        tokensUsed,
+        timestamp: new Date(),
+        processed: false
+      };
+
+      await this.firestore.collection('model_usage').add(usageDoc);
+      
+      this.logger.info('Model usage tracked', { userId, modelId, creditsUsed, tokensUsed });
+    } catch (error) {
+      this.logger.error('Failed to track model usage', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        userId,
+        modelId
+      });
+      throw error;
     }
-    return 'unknown_error';
+  }
+
+  /**
+   * Update low balance thresholds for users
+   */
+  async updateLowBalanceThresholds(userId: string, thresholds: any): Promise<void> {
+    try {
+      await this.firestore.collection('user_settings').doc(userId).set({
+        lowBalanceThresholds: thresholds,
+        updatedAt: new Date()
+      }, { merge: true });
+      
+      this.logger.info('Low balance thresholds updated', { userId });
+    } catch (error) {
+      this.logger.error('Failed to update low balance thresholds', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        userId
+      });
+      throw error;
+    }
   }
 }

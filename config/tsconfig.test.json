@@ -4,7 +4,7 @@
     "types": ["jest", "node", "supertest"],
     "noUnusedLocals": false,
     "noImplicitReturns": false,
-    "baseUrl": "./src",
+    "baseUrl": "../src",
     "paths": {
       "@/*": ["*"],
       "@features/*": ["features/*"],
@@ -13,15 +13,15 @@
     }
   },
   "include": [
-    "src/**/*",
-    "test/**/*",
-    "src/**/*.test.ts",
-    "src/**/*.spec.ts",
-    "test/**/*.test.ts",
-    "test/**/*.spec.ts"
+    "../src/**/*",
+    "../test/**/*",
+    "../src/**/*.test.ts",
+    "../src/**/*.spec.ts",
+    "../test/**/*.test.ts",
+    "../test/**/*.spec.ts"
   ],
   "exclude": [
-    "node_modules",
-    "lib"
+    "../node_modules",
+    "../lib"
   ]
 }

@@ -4,9 +4,9 @@
     "skipLibCheck": true
   },
   "exclude": [
-    "src/shared/orchestration/**/*",
-    "test/**/*",
-    "**/*.test.ts",
-    "**/*.spec.ts"
+    "../src/shared/orchestration/**/*",
+    "../test/**/*",
+    "../**/*.test.ts",
+    "../**/*.spec.ts"
   ]
 }

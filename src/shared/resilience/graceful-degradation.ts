@@ -263,7 +263,7 @@ export class GracefulDegradationManager {
     } catch (error) {
       this.logger.error('Failed to register feature', {
         featureName: config.name,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   }
@@ -330,7 +330,7 @@ export class GracefulDegradationManager {
       
     } catch (error) {
       this.logger.error('Failed to evaluate degradation rules', {
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   }
@@ -353,7 +353,7 @@ export class GracefulDegradationManager {
     } catch (error) {
       this.logger.error('Failed to evaluate rule triggers', {
         ruleId: rule.id,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
       
       return false;
@@ -445,7 +445,7 @@ export class GracefulDegradationManager {
       
     } catch (error) {
       this.logger.error('Failed to execute degradation actions', {
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   }
@@ -760,7 +760,7 @@ export class GracefulDegradationManager {
     } catch (error) {
       this.logger.error('Failed to revert degradations', {
         rulesToRevert,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   }
@@ -862,7 +862,7 @@ export class GracefulDegradationManager {
         await this.evaluateDegradationRules();
       } catch (error) {
         this.logger.error('Monitoring evaluation failed', {
-          error: error.message
+          error: error instanceof Error ? error.message : 'Unknown error'
         });
       }
     }, 30000);
@@ -914,7 +914,7 @@ export class GracefulDegradationManager {
       } catch (error) {
         this.logger.error('Feature health check failed', {
           featureName,
-          error: error.message
+          error: error instanceof Error ? error.message : 'Unknown error'
         });
       }
     }, 60000); // Every minute

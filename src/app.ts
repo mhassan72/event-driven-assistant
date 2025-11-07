@@ -13,11 +13,12 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { getDatabase } from 'firebase-admin/database';
 
 // Import middleware
-import { errorHandler } from './api/middleware/error-handling';
+import { errorHandler, correlationIdMiddleware } from './api/middleware/error-handling';
 import { requestLogger, performanceMonitor, healthCheck, requestTimeout } from './api/middleware/observability';
 import { securityHeaders } from './api/middleware/security';
 import { rateLimiter } from './api/middleware/rate-limiting';
 import { sanitizeRequest } from './api/middleware/validation';
+import { enhanceResponseWithHelpers } from './shared/utils/api-response';
 
 // Import API routes
 import { v1Router } from './api/v1';
@@ -115,6 +116,8 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Custom middleware
 app.use(healthCheck);
 app.use(requestTimeout(30000)); // 30 second timeout
+app.use(correlationIdMiddleware); // Add correlation ID for request tracking
+app.use(enhanceResponseWithHelpers); // Add standardized response helpers
 app.use(requestLogger);
 app.use(performanceMonitor);
 app.use(securityHeaders);
@@ -123,17 +126,29 @@ app.use(rateLimiter);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-  res.status(200).json({
+  const healthData = {
     status: 'healthy',
-    timestamp: new Date().toISOString(),
-    version: process.env.npm_package_version || '1.0.0',
     environment: process.env.NODE_ENV || 'development',
     services: {
-      firestore: 'connected',
-      realtimeDatabase: 'connected',
-      auth: 'connected'
+      firestore: firebaseInitialized ? 'connected' : 'disabled',
+      realtimeDatabase: firebaseInitialized ? 'connected' : 'disabled',
+      auth: firebaseInitialized ? 'connected' : 'disabled'
     }
-  });
+  };
+  
+  // Use enhanced response helper if available
+  if ((res as any).success) {
+    (res as any).success(healthData);
+  } else {
+    res.status(200).json({
+      success: true,
+      data: healthData,
+      metadata: {
+        timestamp: new Date().toISOString(),
+        version: process.env.npm_package_version || '1.0.0'
+      }
+    });
+  }
 });
 
 // API routes
@@ -142,11 +157,21 @@ app.use('/monitoring', monitoringRoutes);
 
 // 404 handler
 app.use((req, res) => {
-  res.status(404).json({
-    error: 'Not Found',
-    message: `Route ${req.method} ${req.originalUrl} not found`,
-    timestamp: new Date().toISOString()
-  });
+  // Use enhanced response helper if available
+  if ((res as any).notFound) {
+    (res as any).notFound(`Route ${req.method} ${req.originalUrl} not found`);
+  } else {
+    res.status(404).json({
+      success: false,
+      error: {
+        code: 'NOT_FOUND',
+        message: `Route ${req.method} ${req.originalUrl} not found`
+      },
+      metadata: {
+        timestamp: new Date().toISOString()
+      }
+    });
+  }
 });
 
 // Global error handler

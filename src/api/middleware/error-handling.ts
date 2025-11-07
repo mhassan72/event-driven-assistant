@@ -1,9 +1,16 @@
 /**
  * Error Handling Middleware
- * Centralized error processing for Express API
+ * Centralized error processing for Express API with enhanced type compatibility
  */
 
 import { Request, Response, NextFunction } from 'express';
+import { 
+  AuthenticatedRequest, 
+  AuthenticatedResponse, 
+  AuthenticatedRequestHandler,
+  AsyncRequestHandler,
+  enhanceResponse
+} from '../../shared/types/express';
 import { logger } from '../../shared/observability/logger';
 
 export interface AppError extends Error {
@@ -79,16 +86,27 @@ export class InternalServerError extends Error implements AppError {
   }
 }
 
+/**
+ * Enhanced error handler with proper typing
+ */
 export const errorHandler = (
   error: Error | AppError,
-  req: Request,
-  res: Response,
+  req: AuthenticatedRequest,
+  res: AuthenticatedResponse,
   next: NextFunction
 ): void => {
+  // Enhance response if not already enhanced
+  const enhancedRes = enhanceResponse(res);
+  
   // Ensure we're working with an AppError
   const appError = error as AppError;
   const statusCode = appError.statusCode || 500;
   const code = appError.code || 'UNKNOWN_ERROR';
+  
+  // Generate request ID if not present
+  const requestId = req.correlationId || 
+                   req.headers['x-request-id'] as string || 
+                   `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   
   // Log error details
   logger.error('API Error', {
@@ -103,38 +121,170 @@ export const errorHandler = (
     request: {
       method: req.method,
       url: req.originalUrl,
-      headers: req.headers,
+      headers: {
+        'user-agent': req.headers['user-agent'],
+        'content-type': req.headers['content-type'],
+        'authorization': req.headers.authorization ? '[PRESENT]' : '[MISSING]'
+      },
       body: req.body,
-      user: (req as any).user?.uid
+      user: req.user?.uid,
+      requestId
     }
   });
 
   // Don't expose internal error details in production
   const isProduction = process.env.NODE_ENV === 'production';
   const response: any = {
-    error: code,
-    message: error.message,
-    timestamp: new Date().toISOString(),
-    requestId: req.headers['x-request-id'] || 'unknown'
+    success: false,
+    error: {
+      code,
+      message: error.message,
+      requestId
+    },
+    timestamp: new Date().toISOString()
   };
 
   // Add details for non-production environments or operational errors
   if (!isProduction || appError.isOperational) {
     if (appError.details) {
-      response.details = appError.details;
+      response.error.details = appError.details;
     }
   }
 
   // Add stack trace for development
   if (!isProduction) {
-    response.stack = error.stack;
+    response.error.stack = error.stack;
   }
+
+  // Set CORS headers for error responses
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
 
   res.status(statusCode).json(response);
 };
 
-export const asyncHandler = (fn: Function) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    Promise.resolve(fn(req, res, next)).catch(next);
+/**
+ * Legacy error handler for backward compatibility
+ */
+export const legacyErrorHandler = (
+  error: Error | AppError,
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
+  return errorHandler(
+    error, 
+    req as AuthenticatedRequest, 
+    enhanceResponse(res), 
+    next
+  );
+};
+
+/**
+ * Async handler wrapper that ensures proper error handling and type compatibility
+ */
+export const asyncHandler = (handler: AsyncRequestHandler): AuthenticatedRequestHandler => {
+  return (req: AuthenticatedRequest, res: AuthenticatedResponse, next: NextFunction): void => {
+    // Enhance response object
+    const enhancedRes = enhanceResponse(res);
+    
+    // Execute handler and catch any errors
+    Promise.resolve(handler(req, enhancedRes))
+      .catch(next);
   };
 };
+
+/**
+ * Legacy async handler for backward compatibility
+ */
+export const legacyAsyncHandler = (fn: Function) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const enhancedRes = enhanceResponse(res);
+    Promise.resolve(fn(req as AuthenticatedRequest, enhancedRes, next)).catch(next);
+  };
+};
+
+/**
+ * Response enhancement middleware
+ * Adds utility methods to all responses
+ */
+export const enhanceResponseMiddleware = (
+  req: Request, 
+  res: Response, 
+  next: NextFunction
+): void => {
+  enhanceResponse(res);
+  next();
+};
+
+/**
+ * Request correlation ID middleware
+ * Adds correlation ID to requests for tracking
+ */
+export const correlationIdMiddleware = (
+  req: AuthenticatedRequest, 
+  res: AuthenticatedResponse, 
+  next: NextFunction
+): void => {
+  // Generate correlation ID if not present
+  req.correlationId = req.correlationId || 
+                     req.headers['x-correlation-id'] as string ||
+                     req.headers['x-request-id'] as string ||
+                     `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  
+  // Add to response headers
+  res.header('X-Correlation-ID', req.correlationId);
+  
+  next();
+};
+
+/**
+ * Standard API response format
+ */
+export interface APIResponse<T = any> {
+  success: boolean;
+  data?: T;
+  error?: {
+    code: string;
+    message: string;
+    details?: any;
+    requestId?: string;
+  };
+  timestamp: string;
+  requestId?: string;
+}
+
+/**
+ * Create success response
+ */
+export function createSuccessResponse<T>(data: T, requestId?: string): APIResponse<T> {
+  return {
+    success: true,
+    data,
+    timestamp: new Date().toISOString(),
+    requestId
+  };
+}
+
+/**
+ * Create error response
+ */
+export function createErrorResponse(
+  code: string, 
+  message: string, 
+  details?: any, 
+  requestId?: string
+): APIResponse {
+  return {
+    success: false,
+    error: {
+      code,
+      message,
+      details,
+      requestId
+    },
+    timestamp: new Date().toISOString(),
+    requestId
+  };
+}

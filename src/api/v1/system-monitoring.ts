@@ -7,14 +7,21 @@ import { Router } from 'express';
 import { 
   AuthenticatedRequest, 
   AuthenticatedResponse,
+  asyncHandler
+} from '../../shared/types/express';
+import { 
   UserRole
-} from '../../shared/types';
+} from '../../shared/types/firebase-auth';
 import { 
   requireAuth, 
   requireRole,
   rateLimitByUser 
 } from '../middleware/auth';
 import { validateRequest } from '../middleware/validation';
+import { 
+  APIResponseHelper, 
+  APIErrorCode
+} from '../../shared/utils/api-response';
 import { 
   SystemMonitoringService,
   DashboardService,
@@ -91,15 +98,12 @@ function getDashboardService(): IDashboardService {
 systemMonitoringRouter.get('/health',
   requireAuth,
   requireRole(UserRole.ADMIN),
-  async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
+  asyncHandler(async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
     try {
       const service = getMonitoringService();
       const health = await service.getSystemHealth();
 
-      res.json({
-        success: true,
-        data: { health }
-      });
+      APIResponseHelper.success(res, { health });
 
     } catch (error) {
       logger.error('Failed to get system health', {
@@ -107,12 +111,9 @@ systemMonitoringRouter.get('/health',
         adminId: req.user?.uid
       });
 
-      res.status(500).json({
-        success: false,
-        error: 'Failed to retrieve system health'
-      });
+      APIResponseHelper.internalError(res, 'Failed to retrieve system health');
     }
-  }
+  })
 );
 
 // Get system metrics
@@ -123,7 +124,7 @@ systemMonitoringRouter.get('/metrics',
     windowMs: 60 * 1000,
     maxRequests: 30
   }),
-  async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
+  asyncHandler(async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
     try {
       const service = getMonitoringService();
       const metrics = await service.collectSystemMetrics();
@@ -145,7 +146,7 @@ systemMonitoringRouter.get('/metrics',
         error: 'Failed to retrieve system metrics'
       });
     }
-  }
+  })
 );
 
 // Get dashboard metrics
@@ -153,7 +154,7 @@ systemMonitoringRouter.get('/dashboard',
   requireAuth,
   requireRole(UserRole.ADMIN),
   validateRequest(timeRangeSchema.partial()),
-  async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
+  asyncHandler(async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
     try {
       const { startDate, endDate } = req.query;
       
@@ -183,14 +184,14 @@ systemMonitoringRouter.get('/dashboard',
         error: 'Failed to retrieve dashboard metrics'
       });
     }
-  }
+  })
 );
 
 // Get active alerts
 systemMonitoringRouter.get('/alerts',
   requireAuth,
   requireRole(UserRole.ADMIN),
-  async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
+  asyncHandler(async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
     try {
       const service = getMonitoringService();
       const alerts = await service.getActiveAlerts();
@@ -212,14 +213,14 @@ systemMonitoringRouter.get('/alerts',
         error: 'Failed to retrieve active alerts'
       });
     }
-  }
+  })
 );
 
 // Acknowledge alert
 systemMonitoringRouter.patch('/alerts/:alertId/acknowledge',
   requireAuth,
   requireRole(UserRole.ADMIN),
-  async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
+  asyncHandler(async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
     try {
       const { alertId } = req.params;
       const userId = req.user!.uid;
@@ -251,14 +252,14 @@ systemMonitoringRouter.patch('/alerts/:alertId/acknowledge',
         error: 'Failed to acknowledge alert'
       });
     }
-  }
+  })
 );
 
 // Resolve alert
 systemMonitoringRouter.patch('/alerts/:alertId/resolve',
   requireAuth,
   requireRole(UserRole.ADMIN),
-  async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
+  asyncHandler(async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
     try {
       const { alertId } = req.params;
       const userId = req.user!.uid;
@@ -290,14 +291,14 @@ systemMonitoringRouter.patch('/alerts/:alertId/resolve',
         error: 'Failed to resolve alert'
       });
     }
-  }
+  })
 );
 
 // Get alert thresholds
 systemMonitoringRouter.get('/thresholds',
   requireAuth,
   requireRole(UserRole.ADMIN),
-  async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
+  asyncHandler(async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
     try {
       const service = getMonitoringService();
       const thresholds = await service.getAlertThresholds();
@@ -319,7 +320,7 @@ systemMonitoringRouter.get('/thresholds',
         error: 'Failed to retrieve alert thresholds'
       });
     }
-  }
+  })
 );
 
 // Create alert threshold
@@ -327,7 +328,7 @@ systemMonitoringRouter.post('/thresholds',
   requireAuth,
   requireRole(UserRole.ADMIN),
   validateRequest(createAlertThresholdSchema),
-  async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
+  asyncHandler(async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
     try {
       const thresholdData = req.body;
 
@@ -352,7 +353,7 @@ systemMonitoringRouter.post('/thresholds',
         error: 'Failed to create alert threshold'
       });
     }
-  }
+  })
 );
 
 // Update alert threshold
@@ -360,7 +361,7 @@ systemMonitoringRouter.put('/thresholds/:thresholdId',
   requireAuth,
   requireRole(UserRole.ADMIN),
   validateRequest(createAlertThresholdSchema.partial()),
-  async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
+  asyncHandler(async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
     try {
       const { thresholdId } = req.params;
       const updates = req.body;
@@ -387,14 +388,14 @@ systemMonitoringRouter.put('/thresholds/:thresholdId',
         error: 'Failed to update alert threshold'
       });
     }
-  }
+  })
 );
 
 // Delete alert threshold
 systemMonitoringRouter.delete('/thresholds/:thresholdId',
   requireAuth,
   requireRole(UserRole.ADMIN),
-  async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
+  asyncHandler(async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
     try {
       const { thresholdId } = req.params;
 
@@ -425,14 +426,14 @@ systemMonitoringRouter.delete('/thresholds/:thresholdId',
         error: 'Failed to delete alert threshold'
       });
     }
-  }
+  })
 );
 
 // Detect fraud
 systemMonitoringRouter.post('/fraud-detection',
   requireAuth,
   requireRole(UserRole.ADMIN),
-  async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
+  asyncHandler(async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
     try {
       const service = getMonitoringService();
       const fraudAlerts = await service.detectFraudulentActivity();
@@ -454,14 +455,14 @@ systemMonitoringRouter.post('/fraud-detection',
         error: 'Failed to run fraud detection'
       });
     }
-  }
+  })
 );
 
 // Monitor model performance
 systemMonitoringRouter.post('/model-performance',
   requireAuth,
   requireRole(UserRole.ADMIN),
-  async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
+  asyncHandler(async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
     try {
       const service = getMonitoringService();
       const performanceAlerts = await service.monitorModelPerformance();
@@ -483,7 +484,7 @@ systemMonitoringRouter.post('/model-performance',
         error: 'Failed to monitor model performance'
       });
     }
-  }
+  })
 );
 
 export { systemMonitoringRouter };

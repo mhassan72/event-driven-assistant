@@ -7,13 +7,22 @@ import { Router } from 'express';
 import { 
   AuthenticatedRequest, 
   AuthenticatedResponse,
+  asyncHandler
+} from '../../shared/types/express';
+import { 
   UserRole
-} from '../../shared/types';
+} from '../../shared/types/firebase-auth';
 import { 
   requireRole, 
   rateLimitByUser 
 } from '../middleware/auth';
 import { validateRequest } from '../middleware/validation';
+import { 
+  APIResponseHelper, 
+  APIErrorCode,
+  createSuccessResponse,
+  createErrorResponse
+} from '../../shared/utils/api-response';
 import { 
   NotificationService,
   NotificationTemplateService,
@@ -151,7 +160,7 @@ notificationsRouter.get('/',
     windowMs: 60 * 1000,
     maxRequests: 100
   }),
-  async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
+  asyncHandler(async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
     try {
       const userId = req.user!.uid;
       
@@ -167,17 +176,14 @@ notificationsRouter.get('/',
       const service = getNotificationService();
       const notifications = await service.getUserNotifications(userId, options);
 
-      res.json({
-        success: true,
-        data: {
-          notifications,
-          pagination: {
-            limit: options.limit,
-            offset: options.offset,
-            hasMore: notifications.length === options.limit
-          }
-        }
-      });
+      // Create pagination metadata
+      const pagination = APIResponseHelper.createPagination(
+        Math.floor(options.offset / options.limit) + 1,
+        options.limit,
+        undefined // Total count would be provided by service in real implementation
+      );
+
+      APIResponseHelper.paginated(res, notifications, pagination);
 
     } catch (error) {
       logger.error('Failed to get user notifications', {
@@ -186,27 +192,22 @@ notificationsRouter.get('/',
         query: req.query
       });
 
-      res.status(500).json({
-        success: false,
-        error: 'Failed to retrieve notifications'
-      });
+      APIResponseHelper.internalError(res, 'Failed to retrieve notifications');
     }
-  }
+  })
 );
 
 // Send notification (admin only)
 notificationsRouter.post('/send',
   requireRole(UserRole.ADMIN),
   validateRequest(sendNotificationSchema),
-  async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
+  asyncHandler(async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
     try {
       const { userId, ...notificationData } = req.body;
       
       if (!userId) {
-        return res.status(400).json({
-          success: false,
-          error: 'userId is required'
-        });
+        APIResponseHelper.validationError(res, 'userId is required');
+        return;
       }
 
       const notificationRequest: NotificationRequest = {
@@ -219,10 +220,7 @@ notificationsRouter.post('/send',
       const service = getNotificationService();
       const notification = await service.sendNotification(notificationRequest);
 
-      return res.json({
-        success: true,
-        data: { notification }
-      });
+      APIResponseHelper.success(res, { notification }, 201);
 
     } catch (error) {
       logger.error('Failed to send notification', {
@@ -236,7 +234,7 @@ notificationsRouter.post('/send',
         error: 'Failed to send notification'
       });
     }
-  }
+  })
 );
 
 // Mark notification as read
@@ -245,7 +243,7 @@ notificationsRouter.patch('/:notificationId/read',
     windowMs: 60 * 1000,
     maxRequests: 200
   }),
-  async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
+  asyncHandler(async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
     try {
       const { notificationId } = req.params;
       const userId = req.user!.uid;
@@ -277,7 +275,7 @@ notificationsRouter.patch('/:notificationId/read',
         error: 'Failed to mark notification as read'
       });
     }
-  }
+  })
 );
 
 // Mark all notifications as read
@@ -286,7 +284,7 @@ notificationsRouter.patch('/read-all',
     windowMs: 60 * 1000,
     maxRequests: 10
   }),
-  async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
+  asyncHandler(async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
     try {
       const userId = req.user!.uid;
 
@@ -309,7 +307,7 @@ notificationsRouter.patch('/read-all',
         error: 'Failed to mark all notifications as read'
       });
     }
-  }
+  })
 );
 
 // Delete notification
@@ -318,7 +316,7 @@ notificationsRouter.delete('/:notificationId',
     windowMs: 60 * 1000,
     maxRequests: 100
   }),
-  async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
+  asyncHandler(async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
     try {
       const { notificationId } = req.params;
       const userId = req.user!.uid;
@@ -350,7 +348,7 @@ notificationsRouter.delete('/:notificationId',
         error: 'Failed to delete notification'
       });
     }
-  }
+  })
 );
 
 // Get notification preferences
@@ -359,7 +357,7 @@ notificationsRouter.get('/preferences',
     windowMs: 60 * 1000,
     maxRequests: 50
   }),
-  async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
+  asyncHandler(async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
     try {
       const userId = req.user!.uid;
 
@@ -382,7 +380,7 @@ notificationsRouter.get('/preferences',
         error: 'Failed to retrieve notification preferences'
       });
     }
-  }
+  })
 );
 
 // Update notification preferences
@@ -392,7 +390,7 @@ notificationsRouter.put('/preferences',
     windowMs: 60 * 1000,
     maxRequests: 20
   }),
-  async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
+  asyncHandler(async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
     try {
       const userId = req.user!.uid;
       const updates = req.body;
@@ -417,13 +415,13 @@ notificationsRouter.put('/preferences',
         error: 'Failed to update notification preferences'
       });
     }
-  }
+  })
 );
 
 // Get notification analytics (admin only)
 notificationsRouter.get('/analytics',
   requireRole(UserRole.ADMIN),
-  async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
+  asyncHandler(async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
     try {
       const options: AnalyticsOptions = {
         userId: req.query.userId as string,
@@ -455,12 +453,12 @@ notificationsRouter.get('/analytics',
         error: 'Failed to retrieve notification analytics'
       });
     }
-  }
+  })
 );
 
 // Get notification types and channels (for UI configuration)
 notificationsRouter.get('/config',
-  async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
+  asyncHandler(async (req: AuthenticatedRequest, res: AuthenticatedResponse) => {
     res.json({
       success: true,
       data: {
@@ -469,7 +467,7 @@ notificationsRouter.get('/config',
         priorities: Object.values(NotificationPriority)
       }
     });
-  }
+  })
 );
 
 export { notificationsRouter };

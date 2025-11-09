@@ -12,11 +12,11 @@ const TEST_CONFIG = {
   timeout: 30000
 };
 
-let request: supertest.SuperTest<supertest.Test>;
+let request: any; // Using any for deployment tests with URL
 
 describe('Security and Compliance Validation', () => {
   beforeAll(async () => {
-    request = supertest(TEST_CONFIG.baseUrl);
+    request = supertest.agent(TEST_CONFIG.baseUrl);
     
     if (admin.apps.length === 0) {
       admin.initializeApp({

@@ -179,7 +179,7 @@ export class DistributedLockManager {
         });
         
         if (this.config.enableMetrics) {
-          this._metrics.counter('distributed_locks.acquired', 1, {
+          this._metrics.incrementCounter('distributed_locks.acquired', {
             resource,
             owner
           });
@@ -199,7 +199,7 @@ export class DistributedLockManager {
         });
         
         if (this.config.enableMetrics) {
-          this._metrics.counter('distributed_locks.acquisition_failed', 1, {
+          this._metrics.incrementCounter('distributed_locks.acquisition_failed', {
             resource,
             owner,
             reason: result.error || 'unknown'
@@ -221,7 +221,7 @@ export class DistributedLockManager {
       });
       
       if (this.config.enableMetrics) {
-        this._metrics.counter('distributed_locks.acquisition_errors', 1, {
+        this._metrics.incrementCounter('distributed_locks.acquisition_errors', {
           resource,
           owner
         });
@@ -407,7 +407,7 @@ export class DistributedLockManager {
       });
       
       if (this.config.enableMetrics) {
-        this._metrics.counter('distributed_locks.released', 1, {
+        this._metrics.incrementCounter('distributed_locks.released', {
           resource: lock.resource,
           owner: lock.owner
         });
@@ -469,7 +469,7 @@ export class DistributedLockManager {
         });
         
         if (this.config.enableMetrics) {
-          this._metrics.counter('distributed_locks.renewed', 1, {
+          this._metrics.incrementCounter('distributed_locks.renewed', {
             resource: lock.resource,
             owner: lock.owner
           });
@@ -630,7 +630,7 @@ export class DistributedLockManager {
         });
         
         if (this.config.enableMetrics) {
-          this._metrics.counter('distributed_locks.expired_cleaned', expiredLocks.length);
+          this._metrics.recordValue('distributed_locks.expired_cleaned', expiredLocks.length);
         }
       }
       
@@ -853,7 +853,7 @@ export class OptimisticConcurrencyManager {
             updatedBy
           });
           
-          this._metrics.counter('optimistic_concurrency.conflicts', 1, {
+          this._metrics.incrementCounter('optimistic_concurrency.conflicts', {
             collection,
             updated_by: updatedBy
           });
@@ -901,7 +901,7 @@ export class OptimisticConcurrencyManager {
           updatedBy
         });
         
-        this._metrics.counter('optimistic_concurrency.updates_success', 1, {
+        this._metrics.incrementCounter('optimistic_concurrency.updates_success', {
           collection,
           updated_by: updatedBy
         });
@@ -917,7 +917,7 @@ export class OptimisticConcurrencyManager {
         updatedBy
       });
       
-      this._metrics.counter('optimistic_concurrency.updates_error', 1, {
+      this._metrics.incrementCounter('optimistic_concurrency.updates_error', {
         collection,
         updated_by: updatedBy
       });

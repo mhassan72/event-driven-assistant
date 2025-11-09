@@ -18,10 +18,13 @@ import {
   ImageGenerationRequest,
   ImageGenerationResult,
   ImageSize,
-  QualityLevel
+  ImageModel,
+  ImageQuality,
+  GenerationStatus
 } from '@/shared/types/image-generation';
 import { IStructuredLogger } from '@/shared/observability/logger';
 import { IMetricsCollector } from '@/shared/observability/metrics';
+import { createMockCreditTransaction, createMockImageGenerationResult } from '../helpers/mock-factories';
 
 // Mock dependencies
 const mockRealtimeDB = {
@@ -43,7 +46,7 @@ const mockFirestore = {
 } as unknown as jest.Mocked<Firestore>;
 
 const mockImageService = {
-  generateImage: jest.fn(),
+  generateImages: jest.fn(),
   generateBatchImages: jest.fn(),
   enhanceImage: jest.fn(),
   getGenerationStatus: jest.fn(),
@@ -112,7 +115,7 @@ describe('Image Generation Workflow Integration Tests', () => {
         prompt: 'A beautiful sunset over mountains with vibrant colors',
         model: 'black-forest-labs/flux-schnell',
         size: ImageSize.SQUARE_1024,
-        quality: QualityLevel.STANDARD,
+        quality: ImageQuality.STANDARD,
         quantity: 1,
         style: 'photorealistic',
         negativePrompt: 'blurry, low quality',
@@ -157,7 +160,7 @@ describe('Image Generation Workflow Integration Tests', () => {
         }
       };
 
-      mockImageService.generateImage.mockResolvedValue(expectedResult);
+      mockImageService.generateImages.mockResolvedValue(expectedResult);
       mockCreditService.validateBalance.mockResolvedValue(true);
       mockCreditService.deductCredits.mockResolvedValue({
         id: 'credit-txn-1',
@@ -172,7 +175,7 @@ describe('Image Generation Workflow Integration Tests', () => {
       });
 
       // Execute image generation workflow
-      const result = await mockImageService.generateImage(imageRequest);
+      const result = await mockImageService.generateImages(imageRequest);
 
       expect(result).toEqual(expectedResult);
       expect(result.status).toBe('completed');
@@ -195,7 +198,7 @@ describe('Image Generation Workflow Integration Tests', () => {
       );
 
       // Verify image generation call
-      expect(mockImageService.generateImage).toHaveBeenCalledWith(imageRequest);
+      expect(mockImageService.generateImages).toHaveBeenCalledWith(imageRequest);
     });
 
     it('should handle image generation with FLUX dev model', async () => {
@@ -205,7 +208,7 @@ describe('Image Generation Workflow Integration Tests', () => {
         prompt: 'A futuristic cityscape at night with neon lights',
         model: 'black-forest-labs/flux-dev',
         size: ImageSize.LANDSCAPE_1344_768,
-        quality: QualityLevel.HIGH,
+        quality: ImageQuality.HIGH,
         quantity: 1,
         style: 'cyberpunk',
         steps: 50,
@@ -248,10 +251,10 @@ describe('Image Generation Workflow Integration Tests', () => {
         }
       };
 
-      mockImageService.generateImage.mockResolvedValue(expectedResult);
+      mockImageService.generateImages.mockResolvedValue(expectedResult);
       mockCreditService.validateBalance.mockResolvedValue(true);
 
-      const result = await mockImageService.generateImage(imageRequest);
+      const result = await mockImageService.generateImages(imageRequest);
 
       expect(result).toEqual(expectedResult);
       expect(result.model).toBe('black-forest-labs/flux-dev');
@@ -267,7 +270,7 @@ describe('Image Generation Workflow Integration Tests', () => {
         prompt: 'An expensive image generation',
         model: 'black-forest-labs/flux-dev',
         size: ImageSize.SQUARE_1024,
-        quality: QualityLevel.HIGH,
+        quality: ImageQuality.HIGH,
         quantity: 1,
         metadata: {
           requestedAt: new Date(),
@@ -277,12 +280,12 @@ describe('Image Generation Workflow Integration Tests', () => {
       };
 
       mockCreditService.validateBalance.mockResolvedValue(false);
-      mockImageService.generateImage.mockRejectedValue(
+      mockImageService.generateImages.mockRejectedValue(
         new Error('Insufficient credits for image generation')
       );
 
       await expect(
-        mockImageService.generateImage(imageRequest)
+        mockImageService.generateImages(imageRequest)
       ).rejects.toThrow('Insufficient credits for image generation');
 
       expect(mockCreditService.validateBalance).toHaveBeenCalledWith(
@@ -303,7 +306,7 @@ describe('Image Generation Workflow Integration Tests', () => {
         prompt: 'Various landscape scenes',
         model: 'black-forest-labs/flux-schnell',
         size: ImageSize.SQUARE_1024,
-        quality: QualityLevel.STANDARD,
+        quality: ImageQuality.STANDARD,
         quantity: 4,
         variations: [
           'mountain landscape',
@@ -415,7 +418,7 @@ describe('Image Generation Workflow Integration Tests', () => {
         prompt: 'Batch with some failures',
         model: 'black-forest-labs/flux-schnell',
         size: ImageSize.SQUARE_1024,
-        quality: QualityLevel.STANDARD,
+        quality: ImageQuality.STANDARD,
         quantity: 3,
         variations: [
           'successful image 1',
@@ -508,7 +511,7 @@ describe('Image Generation Workflow Integration Tests', () => {
         originalImageUrl: 'https://storage.googleapis.com/bucket/original.png',
         enhancementType: 'upscale',
         targetSize: ImageSize.SQUARE_2048,
-        quality: QualityLevel.HIGH,
+        quality: ImageQuality.HIGH,
         parameters: {
           upscaleFactor: 2,
           preserveDetails: true,
@@ -578,7 +581,7 @@ describe('Image Generation Workflow Integration Tests', () => {
         prompt: 'A complex scene requiring progress tracking',
         model: 'black-forest-labs/flux-dev',
         size: ImageSize.LANDSCAPE_1344_768,
-        quality: QualityLevel.HIGH,
+        quality: ImageQuality.HIGH,
         quantity: 1,
         steps: 100, // More steps for detailed progress
         metadata: {
@@ -635,17 +638,18 @@ describe('Image Generation Workflow Integration Tests', () => {
       };
 
       mockImageService.cancelGeneration.mockResolvedValue(cancellationResult);
-      mockCreditService.deductCredits.mockResolvedValue({
-        id: 'refund-txn-1',
-        userId: 'user-cancel',
-        type: 'addition' as any,
-        amount: 30,
-        balanceBefore: 500,
-        balanceAfter: 530,
-        reason: 'Image generation cancellation refund',
-        timestamp: new Date(),
-        metadata: { requestId }
-      });
+      mockCreditService.deductCredits.mockResolvedValue(
+        createMockCreditTransaction({
+          id: 'refund-txn-1',
+          userId: 'user-cancel',
+          type: 'addition' as any,
+          amount: 30,
+          balanceBefore: 500,
+          balanceAfter: 530,
+          reason: 'Image generation cancellation refund',
+          metadata: { requestId, feature: 'image-generation', details: {} }
+        })
+      );
 
       const result = await mockImageService.cancelGeneration(requestId);
 
@@ -747,9 +751,9 @@ describe('Image Generation Workflow Integration Tests', () => {
         id: 'unavailable-model-req',
         userId: 'user-unavailable',
         prompt: 'Test with unavailable model',
-        model: 'unavailable-model',
+        model: ImageModel.FLUX_DEV as any, // Using valid model but will mock as unavailable
         size: ImageSize.SQUARE_1024,
-        quality: QualityLevel.STANDARD,
+        quality: ImageQuality.STANDARD,
         quantity: 1,
         metadata: {
           requestedAt: new Date(),
@@ -758,15 +762,15 @@ describe('Image Generation Workflow Integration Tests', () => {
         }
       };
 
-      mockImageService.generateImage.mockRejectedValue(
+      mockImageService.generateImages.mockRejectedValue(
         new Error('Model unavailable: unavailable-model')
       );
 
       await expect(
-        mockImageService.generateImage(imageRequest)
+        mockImageService.generateImages(imageRequest)
       ).rejects.toThrow('Model unavailable: unavailable-model');
 
-      expect(mockImageService.generateImage).toHaveBeenCalledWith(imageRequest);
+      expect(mockImageService.generateImages).toHaveBeenCalledWith(imageRequest);
     });
 
     it('should handle content policy violations', async () => {
@@ -774,9 +778,9 @@ describe('Image Generation Workflow Integration Tests', () => {
         id: 'policy-violation-req',
         userId: 'user-violation',
         prompt: 'Content that violates policy',
-        model: 'black-forest-labs/flux-schnell',
+        model: ImageModel.FLUX_SCHNELL,
         size: ImageSize.SQUARE_1024,
-        quality: QualityLevel.STANDARD,
+        quality: ImageQuality.STANDARD,
         quantity: 1,
         metadata: {
           requestedAt: new Date(),
@@ -785,40 +789,41 @@ describe('Image Generation Workflow Integration Tests', () => {
         }
       };
 
-      const policyViolationResult: ImageGenerationResult = {
-        id: 'policy-violation-result',
+      const policyViolationResult: ImageGenerationResult = createMockImageGenerationResult({
+        taskId: 'policy-violation-result',
         requestId: 'policy-violation-req',
         userId: 'user-violation',
-        status: 'failed',
+        status: GenerationStatus.FAILED,
         images: [],
-        prompt: violatingRequest.prompt,
-        model: violatingRequest.model,
-        generationTime: 2000,
         creditsUsed: 0, // No charge for policy violations
-        errors: [
-          {
-            code: 'CONTENT_POLICY_VIOLATION',
-            message: 'The provided prompt violates our content policy',
-            timestamp: new Date()
-          }
-        ],
+        error: {
+          code: 'CONTENT_POLICY_VIOLATION',
+          message: 'The provided prompt violates our content policy',
+          timestamp: new Date(),
+          severity: 'high' as any,
+          category: 'validation' as any
+        },
         metadata: {
-          completedAt: new Date(),
-          processingSteps: ['prompt_analysis', 'policy_check'],
-          policyViolation: true
+          requestId: 'policy-violation-req',
+          feature: 'image-generation',
+          details: {
+            completedAt: new Date(),
+            processingSteps: ['prompt_analysis', 'policy_check'],
+            policyViolation: true
+          }
         }
-      };
+      });
 
-      mockImageService.generateImage.mockResolvedValue(policyViolationResult);
+      mockImageService.generateImages.mockResolvedValue(policyViolationResult);
 
-      const result = await mockImageService.generateImage(violatingRequest);
+      const result = await mockImageService.generateImages(violatingRequest);
 
-      expect(result.status).toBe('failed');
+      expect(result.status).toBe(GenerationStatus.FAILED);
       expect(result.images).toHaveLength(0);
       expect(result.creditsUsed).toBe(0);
-      expect(result.errors).toHaveLength(1);
-      expect(result.errors[0].code).toBe('CONTENT_POLICY_VIOLATION');
-      expect(result.metadata.policyViolation).toBe(true);
+      expect(result.error).toBeDefined();
+      expect(result.error?.code).toBe('CONTENT_POLICY_VIOLATION');
+      expect(result.metadata.details.policyViolation).toBe(true);
     });
 
     it('should handle storage failures with retry mechanism', async () => {
@@ -826,9 +831,9 @@ describe('Image Generation Workflow Integration Tests', () => {
         id: 'storage-fail-req',
         userId: 'user-storage-fail',
         prompt: 'Image with storage issues',
-        model: 'black-forest-labs/flux-schnell',
+        model: ImageModel.FLUX_SCHNELL,
         size: ImageSize.SQUARE_1024,
-        quality: QualityLevel.STANDARD,
+        quality: ImageQuality.STANDARD,
         quantity: 1,
         metadata: {
           requestedAt: new Date(),

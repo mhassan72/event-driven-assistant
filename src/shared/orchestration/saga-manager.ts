@@ -114,7 +114,7 @@ export class SagaManager implements ISagaManager {
         definition_id: definition.id
       });
       
-      this.metrics.counter('saga.started', 1, {
+      this.metrics.incrementCounter('saga.started', {
         definition_id: definition.id
       });
       
@@ -128,7 +128,7 @@ export class SagaManager implements ISagaManager {
       });
       
       const errorInstance = error instanceof Error ? error : new Error(String(error));
-      this.metrics.counter('saga.start_errors', 1, {
+      this.metrics.incrementCounter('saga.start_errors', {
         definition_id: definition.id,
         error_type: this.categorizeError(errorInstance)
       });
@@ -229,7 +229,7 @@ export class SagaManager implements ISagaManager {
         status: compensationResult.status
       });
       
-      this.metrics.counter('saga.compensated', 1, {
+      this.metrics.incrementCounter('saga.compensated', {
         definition_id: sagaExecution.definition.id,
         status: compensationResult.status
       });
@@ -243,7 +243,7 @@ export class SagaManager implements ISagaManager {
       });
       
       const errorInstance = error instanceof Error ? error : new Error(String(error));
-      this.metrics.counter('saga.compensation_errors', 1, {
+      this.metrics.incrementCounter('saga.compensation_errors', {
         error_type: this.categorizeError(errorInstance)
       });
       

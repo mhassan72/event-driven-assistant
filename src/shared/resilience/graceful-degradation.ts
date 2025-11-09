@@ -255,7 +255,7 @@ export class GracefulDegradationManager {
         canDegrade: config.canDegrade
       });
       
-      this.metrics.counter('graceful_degradation.features_registered', 1, {
+      this.metrics.incrementCounter('graceful_degradation.features_registered', {
         feature_name: config.name,
         priority: config.priority.toString()
       });
@@ -512,7 +512,7 @@ export class GracefulDegradationManager {
       parameters: action.parameters
     });
     
-    this.metrics.counter('graceful_degradation.actions_executed', 1, {
+    this.metrics.incrementCounter('graceful_degradation.actions_executed', {
       feature_name: action.target,
       action_type: action.type
     });
@@ -690,9 +690,9 @@ export class GracefulDegradationManager {
         degradedFeatures: degradedFeatures.size
       });
       
-      this.metrics.gauge('graceful_degradation.current_level', level);
+      this.metrics.recordGauge('graceful_degradation.current_level', level);
       
-      this.metrics.counter('graceful_degradation.level_changes', 1, {
+      this.metrics.incrementCounter('graceful_degradation.level_changes', {
         from_level: previousLevel.toString(),
         to_level: level.toString()
       });
@@ -755,7 +755,7 @@ export class GracefulDegradationManager {
         `Reverted rules: ${rulesToRevert.join(', ')}`
       );
       
-      this.metrics.counter('graceful_degradation.reverts', rulesToRevert.length);
+      this.metrics.recordValue('graceful_degradation.reverts', rulesToRevert.length);
       
     } catch (error) {
       this.logger.error('Failed to revert degradations', {
@@ -971,7 +971,7 @@ export class GracefulDegradationManager {
       `Manual override: ${reason}`
     );
     
-    this.metrics.counter('graceful_degradation.manual_overrides', 1, {
+    this.metrics.incrementCounter('graceful_degradation.manual_overrides', {
       level: level.toString()
     });
   }

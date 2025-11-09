@@ -41,6 +41,33 @@ jest.mock('firebase-admin', () => ({
   }))
 }));
 
+// Mock singleton services that start intervals to prevent open handles
+jest.mock('../src/shared/observability/health-checker', () => ({
+  HealthChecker: {
+    getInstance: jest.fn(() => ({
+      registerCheck: jest.fn(),
+      runHealthCheck: jest.fn(),
+      getHealthStatus: jest.fn(),
+      stop: jest.fn()
+    }))
+  }
+}));
+
+jest.mock('../src/shared/observability/performance-monitor', () => ({
+  PerformanceMonitor: {
+    getInstance: jest.fn(() => ({
+      recordMetric: jest.fn(),
+      getMetrics: jest.fn(),
+      stop: jest.fn()
+    }))
+  },
+  performanceMonitor: {
+    recordMetric: jest.fn(),
+    getMetrics: jest.fn(),
+    stop: jest.fn()
+  }
+}));
+
 // Mock console methods to reduce noise in tests
 const originalConsoleWarn = console.warn;
 const originalConsoleError = console.error;

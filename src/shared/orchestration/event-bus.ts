@@ -123,7 +123,7 @@ export class EventBus implements IEventBus {
         subscriber_count: subscribers.length.toString()
       });
       
-      this.metrics.counter('event_bus.events_published', 1, {
+      this.metrics.incrementCounter('event_bus.events_published', {
         event_type: event.type,
         priority: event.metadata.priority
       });
@@ -142,7 +142,7 @@ export class EventBus implements IEventBus {
         error: error instanceof Error ? error.message : 'Unknown error'
       });
       
-      this.metrics.counter('event_bus.publish_errors', 1, {
+      this.metrics.incrementCounter('event_bus.publish_errors', {
         event_type: event.type,
         error_type: 'publish_failed'
       });
@@ -333,7 +333,7 @@ export class EventBus implements IEventBus {
       await this.dlqProcessor.addMessage(dlqMessage);
       
       // Update metrics
-      this.metrics.counter('event_bus.dlq_messages', 1, {
+      this.metrics.incrementCounter('event_bus.dlq_messages', {
         event_type: event.type,
         error_type: this.categorizeError(error)
       });
@@ -401,8 +401,8 @@ export class EventBus implements IEventBus {
       }
       
       // Update metrics
-      this.metrics.counter('event_bus.dlq_reprocessed', successfulMessages);
-      this.metrics.counter('event_bus.dlq_failed_reprocess', failedMessages);
+      this.metrics.recordValue('event_bus.dlq_reprocessed', successfulMessages);
+      this.metrics.recordValue('event_bus.dlq_failed_reprocess', failedMessages);
       
       return {
         totalMessages: messages.length,
@@ -492,7 +492,7 @@ export class EventBus implements IEventBus {
     } catch (error) {
       const errorInstance = error instanceof Error ? error : new Error(String(error));
       // Update error metrics
-      this.metrics.counter('event_bus.handler_errors', 1, {
+      this.metrics.incrementCounter('event_bus.handler_errors', {
         event_type: event.type,
         subscription_id: subscription.subscription.id,
         error_type: this.categorizeError(errorInstance)

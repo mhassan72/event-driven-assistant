@@ -275,7 +275,7 @@ export class DataConsistencyManager {
         enabled: rule.enabled
       });
       
-      this.metrics.counter('data_consistency.rules_registered', 1, {
+      this.metrics.incrementCounter('data_consistency.rules_registered', {
         rule_type: rule.type,
         severity: rule.severity
       });
@@ -382,13 +382,13 @@ export class DataConsistencyManager {
         violationsFound: checkResult.violationsFound
       });
       
-      this.metrics.counter('data_consistency.checks_completed', 1, {
+      this.metrics.incrementCounter('data_consistency.checks_completed', {
         rule_type: rule.type,
         rule_name: rule.name,
         violations_found: checkResult.violationsFound.toString()
       });
       
-      this.metrics.histogram('data_consistency.check_duration', checkResult.duration, {
+      this.metrics.recordHistogram('data_consistency.check_duration', checkResult.duration, {
         rule_type: rule.type,
         success: 'true'
       });
@@ -421,7 +421,7 @@ export class DataConsistencyManager {
         metadata: {}
       };
       
-      this.metrics.counter('data_consistency.checks_failed', 1, {
+      this.metrics.incrementCounter('data_consistency.checks_failed', {
         rule_type: rule.type,
         rule_name: rule.name
       });
@@ -475,7 +475,7 @@ export class DataConsistencyManager {
       affectedDocuments: violation.affectedDocuments.length
     });
     
-    this.metrics.counter('data_consistency.violations_detected', 1, {
+    this.metrics.incrementCounter('data_consistency.violations_detected', {
       rule_type: rule.type,
       severity: rule.severity,
       rule_name: rule.name
@@ -546,7 +546,7 @@ export class DataConsistencyManager {
         changesApplied: repairChanges?.length || 0
       });
       
-      this.metrics.counter('data_consistency.repairs_success', 1, {
+      this.metrics.incrementCounter('data_consistency.repairs_success', {
         rule_type: rule.type,
         severity: violation.severity,
         strategy: RepairStrategy.AUTOMATIC
@@ -579,7 +579,7 @@ export class DataConsistencyManager {
         duration: Date.now() - startTime
       });
       
-      this.metrics.counter('data_consistency.repairs_failed', 1, {
+      this.metrics.incrementCounter('data_consistency.repairs_failed', {
         rule_type: rule.type,
         severity: violation.severity,
         strategy: RepairStrategy.AUTOMATIC
@@ -636,7 +636,7 @@ export class DataConsistencyManager {
         repairedBy
       });
       
-      this.metrics.counter('data_consistency.repairs_success', 1, {
+      this.metrics.incrementCounter('data_consistency.repairs_success', {
         severity: violation.severity,
         strategy: RepairStrategy.MANUAL
       });

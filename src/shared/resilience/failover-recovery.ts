@@ -209,7 +209,7 @@ export class FailoverRecoveryManager {
       // Start health monitoring
       this.startServiceHealthCheck(config.name);
       
-      this._metrics.counter('failover_manager.services_registered', 1, {
+      this._metrics.incrementCounter('failover_manager.services_registered', {
         service_type: config.type,
         service_name: config.name
       });
@@ -251,7 +251,7 @@ export class FailoverRecoveryManager {
       // Remove from Firestore
       await this._firestore.collection('service_registry').doc(serviceName).delete();
       
-      this._metrics.counter('failover_manager.services_unregistered', 1, {
+      this._metrics.incrementCounter('failover_manager.services_unregistered', {
         service_name: serviceName
       });
       
@@ -489,7 +489,7 @@ export class FailoverRecoveryManager {
         failureCount: service.failureCount
       });
       
-      this._metrics.counter('failover_manager.health_status_changes', 1, {
+      this._metrics.incrementCounter('failover_manager.health_status_changes', {
         service_name: serviceName,
         from_status: previousStatus,
         to_status: healthResult.status
@@ -556,7 +556,7 @@ export class FailoverRecoveryManager {
           serviceType: fromService.config.type
         });
         
-        this._metrics.counter('failover_manager.failover_no_backup', 1, {
+        this._metrics.incrementCounter('failover_manager.failover_no_backup', {
           service_name: fromServiceName,
           service_type: fromService.config.type
         });
@@ -627,13 +627,13 @@ export class FailoverRecoveryManager {
           duration: failoverDuration
         });
         
-        this._metrics.counter('failover_manager.failovers_success', 1, {
+        this._metrics.incrementCounter('failover_manager.failovers_success', {
           from_service: fromServiceName,
           to_service: backupService.config.name,
           strategy: fromService.config.failoverStrategy
         });
         
-        this._metrics.histogram('failover_manager.failover_duration', failoverDuration, {
+        this._metrics.recordHistogram('failover_manager.failover_duration', failoverDuration, {
           strategy: fromService.config.failoverStrategy,
           success: 'true'
         });
@@ -649,7 +649,7 @@ export class FailoverRecoveryManager {
           duration: failoverDuration
         });
         
-        this._metrics.counter('failover_manager.failovers_failed', 1, {
+        this._metrics.incrementCounter('failover_manager.failovers_failed', {
           from_service: fromServiceName,
           to_service: backupService.config.name,
           strategy: fromService.config.failoverStrategy
@@ -940,7 +940,7 @@ export class FailoverRecoveryManager {
           this.recoveryCheckTimers.delete(serviceName);
         }
         
-        this._metrics.counter('failover_manager.recoveries_success', 1, {
+        this._metrics.incrementCounter('failover_manager.recoveries_success', {
           service_name: serviceName,
           strategy: service.config.recoveryStrategy
         });
@@ -952,7 +952,7 @@ export class FailoverRecoveryManager {
           duration: recoveryDuration
         });
         
-        this._metrics.counter('failover_manager.recoveries_failed', 1, {
+        this._metrics.incrementCounter('failover_manager.recoveries_failed', {
           service_name: serviceName,
           strategy: service.config.recoveryStrategy
         });

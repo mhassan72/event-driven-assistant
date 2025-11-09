@@ -15,14 +15,14 @@ const TEST_CONFIG = {
   retryDelay: 2000
 };
 
-let request: supertest.SuperTest<supertest.Test>;
+let request: any; // Using any for deployment tests with URL
 let testUserId: string;
 let testUserToken: string;
 
 describe('Production Deployment Smoke Tests', () => {
   beforeAll(async () => {
-    // Initialize test client
-    request = supertest(TEST_CONFIG.baseUrl);
+    // Initialize test client with agent for URL-based testing
+    request = supertest.agent(TEST_CONFIG.baseUrl);
     
     // Create test user for authenticated endpoints
     if (admin.apps.length === 0) {

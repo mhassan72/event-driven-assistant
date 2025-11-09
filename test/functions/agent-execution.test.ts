@@ -13,6 +13,7 @@ import { CreditService } from '@/features/credit-system/services/credit-service'
 import { TaskType, TaskStatus, TaskPriority } from '@/shared/types/ai-assistant';
 import { IStructuredLogger } from '@/shared/observability/logger';
 import { IMetricsCollector } from '@/shared/observability/metrics';
+import { createMockCreditTransaction, createMockExecutionResult } from '../helpers/mock-factories';
 
 // Mock dependencies
 const mockRealtimeDB = {
@@ -74,9 +75,14 @@ const mockLogger: jest.Mocked<IStructuredLogger> = {
 };
 
 const mockMetrics: jest.Mocked<IMetricsCollector> = {
-  increment: jest.fn(),
-  gauge: jest.fn(),
+  incrementCounter: jest.fn(),
+  recordValue: jest.fn(),
+  recordHistogram: jest.fn(),
+  recordGauge: jest.fn(),
+  counter: jest.fn(),
   histogram: jest.fn(),
+  gauge: jest.fn(),
+  startTimer: jest.fn(() => ({ end: jest.fn() })),
   recordHttpRequest: jest.fn(),
   recordCreditOperation: jest.fn(),
   recordPayment: jest.fn(),
@@ -139,7 +145,7 @@ describe('Agent Execution Integration Tests', () => {
       mockLangGraphManager.executeWorkflowDefinition.mockResolvedValue({
         id: 'workflow-exec-1',
         workflowId: 'research-workflow',
-        status: 'completed',
+        status: 'COMPLETED' as any,
         output: {
           data: {
             synthesis: 'Comprehensive research on quantum computing developments...',
@@ -163,17 +169,19 @@ describe('Agent Execution Integration Tests', () => {
       });
 
       // Mock credit deduction
-      mockCreditService.deductCredits.mockResolvedValue({
-        id: 'credit-txn-1',
-        userId: 'user-123',
-        type: 'deduction' as any,
-        amount: 75,
-        balanceBefore: 1000,
-        balanceAfter: 925,
-        reason: 'Agent task: research_task',
-        timestamp: new Date(),
-        metadata: { taskId: 'research-task-1' }
-      });
+      mockCreditService.deductCredits.mockResolvedValue(
+        createMockCreditTransaction({
+          id: 'credit-txn-1',
+          userId: 'user-123',
+          type: 'deduction' as any,
+          amount: 75,
+          balanceBefore: 1000,
+          balanceAfter: 925,
+          reason: 'Agent task: research_task',
+          timestamp: new Date(),
+          metadata: { taskId: 'research-task-1', feature: 'agent-execution', details: {} }
+        })
+      );
 
       // Execute the agent task
       const event = {
@@ -426,7 +434,7 @@ describe('Agent Execution Integration Tests', () => {
       mockLangGraphManager.executeWorkflowDefinition.mockResolvedValue({
         id: 'workflow-exec-2',
         workflowId: 'custom-workflow',
-        status: 'completed',
+        status: 'COMPLETED' as any,
         output: {
           data: {
             final_result: 'Comprehensive project plan completed',

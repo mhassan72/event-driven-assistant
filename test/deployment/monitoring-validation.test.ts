@@ -16,12 +16,12 @@ const TEST_CONFIG = {
   timeout: 30000
 };
 
-let request: supertest.SuperTest<supertest.Test>;
+let request: any; // Using any for deployment tests with URL
 let adminToken: string;
 
 describe('Monitoring and Alerting Validation', () => {
   beforeAll(async () => {
-    request = supertest(TEST_CONFIG.baseUrl);
+    request = supertest.agent(TEST_CONFIG.baseUrl);
     
     // Create admin user for monitoring endpoints
     if (admin.apps.length === 0) {

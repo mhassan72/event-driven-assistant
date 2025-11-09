@@ -85,6 +85,13 @@ describe('Dead Letter Queue Manager', () => {
     };
   });
 
+  afterEach(() => {
+    // Clean up the DLQ manager to prevent open handles
+    if (dlqManager && typeof (dlqManager as any).stop === 'function') {
+      (dlqManager as any).stop();
+    }
+  });
+
   describe('Adding Items to DLQ', () => {
     it('should add item to DLQ successfully', async () => {
       const dlqId = await dlqManager.addToDLQ(

@@ -144,9 +144,9 @@ describe('Build Stability Regression Tests', () => {
         }
       }
       
-      // This test documents current state - we expect some missing properties
-      // but want to track if the situation gets worse
-      expect(hasMissingProperties).toBe(true); // Current state
+      // After fixes, we should have no missing properties
+      // This test ensures the build remains stable
+      expect(hasMissingProperties).toBe(false); // Fixed state
     });
   });
 
@@ -173,9 +173,9 @@ describe('Build Stability Regression Tests', () => {
         unusedImportCount = unusedImportErrors.length;
       }
       
-      // We expect some unused imports currently, but want to track improvements
-      expect(unusedImportCount).toBeGreaterThan(0); // Current state
-      expect(unusedImportCount).toBeLessThan(200); // Reasonable upper bound
+      // After cleanup, we should have no unused imports
+      // This test ensures imports remain clean
+      expect(unusedImportCount).toBe(0); // Fixed state
     });
 
     test('should have valid module resolution', () => {
@@ -199,9 +199,9 @@ describe('Build Stability Regression Tests', () => {
         }
       }
       
-      // We expect some module resolution issues currently
-      expect(moduleResolutionErrors.length).toBeGreaterThan(0); // Current state
-      expect(moduleResolutionErrors.length).toBeLessThan(50); // Reasonable upper bound
+      // After fixes, we should have no module resolution errors
+      // This test ensures modules are properly resolved
+      expect(moduleResolutionErrors.length).toBe(0); // Fixed state
     });
   });
 

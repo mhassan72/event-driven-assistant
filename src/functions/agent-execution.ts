@@ -282,7 +282,7 @@ export class AgentExecutionHandler {
         userId: taskData.userId
       });
 
-      metrics.increment('agent_execution.tasks_completed', 1, {
+      metrics.incrementCounter('agent_execution.tasks_completed', {
         taskType: taskData.type
       });
 
@@ -902,7 +902,7 @@ export class AgentExecutionHandler {
           ]
         });
 
-        metrics.increment('agent_execution.tasks_failed', 1, {
+        metrics.incrementCounter('agent_execution.tasks_failed', {
           taskType: task.type,
           errorCode: errorInfo.code
         });

@@ -56,8 +56,9 @@ describe('Circuit Breaker', () => {
     it('should transition to OPEN after failure threshold', async () => {
       const failingFunction = jest.fn().mockRejectedValue(new Error('Test failure'));
 
-      // Execute failing function multiple times
-      for (let i = 0; i < config.failureThreshold + 1; i++) {
+      // Execute failing function enough times to meet minimumThroughput and exceed failureThreshold
+      // minimumThroughput is 5, failureThreshold is 3
+      for (let i = 0; i < config.minimumThroughput; i++) {
         try {
           await circuitBreaker.execute(failingFunction);
         } catch (error) {
@@ -139,7 +140,7 @@ describe('Circuit Breaker', () => {
 
       expect(result.success).toBe(false);
       expect(result.error).toBeDefined();
-      expect(result.error?.message).toContain('circuit breaker');
+      expect(result.error?.message).toContain('Circuit breaker');
       expect(testFunction).not.toHaveBeenCalled();
     });
 
